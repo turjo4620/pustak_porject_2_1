@@ -14,9 +14,13 @@ export function AppProvider({ children }) {
   const [wishOpen, setWishOpen]     = useState(false)
   const [previewBook, setPreviewBook] = useState(null)
 
-  // Auth (persisted to localStorage)
+  // Auth (persisted to localStorage — customer only, never admin)
   const [authUser, setAuthUserState] = useState(() => {
     try {
+      const userType = localStorage.getItem('pustak-user-type')
+      // If the stored session is an admin session, do NOT restore authUser.
+      // Admin auth is handled separately via adminToken.
+      if (userType === 'admin') return null
       const raw = localStorage.getItem('pustak-auth-user')
       return raw ? JSON.parse(raw) : null
     } catch (e) {
@@ -139,10 +143,8 @@ export function AppProvider({ children }) {
   const totalCartPrice = cartTotal
 
   // Places an order from the current cart. Returns the created order row.
-  const placeOrder = async (addressId, couponCode = null) => {
-    const order = await api.post('/orders', { addressId, couponCode })
-    // Don't clear cart state here — keep items visible if user navigates back.
-    // Cart will be refreshed from DB on next fetchCart() call.
+  const placeOrder = async (addressId, couponCode = null, deliveryCharge = 0) => {
+    const order = await api.post('/orders', { addressId, couponCode, deliveryCharge })
     return order
   }
 

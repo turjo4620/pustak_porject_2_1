@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import './styles/App.css'
 
 import { AppProvider } from './context/AppContext'
@@ -55,6 +55,21 @@ function ScrollToTop() {
   return null
 }
 
+// Redirect admin sessions away from customer routes to /login
+function CustomerGuard({ children }) {
+  const location = useLocation()
+  const userType   = localStorage.getItem('pustak-user-type')
+  const adminToken = localStorage.getItem('adminToken')
+  const isAdminRoute = location.pathname.startsWith('/admin')
+  const isAuthRoute  = location.pathname === '/login' || location.pathname === '/register'
+
+  if (!isAdminRoute && !isAuthRoute && userType === 'admin' && adminToken) {
+    // Push /login onto history so the browser back button works normally
+    return <Navigate to="/login" />
+  }
+  return children
+}
+
 function Layout({ children, isDarkMode, toggleDarkMode }) {
   const location = useLocation()
   const isAdminRoute = location.pathname.startsWith('/admin')
@@ -80,6 +95,7 @@ export default function App() {
       <AppProvider>
         <ScrollToTop />
         <Layout isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)}>
+          <CustomerGuard>
           <Routes>
             <Route path="/"                  element={<HomePage />} />
             <Route path="/book/:id"          element={<BookDetailPage />} />
@@ -134,6 +150,7 @@ export default function App() {
             <Route path="/settings"          element={<LoginPage />} />
             <Route path="*"                  element={<NotFoundPage />} />
           </Routes>
+          </CustomerGuard>
         </Layout>
       </AppProvider>
     </BrowserRouter>

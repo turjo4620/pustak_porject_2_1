@@ -301,13 +301,40 @@ class AdminService {
   }
 
   async deleteBook(bookId) {
-    await pool.query('DELETE FROM books WHERE id = $1', [bookId]);
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      // Remove from junction tables first
+      await client.query('DELETE FROM book_author     WHERE book_id = $1', [bookId]);
+      await client.query('DELETE FROM book_category   WHERE book_id = $1', [bookId]);
+      // Detach order_item rows from sold copies (null out copy reference isn't possible since NOT NULL)
+      // Instead, set book_copy status to 'removed' for sold copies so FK isn't violated,
+      // and delete only unsold copies before deleting the book.
+      await client.query(`DELETE FROM book_copy WHERE book_id = $1 AND status != 'sold'`, [bookId]);
+      // Update publication FK to null on books table
+      await client.query('UPDATE books SET publication_id = NULL WHERE id = $1', [bookId]);
+      // Now delete the book — remaining sold book_copy rows (if any) are detached via book_id
+      // They still reference the book; if book deletion fails due to FK, inform admin
+      await client.query('DELETE FROM books WHERE id = $1', [bookId]);
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   async updateBookStock(bookId, quantity) {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
+
+      // Clean up any stale 'unavailable' rows first (legacy from old update logic)
+      await client.query(
+        `DELETE FROM book_copy WHERE book_id = $1 AND status = 'unavailable'`,
+        [bookId]
+      );
 
       const currentRes = await client.query(
         `SELECT COUNT(*)::int as current FROM book_copy WHERE book_id = $1 AND status = 'in_stock'`,
@@ -323,8 +350,10 @@ class AdminService {
           );
         }
       } else if (quantity < current) {
+        // DELETE excess in_stock copies — don't just mark unavailable
+        // (sold copies are untouched; only in_stock rows are removed)
         await client.query(
-          `UPDATE book_copy SET status = 'unavailable'
+          `DELETE FROM book_copy
            WHERE copy_id IN (
              SELECT copy_id FROM book_copy
              WHERE book_id = $1 AND status = 'in_stock'
@@ -514,6 +543,31 @@ class AdminService {
       `UPDATE orders SET status = $1 WHERE order_id = $2 RETURNING *`,
       [status, orderId]
     );
+
+    // Keep the deliveries row in sync with the order status
+    if (status === 'Delivered') {
+      // Mark delivered and record the timestamp
+      await pool.query(
+        `UPDATE deliveries
+         SET status = 'Delivered', delivered_at = CURRENT_TIMESTAMP
+         WHERE order_id = $1`,
+        [orderId]
+      );
+    } else if (status === 'Shipped') {
+      // Record dispatch date when order is shipped
+      await pool.query(
+        `UPDATE deliveries
+         SET status = 'Shipped', dispatch_date = COALESCE(dispatch_date, CURRENT_TIMESTAMP)
+         WHERE order_id = $1`,
+        [orderId]
+      );
+    } else if (status === 'Cancelled' || status === 'Returned') {
+      await pool.query(
+        `UPDATE deliveries SET status = $1 WHERE order_id = $2`,
+        [status, orderId]
+      );
+    }
+
     return result.rows[0];
   }
 

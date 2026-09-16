@@ -3,8 +3,10 @@ const orderService = require('../services/orderService');
 
 async function placeOrder(req, res, next) {
   try {
-    const { addressId, couponCode } = req.body;
-    const order = await orderService.placeOrderFromCart(req.userId, addressId, couponCode || null);
+    const { addressId, couponCode, deliveryCharge } = req.body;
+    const order = await orderService.placeOrderFromCart(
+      req.userId, addressId, couponCode || null, Number(deliveryCharge) || 0
+    );
     res.status(201).json(order);
   } catch (err) {
     next(err);
@@ -40,13 +42,14 @@ async function getTracking(req, res, next) {
 
 async function buyNow(req, res, next) {
   try {
-    const { bookId, quantity, addressId, couponCode } = req.body;
+    const { bookId, quantity, addressId, deliveryCharge, couponCode } = req.body;
     if (!bookId) return res.status(400).json({ message: 'bookId is required' });
     const order = await orderService.placeBuyNowOrder(
       req.userId,
       bookId,
       parseInt(quantity) || 1,
       addressId || null,
+      Number(deliveryCharge) || 0,
       couponCode || null
     );
     res.status(201).json(order);
