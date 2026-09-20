@@ -25,7 +25,7 @@ export default function NewlyReleased() {
           title="সদ্য প্রকাশিত"
           subtitle="সর্বশেষ প্রকাশিত বই"
           linkText="সব নতুন বই"
-          linkTo="/new-arrivals"
+          linkHref="/new-arrivals"
         />
         <div className="newly__grid">
           {books.slice(0, 8).map(book => (

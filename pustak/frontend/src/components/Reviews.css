@@ -59,3 +59,16 @@
 .review-card__date {
   font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-sans);
 }
+
+/* ── review-card link style ── */
+.review-card__book {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  text-decoration: none;
+  font-family: var(--font-sans);
+  transition: opacity var(--transition-fast);
+}
+.review-card__book:hover { opacity: 0.75; }

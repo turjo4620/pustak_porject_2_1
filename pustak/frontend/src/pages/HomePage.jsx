@@ -1,6 +1,6 @@
 import Hero from '../components/Hero'
 import SearchBar from '../components/SearchBar'
-import FeaturedCollections from '../components/FeaturedCollections'
+import AuthorsMarquee from '../components/AuthorsMarquee'
 import BestSellers from '../components/BestSellers'
 import NewlyReleased from '../components/NewlyReleased'
 import Recommendations from '../components/Recommendations'
@@ -16,7 +16,7 @@ export default function HomePage() {
     <>
       <Hero />
       <SearchBar />
-      <FeaturedCollections />
+      <AuthorsMarquee />
       <BestSellers />
       <NewlyReleased />
       <Recommendations />

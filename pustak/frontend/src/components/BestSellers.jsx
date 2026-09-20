@@ -63,6 +63,7 @@ export default function BestSellers() {
           title="সবচেয়ে বেশি পড়া বই"
           subtitle="পাঠকদের প্রিয় — এ মাসের সেরা বিক্রয়"
           linkText="সব দেখুন"
+          linkHref="/bestsellers"
         />
       </div>
 
