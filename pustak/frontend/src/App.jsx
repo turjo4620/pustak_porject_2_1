@@ -30,6 +30,7 @@ import AccountProfileCard     from './pages/AccountProfileCard'
 import AccountOrders          from './pages/AccountOrders'
 import AccountWishlist        from './pages/AccountWishlist'
 import AccountReviews         from './pages/AccountReviews'
+import AccountReturns         from './pages/AccountReturns'
 import PaymentPage            from './pages/PaymentPage'
 import OrderSuccessPage       from './pages/OrderSuccessPage'
 import OrderDetailPage        from './pages/OrderDetailPage'
@@ -111,6 +112,7 @@ export default function App() {
               <Route path="orders" element={<AccountOrders />} />
               <Route path="orders/:orderId" element={<OrderDetailPage />} />
               <Route path="wishlist" element={<AccountWishlist />} />
+              <Route path="returns" element={<AccountReturns />} />
               <Route path="reviews" element={<AccountReviews />} />
             </Route>
 

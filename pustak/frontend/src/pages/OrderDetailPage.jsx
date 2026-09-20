@@ -8,6 +8,7 @@ import {
 import { api } from '../api/http'
 import { useApp } from '../context/AppContext'
 import { ORDER_STAGES, statusIndex, isStageDone } from '../utils/orderStages'
+import ReturnModal from '../components/ReturnModal'
 import './OrderDetailPage.css'
 
 // ── Bengali helpers ──────────────────────────────────────────────────────
@@ -147,6 +148,47 @@ function ReviewBtn({ book }) {
   )
 }
 
+// ── Return status badge / button ─────────────────────────────────────────
+const RETURN_STATUS_BN = {
+  Requested: { label: 'রিটার্ন পেন্ডিং', cls: 'odp__return-badge--pending'  },
+  Approved:  { label: 'রিটার্ন অনুমোদিত', cls: 'odp__return-badge--approved' },
+  Rejected:  { label: 'রিটার্ন বাতিল',   cls: 'odp__return-badge--rejected' },
+}
+
+function ReturnItemCell({ item, returnRow, onRequest }) {
+  if (returnRow) {
+    const info = RETURN_STATUS_BN[returnRow.return_status] || {
+      label: returnRow.return_status,
+      cls: '',
+    }
+    // If approved and refund exists, show refund status too
+    const refundLabel =
+      returnRow.refund_status === 'Processed'
+        ? ' · রিফান্ড সম্পন্ন'
+        : returnRow.refund_status === 'Pending' && returnRow.return_status === 'Approved'
+        ? ' · রিফান্ড প্রক্রিয়াধীন'
+        : ''
+
+    return (
+      <span className={`odp__return-badge ${info.cls}`}>
+        <RotateCcw size={11} />
+        {info.label}{refundLabel}
+      </span>
+    )
+  }
+
+  return (
+    <button
+      className="odp__return-btn"
+      onClick={onRequest}
+      title={`${item.book_name} রিটার্ন করুন`}
+    >
+      <RotateCcw size={13} />
+      রিটার্ন করুন
+    </button>
+  )
+}
+
 // ── Invoice print/download ───────────────────────────────────────────────
 function downloadInvoice(order, items, address, payment) {
   const rows = items.map(item => `
@@ -223,19 +265,31 @@ export default function OrderDetailPage() {
   const [reordering, setReordering] = useState(false)
   const [cancelDone, setCancelDone] = useState(false)
 
+  // ── Return state ──────────────────────────────────────────────
+  // returnMap: { [order_item_id]: { return_status, refund_status } }
+  const [returnMap,    setReturnMap]    = useState({})
+  const [returnModal,  setReturnModal]  = useState(null)  // item object or null
+
   // Fetch order + tracking in parallel
   useEffect(() => {
     setLoading(true)
     Promise.all([
       api.get(`/orders/${orderId}`),
       api.get(`/orders/${orderId}/tracking`).catch(() => null),
+      api.get(`/returns/order/${orderId}`).catch(() => null),
     ])
-      .then(([orderData, trackData]) => {
+      .then(([orderData, trackData, returnsData]) => {
         setOrder(orderData.order   || null)
         setItems(orderData.items   || [])
         setAddress(orderData.address || null)
         setPayment(orderData.payment || null)
         if (trackData?.delivery) setDelivery(trackData.delivery)
+        // Build a lookup map: order_item_id → return row
+        if (returnsData?.data?.length) {
+          const map = {}
+          returnsData.data.forEach((r) => { map[r.order_item_id] = r })
+          setReturnMap(map)
+        }
       })
       .catch(err => setError(err.message || 'অর্ডারের তথ্য লোড করা যায়নি'))
       .finally(() => setLoading(false))
@@ -336,6 +390,7 @@ export default function OrderDetailPage() {
   }
 
   return (
+    <>
     <div className="odp">
       <div className="odp__wrap">
 
@@ -486,7 +541,14 @@ export default function OrderDetailPage() {
                       <td className="odp__td odp__td--num odp__td--total">৳{fmtAmt(lineTotal)}</td>
                       {isDelivered && (
                         <td className="odp__td odp__td--action">
-                          <ReviewBtn book={item} />
+                          <div className="odp__item-actions">
+                            <ReviewBtn book={item} />
+                            <ReturnItemCell
+                              item={item}
+                              returnRow={returnMap[item.order_item_id]}
+                              onRequest={() => setReturnModal(item)}
+                            />
+                          </div>
                         </td>
                       )}
                     </tr>
@@ -631,5 +693,25 @@ export default function OrderDetailPage() {
 
       </div>
     </div>
+
+    {/* ── Return request modal — portalled to <body> ── */}
+    {returnModal && (
+      <ReturnModal
+        item={returnModal}
+        onClose={() => setReturnModal(null)}
+        onSuccess={(newReturn) => {
+          setReturnMap((prev) => ({
+            ...prev,
+            [newReturn.order_item_id]: {
+              return_status:  newReturn.status,
+              refund_status:  null,
+              order_item_id:  newReturn.order_item_id,
+            },
+          }))
+          setReturnModal(null)
+        }}
+      />
+    )}
+    </>
   )
 }

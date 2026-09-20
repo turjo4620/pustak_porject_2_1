@@ -11,6 +11,20 @@ const getAuthors = async (req, res) => {
     }
 };
 
+const getAuthorByName = async (req, res) => {
+    try {
+        const { name } = req.params;
+        const author = await authorService.getAuthorByName(decodeURIComponent(name));
+        if (!author) {
+            return res.status(404).json({ success: false, message: 'Author not found' });
+        }
+        return res.status(200).json({ success: true, data: author });
+    } catch (error) {
+        console.error('Error fetching author by name:', error.message);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};
+
 const getAuthor = async (req, res) => {
     try {
         const {id} = req.params;
@@ -74,6 +88,7 @@ const deleteAuthor = async (req, res) => {
 module.exports = { 
     getAuthors, 
     getAuthor,
+    getAuthorByName,
     createAuthor,
     updateAuthor,
     deleteAuthor

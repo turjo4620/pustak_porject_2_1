@@ -31,6 +31,25 @@ const getAuthorByID = async (id) => {
     return result.rows[0];
 };
 
+const getAuthorByName = async (name) => {
+    // Join with book_author so we can return the book count alongside
+    const result = await pool.query(
+        `SELECT
+            a.author_id,
+            a.name,
+            a.bio,
+            a.photo_url,
+            COUNT(ba.book_id) AS count
+         FROM authors a
+         LEFT JOIN book_author ba ON a.author_id = ba.author_id
+         WHERE a.name ILIKE $1
+         GROUP BY a.author_id
+         LIMIT 1`,
+        [name]
+    );
+    return result.rows[0] || null;
+};
+
 const createAuthor = async (authorData) => {
     const { name, bio, photo_url } = authorData;
     const query = `
@@ -63,6 +82,7 @@ const deleteAuthor = async (id) => {
 module.exports = { 
     getAllAuthors,
     getAuthorByID,
+    getAuthorByName,
     createAuthor,
     updateAuthor,
     deleteAuthor

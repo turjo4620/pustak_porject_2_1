@@ -1,13 +1,14 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { User, Package, Heart, Star, LogOut, Camera } from 'lucide-react'
+import { User, Package, Heart, Star, LogOut, Camera, RotateCcw } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import './account-dashboard.css'
 
 const NAV_ITEMS = [
-  { to: '/account/info',     icon: User,    label: 'আমার তথ্য' },
-  { to: '/account/orders',   icon: Package, label: 'অর্ডার ও ট্র্যাকিং' },
-  { to: '/account/wishlist', icon: Heart,   label: 'পছন্দের তালিকা' },
-  { to: '/account/reviews',  icon: Star,    label: 'রিভিউ ও রেটিং' },
+  { to: '/account/info',     icon: User,       label: 'আমার তথ্য'        },
+  { to: '/account/orders',   icon: Package,    label: 'অর্ডার ও ট্র্যাকিং' },
+  { to: '/account/wishlist', icon: Heart,      label: 'পছন্দের তালিকা'   },
+  { to: '/account/returns',  icon: RotateCcw,  label: 'রিটার্ন ও রিফান্ড' },
+  { to: '/account/reviews',  icon: Star,       label: 'রিভিউ ও রেটিং'    },
 ]
 
 export default function AccountSidebar() {

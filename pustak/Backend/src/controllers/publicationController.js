@@ -11,6 +11,22 @@ const getPublications = async (req, res) => {
   }
 };
 
+const getPublicationByTitle = async (req, res) => {
+  try {
+    const { title } = req.params;
+    const publication = await publicationService.getPublicationByTitle(
+      decodeURIComponent(title)
+    );
+    if (!publication) {
+      return res.status(404).json({ success: false, message: 'Publication not found' });
+    }
+    return res.status(200).json({ success: true, data: publication });
+  } catch (error) {
+    console.error('Error fetching publication by title:', error.message);
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
 const getPublication = async (req, res) => {
   try {
     const { id } = req.params;
@@ -74,6 +90,7 @@ const deletePublication = async (req, res) => {
 module.exports = {
   getPublications,
   getPublication,
+  getPublicationByTitle,
   createPublication,
   updatePublication,
   deletePublication

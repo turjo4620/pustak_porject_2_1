@@ -37,7 +37,8 @@ CREATE TABLE authors(
 	author_id INT PRIMARY KEY,
 	name VARCHAR(150) NOT NULL,
 	bio TEXT,
-	photo_url VARCHAR(255)
+	photo_url VARCHAR(255),
+    address VARCHAR(255)
 );
 
 

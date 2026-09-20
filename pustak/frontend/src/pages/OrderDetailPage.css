@@ -665,3 +665,69 @@
 
   .odp__wrap .card { padding: 1rem; }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   RETURN / REFUND  —  per-item action cell additions
+══════════════════════════════════════════════════════════════════ */
+
+/* Stack review + return buttons vertically in the action cell */
+.odp__item-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+/* "রিটার্ন করুন" button — mirrors review-btn but in red-tint */
+.odp__return-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1.5px solid #fca5a5;
+  background: #fff1f1;
+  color: #991b1b;
+  font-size: 0.76rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.odp__return-btn:hover {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #7f1d1d;
+}
+
+/* Status badge — shown instead of button once a return exists */
+.odp__return-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.73rem;
+  font-weight: 600;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.odp__return-badge--pending {
+  background: #fff8e1;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.odp__return-badge--approved {
+  background: #dcfce7;
+  color: #065f46;
+  border: 1px solid #86efac;
+}
+
+.odp__return-badge--rejected {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}

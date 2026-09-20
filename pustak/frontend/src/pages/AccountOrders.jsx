@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, X } from 'lucide-react'
+import { Search, X, RotateCcw } from 'lucide-react'
 import { api } from '../api/http'
 import { ORDER_STAGES, statusIndex } from '../utils/orderStages'
 import './account-dashboard.css'
@@ -171,6 +171,7 @@ export default function AccountOrders() {
     topay:      'Pending',
     processing: 'Processing',
     shipped:    'Shipped',
+    delivered:  'Delivered',
   }
 
   const TABS = [
@@ -178,6 +179,7 @@ export default function AccountOrders() {
     { key: 'topay',      label: 'পেমেন্ট বাকি' },
     { key: 'processing', label: 'প্রসেসিং' },
     { key: 'shipped',    label: 'পাঠানো হয়েছে' },
+    { key: 'delivered',  label: 'ডেলিভার্ড' },
   ]
 
   // Counts per tab
@@ -246,7 +248,8 @@ export default function AccountOrders() {
       {/* ── Order cards ── */}
       {!loading && filtered.map(order => {
         const { bg, color, border } = statusStyle(order.status)
-        const isPending = order.status === 'Pending' || order.status === 'pending'
+        const isPending   = order.status === 'Pending'   || order.status === 'pending'
+        const isDelivered = order.status === 'Delivered' || order.status === 'delivered'
 
         return (
           <div key={order.order_id} className="order-card">
@@ -328,6 +331,16 @@ export default function AccountOrders() {
               >
                 বিস্তারিত দেখুন
               </button>
+              {isDelivered && (
+                <button
+                  className="order-btn order-btn--return"
+                  onClick={() => navigate(`/account/orders/${order.order_id}`)}
+                  title="রিটার্ন রিকোয়েস্ট করুন"
+                >
+                  <RotateCcw size={13} />
+                  রিটার্ন করুন
+                </button>
+              )}
             </div>
           </div>
         )

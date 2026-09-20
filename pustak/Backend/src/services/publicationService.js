@@ -24,6 +24,24 @@ const getAllPublications = async (searchTerm = '') => {
   return result.rows;
 };
 
+const getPublicationByTitle = async (title) => {
+  const query = `
+    SELECT
+      p.publication_id,
+      p.title,
+      p.bio,
+      p.cover_image_url,
+      COUNT(b.id) AS book_count
+    FROM publications p
+    LEFT JOIN books b ON p.publication_id = b.publication_id
+    WHERE p.title ILIKE $1
+    GROUP BY p.publication_id
+    LIMIT 1
+  `;
+  const result = await pool.query(query, [title]);
+  return result.rows[0] || null;
+};
+
 const getPublicationByID = async (id) => {
   const query = `
     SELECT publication_id, title, bio, cover_image_url
@@ -66,6 +84,7 @@ const deletePublication = async (id) => {
 module.exports = {
   getAllPublications,
   getPublicationByID,
+  getPublicationByTitle,
   createPublication,
   updatePublication,
   deletePublication
