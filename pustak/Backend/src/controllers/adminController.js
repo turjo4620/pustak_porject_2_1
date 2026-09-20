@@ -213,12 +213,13 @@ class AdminController {
       const startDate = start_date || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
       const endDate = end_date || new Date().toISOString();
 
-      const [salesData, bestSellers, popularCategories, lowStock, outOfStock] = await Promise.all([
+      const [salesData, bestSellers, popularCategories, lowStock, outOfStock, bestCustomers] = await Promise.all([
         adminService.getSalesAnalytics(startDate, endDate),
         adminService.getBestSellingBooks(10),
         adminService.getPopularCategories(),
         adminService.getLowStockBooks(),
-        adminService.getOutOfStockBooks()
+        adminService.getOutOfStockBooks(),
+        adminService.getBestCustomers(10)
       ]);
 
       res.json({
@@ -226,7 +227,8 @@ class AdminController {
         bestSellers,
         popularCategories,
         lowStock,
-        outOfStock
+        outOfStock,
+        bestCustomers
       });
     } catch (error) {
       console.error('Get analytics error:', error);

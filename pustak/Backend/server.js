@@ -63,6 +63,27 @@ app.use('/api/books', bookRoutes);
 app.use('/api/publications', publicationRoutes);
 app.use('/api/categories', categoryRoutes);
 
+// ── Public: top customers for landing page (name + order count only, no sensitive data)
+app.get('/api/public/top-customers', async (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 5, 10);
+    const result = await pool.query(`
+      SELECT
+        u.name,
+        COUNT(DISTINCT o.order_id) AS total_orders
+      FROM users u
+      JOIN orders o ON o.user_id = u.user_id
+      WHERE o.status NOT IN ('Cancelled')
+      GROUP BY u.user_id, u.name
+      ORDER BY total_orders DESC
+      LIMIT $1
+    `, [limit]);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed' });
+  }
+});
+
 // Admin panel API
 app.use('/api/admin', adminRoutes);
 

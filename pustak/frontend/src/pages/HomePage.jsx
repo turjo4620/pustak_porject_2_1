@@ -9,6 +9,7 @@ import PublisherShowcase from '../components/PublisherShowcase'
 import ReadingInspiration from '../components/ReadingInspiration'
 import Categories from '../components/Categories'
 import Reviews from '../components/Reviews'
+import TopCustomers from '../components/TopCustomers'
 import Newsletter from '../components/Newsletter'
 
 export default function HomePage() {
@@ -25,6 +26,7 @@ export default function HomePage() {
       <ReadingInspiration />
       <Categories />
       <Reviews />
+      <TopCustomers />
       <Newsletter />
     </>
   )
