@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Plus, Edit, Trash2, Package } from 'lucide-react';
 import '../../styles/admin.css';
 
@@ -283,6 +283,173 @@ export default function AdminBooks() {
   );
 }
 
+// ── Floating tooltip portal rendered at document.body level ────────────────
+function FloatingTooltip({ text, anchorRect }) {
+  if (!text || !anchorRect) return null;
+
+  // Position above the card, centred
+  const style = {
+    position:  'fixed',
+    left:      anchorRect.left + anchorRect.width / 2,
+    top:       anchorRect.top - 8,
+    transform: 'translate(-50%, -100%)',
+    zIndex:    9999,
+    maxWidth:  220,
+    background:     '#1a1a1a',
+    color:          '#f0ece4',
+    borderRadius:   8,
+    padding:        '10px 13px',
+    fontSize:       '0.78rem',
+    lineHeight:     1.55,
+    pointerEvents:  'none',
+    boxShadow:      '0 8px 24px rgba(0,0,0,0.35)',
+    wordBreak:      'break-word',
+  };
+
+  // Keep within viewport horizontally
+  const vw = window.innerWidth;
+  let left = anchorRect.left + anchorRect.width / 2;
+  if (left - 110 < 8)  left = 118;
+  if (left + 110 > vw - 8) left = vw - 118;
+  style.left = left;
+
+  return (
+    <div style={style}>
+      {text}
+      {/* Arrow */}
+      <div style={{
+        position: 'absolute',
+        top: '100%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        borderWidth: 6,
+        borderStyle: 'solid',
+        borderColor: '#1a1a1a transparent transparent transparent',
+      }} />
+    </div>
+  );
+}
+
+// ── Generic picker (works for both authors and publications) ────────────────
+function EntityPicker({
+  items,          // array of objects
+  selectedIds,    // number[]
+  onToggle,       // (id: number) => void
+  idKey,          // e.g. 'author_id' | 'publication_id'
+  nameKey,        // e.g. 'name' | 'title'
+  photoKey,       // e.g. 'photo_url' | 'cover_image_url'
+  bioKey,         // e.g. 'bio'
+  searchPlaceholder,
+}) {
+  const [search,      setSearch]      = useState('');
+  const [tooltip,     setTooltip]     = useState(null);  // { text, rect }
+  const leaveTimer = useRef(null);
+
+  const filtered = items.filter(item =>
+    (item[nameKey] || '').toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleMouseEnter = useCallback((e, item) => {
+    const bio = item[bioKey];
+    if (!bio) return;
+    clearTimeout(leaveTimer.current);
+    const rect = e.currentTarget.getBoundingClientRect();
+    setTooltip({ text: bio.slice(0, 160) + (bio.length > 160 ? '…' : ''), rect });
+  }, [bioKey]);
+
+  const handleMouseLeave = useCallback(() => {
+    leaveTimer.current = setTimeout(() => setTooltip(null), 120);
+  }, []);
+
+  return (
+    <>
+      {/* Portal tooltip */}
+      {tooltip && (
+        <FloatingTooltip text={tooltip.text} anchorRect={tooltip.rect} />
+      )}
+
+      <div className="author-picker">
+        <input
+          type="text"
+          className="author-picker__search"
+          placeholder={searchPlaceholder}
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        <div className="author-picker__grid">
+          {filtered.map(item => {
+            const id       = item[idKey];
+            const name     = item[nameKey] || '';
+            const photo    = item[photoKey];
+            const selected = selectedIds.includes(id);
+
+            return (
+              <button
+                key={id}
+                type="button"
+                className={`author-card ${selected ? 'author-card--selected' : ''}`}
+                onClick={() => onToggle(id)}
+                onMouseEnter={(e) => handleMouseEnter(e, item)}
+                onMouseLeave={handleMouseLeave}
+                aria-pressed={selected}
+              >
+                <div className="author-card__photo-wrap">
+                  {photo
+                    ? <img src={photo} alt={name} className="author-card__photo" />
+                    : <div className="author-card__photo-fallback">
+                        {name.charAt(0).toUpperCase()}
+                      </div>
+                  }
+                  {selected && (
+                    <span className="author-card__check" aria-hidden="true">✓</span>
+                  )}
+                </div>
+                <span className="author-card__name">{name}</span>
+              </button>
+            );
+          })}
+
+          {filtered.length === 0 && (
+            <p className="author-picker__empty">কিছু পাওয়া যায়নি।</p>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// Keep AuthorPicker as a thin wrapper for backwards compat
+function AuthorPicker({ authors, selectedIds, onToggle }) {
+  return (
+    <EntityPicker
+      items={authors}
+      selectedIds={selectedIds}
+      onToggle={onToggle}
+      idKey="author_id"
+      nameKey="name"
+      photoKey="photo_url"
+      bioKey="bio"
+      searchPlaceholder="লেখক খুঁজুন..."
+    />
+  );
+}
+
+// Publication picker wrapper
+function PublicationPicker({ publications, selectedIds, onToggle }) {
+  return (
+    <EntityPicker
+      items={publications}
+      selectedIds={selectedIds}
+      onToggle={onToggle}
+      idKey="publication_id"
+      nameKey="title"
+      photoKey="cover_image_url"
+      bioKey="bio"
+      searchPlaceholder="প্রকাশনী খুঁজুন..."
+    />
+  );
+}
+
 function BookModal({ book, categories, authors, publications, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     book_name: book?.book_name || '',
@@ -488,35 +655,35 @@ function BookModal({ book, categories, authors, publications, onClose, onSuccess
           </div>
 
           <div className="form-group">
-            <label>Authors</label>
-            <div className="checkbox-group">
-              {authors.slice(0, 10).map(author => (
-                <label key={author.author_id} className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.author_ids.includes(author.author_id)}
-                    onChange={() => handleMultiSelect('author_ids', author.author_id)}
-                  />
-                  {author.name}
-                </label>
-              ))}
-            </div>
+            <label>
+              Authors
+              {formData.author_ids.length > 0 && (
+                <span className="author-picker__count">
+                  {formData.author_ids.length} selected
+                </span>
+              )}
+            </label>
+            <AuthorPicker
+              authors={authors}
+              selectedIds={formData.author_ids}
+              onToggle={(id) => handleMultiSelect('author_ids', id)}
+            />
           </div>
 
           <div className="form-group">
-            <label>Publications</label>
-            <div className="checkbox-group">
-              {publications.slice(0, 10).map(pub => (
-                <label key={pub.publication_id} className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.publication_ids.includes(pub.publication_id)}
-                    onChange={() => handleMultiSelect('publication_ids', pub.publication_id)}
-                  />
-                  {pub.title}
-                </label>
-              ))}
-            </div>
+            <label>
+              Publications
+              {formData.publication_ids.length > 0 && (
+                <span className="author-picker__count">
+                  {formData.publication_ids.length} selected
+                </span>
+              )}
+            </label>
+            <PublicationPicker
+              publications={publications}
+              selectedIds={formData.publication_ids}
+              onToggle={(id) => handleMultiSelect('publication_ids', id)}
+            />
           </div>
 
           <div className="form-group">

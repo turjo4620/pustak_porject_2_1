@@ -139,17 +139,24 @@ async function getOrderById(userId, orderId) {
   }
 
   const itemsRes = await pool.query(
-    `SELECT b.id AS book_id, b.book_name, b.cover_image_url,
-            MIN(a.name) AS author,
-            COUNT(*)::int AS quantity,
-            SUM(oi.price_sold)::numeric(10,2) AS line_total
+    `SELECT
+       oi.order_item_id,
+       oi.price_sold,
+       oi.price_sold                            AS unit_price,
+       oi.price_sold                            AS line_total,
+       1                                        AS quantity,
+       b.id                                     AS book_id,
+       b.book_name,
+       b.cover_image_url,
+       MIN(a.name)                              AS author
      FROM order_item oi
-     JOIN book_copy bc ON bc.copy_id = oi.copy_id
-     JOIN books b ON b.id = bc.book_id
-     LEFT JOIN book_author ba ON b.id = ba.book_id
-     LEFT JOIN authors a ON ba.author_id = a.author_id
+     JOIN book_copy   bc ON bc.copy_id  = oi.copy_id
+     JOIN books        b ON b.id        = bc.book_id
+     LEFT JOIN book_author ba ON ba.book_id   = b.id
+     LEFT JOIN authors     a  ON a.author_id  = ba.author_id
      WHERE oi.order_id = $1
-     GROUP BY b.id, b.book_name, b.cover_image_url`,
+     GROUP BY oi.order_item_id, oi.price_sold, b.id, b.book_name, b.cover_image_url
+     ORDER BY oi.order_item_id`,
     [orderId]
   );
 
@@ -239,7 +246,9 @@ async function listOrders(userId) {
 
 async function getTrackingInfo(userId, orderId) {
   const orderRes = await pool.query(
-    'SELECT order_id, order_number, status FROM orders WHERE order_id = $1 AND user_id = $2',
+    `SELECT order_id, order_number, status,
+            order_date, confirmed_at, packed_at, cancelled_at
+     FROM orders WHERE order_id = $1 AND user_id = $2`,
     [orderId, userId]
   );
   if (!orderRes.rows.length) {

@@ -17,9 +17,9 @@ function fmtDate(iso) {
 
 // ── Status config ─────────────────────────────────────────────────────────────
 const RETURN_STATUS = {
-  Requested: { label: 'পর্যালোচনাধীন', cls: 'ar-badge ar-badge--pending'  },
-  Approved:  { label: 'অনুমোদিত',      cls: 'ar-badge ar-badge--approved' },
-  Rejected:  { label: 'প্রত্যাখ্যাত',  cls: 'ar-badge ar-badge--rejected' },
+  initiated: { label: 'পর্যালোচনাধীন', cls: 'ar-badge ar-badge--pending'  },
+  approved:  { label: 'অনুমোদিত',      cls: 'ar-badge ar-badge--approved' },
+  rejected:  { label: 'প্রত্যাখ্যাত',  cls: 'ar-badge ar-badge--rejected' },
 }
 
 const REFUND_STATUS = {
@@ -45,9 +45,9 @@ function localiseReason(reason) {
 // ── Tab definitions ───────────────────────────────────────────────────────────
 const TABS = [
   { key: 'all',       label: 'সব রিটার্ন'     },
-  { key: 'Requested', label: 'পর্যালোচনাধীন'  },
-  { key: 'Approved',  label: 'অনুমোদিত'        },
-  { key: 'Rejected',  label: 'প্রত্যাখ্যাত'    },
+  { key: 'initiated', label: 'পর্যালোচনাধীন'  },
+  { key: 'approved',  label: 'অনুমোদিত'        },
+  { key: 'rejected',  label: 'প্রত্যাখ্যাত'    },
 ]
 
 // ═════════════════════════════════════════════════════════════════════════════

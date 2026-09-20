@@ -94,38 +94,48 @@ function buildSteps(order, delivery) {
   const currentIdx = statusIndex(order?.status)
 
   return ORDER_STAGES.map((stage, i) => {
-    const done   = currentIdx >= i          // all stages up to & including current
-    const active = currentIdx === i         // exactly the current stage
+    const done   = currentIdx >= i
+    const active = currentIdx === i
 
-    // Per-stage sublabels: timestamps where available, else status text
     let sublabel = null
+
     if (i === 0) {
-      // placed — show order date
+      // Placed — always show order date
       sublabel = order?.order_date ? fmtDate(order.order_date) : null
+
     } else if (i === 1) {
-      // confirmed — show confirmation date if API provides it
-      sublabel = done
-        ? (order?.confirmed_at ? fmtDate(order.confirmed_at) : 'নিশ্চিত করা হয়েছে')
-        : 'অপেক্ষমাণ'
-    } else if (i === 2) {
-      // packed
-      sublabel = done ? 'প্যাকেজিং সম্পন্ন' : 'অপেক্ষমাণ'
-    } else if (i === 3) {
-      // shipped — show courier + tracking number
-      if (done && delivery?.courier_name) {
-        sublabel = delivery.courier_name +
-          (delivery.tracking_no ? ` · ${delivery.tracking_no}` : '')
-      } else {
-        sublabel = done ? 'কুরিয়ারে প্রেরণ করা হয়েছে' : 'অপেক্ষমাণ'
+      // Confirmed
+      if (done) {
+        sublabel = order?.confirmed_at ? fmtDate(order.confirmed_at) : null
       }
+
+    } else if (i === 2) {
+      // Packed / Processing
+      if (done) {
+        sublabel = order?.packed_at ? fmtDate(order.packed_at) : null
+      }
+
+    } else if (i === 3) {
+      // Shipped — prefer dispatch date, fall back to courier name
+      if (done) {
+        if (delivery?.dispatch_date) {
+          sublabel = fmtDate(delivery.dispatch_date)
+          if (delivery.courier_name) sublabel += ` · ${delivery.courier_name}`
+          if (delivery.tracking_no)  sublabel += ` · ${delivery.tracking_no}`
+        } else if (delivery?.courier_name) {
+          sublabel = delivery.courier_name +
+            (delivery.tracking_no ? ` · ${delivery.tracking_no}` : '')
+        }
+      }
+
     } else if (i === 4) {
-      // delivered — show actual or estimated date
-      if (delivery?.delivered_at) {
-        sublabel = fmtDate(delivery.delivered_at)
-      } else if (delivery?.est_date) {
-        sublabel = `আনু. ${fmtDate(delivery.est_date)}`
-      } else {
-        sublabel = done ? 'ডেলিভার্ড' : 'অপেক্ষমাণ'
+      // Delivered
+      if (done) {
+        if (delivery?.delivered_at) {
+          sublabel = fmtDate(delivery.delivered_at)
+        } else if (delivery?.est_date) {
+          sublabel = `আনু. ${fmtDate(delivery.est_date)}`
+        }
       }
     }
 
@@ -150,9 +160,9 @@ function ReviewBtn({ book }) {
 
 // ── Return status badge / button ─────────────────────────────────────────
 const RETURN_STATUS_BN = {
-  Requested: { label: 'রিটার্ন পেন্ডিং', cls: 'odp__return-badge--pending'  },
-  Approved:  { label: 'রিটার্ন অনুমোদিত', cls: 'odp__return-badge--approved' },
-  Rejected:  { label: 'রিটার্ন বাতিল',   cls: 'odp__return-badge--rejected' },
+  initiated: { label: 'রিটার্ন পেন্ডিং',  cls: 'odp__return-badge--pending'  },
+  approved:  { label: 'রিটার্ন অনুমোদিত', cls: 'odp__return-badge--approved' },
+  rejected:  { label: 'রিটার্ন বাতিল',    cls: 'odp__return-badge--rejected' },
 }
 
 function ReturnItemCell({ item, returnRow, onRequest }) {
@@ -165,7 +175,7 @@ function ReturnItemCell({ item, returnRow, onRequest }) {
     const refundLabel =
       returnRow.refund_status === 'Processed'
         ? ' · রিফান্ড সম্পন্ন'
-        : returnRow.refund_status === 'Pending' && returnRow.return_status === 'Approved'
+        : returnRow.refund_status === 'Pending' && returnRow.return_status === 'approved'
         ? ' · রিফান্ড প্রক্রিয়াধীন'
         : ''
 
@@ -703,7 +713,7 @@ export default function OrderDetailPage() {
           setReturnMap((prev) => ({
             ...prev,
             [newReturn.order_item_id]: {
-              return_status:  newReturn.status,
+              return_status:  newReturn.status,   // 'initiated' from DB
               refund_status:  null,
               order_item_id:  newReturn.order_item_id,
             },

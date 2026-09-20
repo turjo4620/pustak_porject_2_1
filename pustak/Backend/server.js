@@ -43,6 +43,7 @@ const wishlistRoutes = require("./src/routes/wishlistRoutes");
 const couponRoutes = require("./src/routes/couponRoutes");
 const addressRoutes = require("./src/routes/addressRoutes");
 const returnRoutes = require("./src/routes/returnRoutes");
+const reviewRoutes = require("./src/routes/reviewRoutes");
 
 // Admin routes
 const adminRoutes = require('./src/routes/adminRoutes');
@@ -54,6 +55,7 @@ app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/addresses", addressRoutes);
 app.use("/api/returns", returnRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/authors', authorRoutes);

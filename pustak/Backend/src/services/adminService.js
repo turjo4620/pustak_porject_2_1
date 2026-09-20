@@ -539,22 +539,36 @@ class AdminService {
   }
 
   async updateOrderStatus(orderId, status) {
-    const result = await pool.query(
-      `UPDATE orders SET status = $1 WHERE order_id = $2 RETURNING *`,
-      [status, orderId]
-    );
+    // Build the SET clause: always update status, conditionally stamp a timestamp
+    const tsColumn = {
+      Confirmed:  'confirmed_at',
+      Processing: 'packed_at',
+      Cancelled:  'cancelled_at',
+    }[status];
+
+    const result = tsColumn
+      ? await pool.query(
+          `UPDATE orders
+           SET status = $1,
+               ${tsColumn} = COALESCE(${tsColumn}, CURRENT_TIMESTAMP)
+           WHERE order_id = $2
+           RETURNING *`,
+          [status, orderId]
+        )
+      : await pool.query(
+          `UPDATE orders SET status = $1 WHERE order_id = $2 RETURNING *`,
+          [status, orderId]
+        );
 
     // Keep the deliveries row in sync with the order status
     if (status === 'Delivered') {
-      // Mark delivered and record the timestamp
       await pool.query(
         `UPDATE deliveries
-         SET status = 'Delivered', delivered_at = CURRENT_TIMESTAMP
+         SET status = 'Delivered', delivered_at = COALESCE(delivered_at, CURRENT_TIMESTAMP)
          WHERE order_id = $1`,
         [orderId]
       );
     } else if (status === 'Shipped') {
-      // Record dispatch date when order is shipped
       await pool.query(
         `UPDATE deliveries
          SET status = 'Shipped', dispatch_date = COALESCE(dispatch_date, CURRENT_TIMESTAMP)

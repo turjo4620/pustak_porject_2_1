@@ -89,15 +89,38 @@ function TrackingModal({ orderId, orderNumber, onClose }) {
               {ORDER_STAGES.map((stage, i) => {
                 const done   = currentIdx >= i
                 const active = currentIdx === i
+                const order  = data?.order
 
-                // Sublabel: courier info on the shipped step, dates elsewhere
                 let sublabel = null
-                if (i === 3 && done && delivery?.courier_name) {
-                  sublabel = delivery.courier_name +
-                    (delivery.tracking_no ? ` · ${delivery.tracking_no}` : '')
-                } else if (i === 4 && done && delivery?.delivered_at) {
-                  sublabel = new Date(delivery.delivered_at)
-                    .toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' })
+                if (i === 0 && done) {
+                  sublabel = order?.order_date
+                    ? new Date(order.order_date).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' })
+                    : null
+                } else if (i === 1 && done) {
+                  sublabel = order?.confirmed_at
+                    ? new Date(order.confirmed_at).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' })
+                    : null
+                } else if (i === 2 && done) {
+                  sublabel = order?.packed_at
+                    ? new Date(order.packed_at).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' })
+                    : null
+                } else if (i === 3 && done) {
+                  if (delivery?.dispatch_date) {
+                    sublabel = new Date(delivery.dispatch_date).toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' })
+                    if (delivery.courier_name) sublabel += ` · ${delivery.courier_name}`
+                    if (delivery.tracking_no)  sublabel += ` · ${delivery.tracking_no}`
+                  } else if (delivery?.courier_name) {
+                    sublabel = delivery.courier_name +
+                      (delivery.tracking_no ? ` · ${delivery.tracking_no}` : '')
+                  }
+                } else if (i === 4 && done) {
+                  if (delivery?.delivered_at) {
+                    sublabel = new Date(delivery.delivered_at)
+                      .toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' })
+                  } else if (delivery?.est_date) {
+                    sublabel = 'আনু. ' + new Date(delivery.est_date)
+                      .toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' })
+                  }
                 }
 
                 return (

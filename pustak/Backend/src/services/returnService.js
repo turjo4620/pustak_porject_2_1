@@ -1,20 +1,15 @@
 // services/returnService.js
 //
-// Business rules:
-//   • A return can only be requested for a DELIVERED order.
-//   • The order must have been delivered within the last 7 days
-//     (checked via deliveries.delivered_at).
-//   • Each order_item_id may have at most one return (UNIQUE constraint
-//     in the DB also enforces this).
-//   • Only the user who placed the order may request a return.
-//   • Admin approval auto-creates a pending refund row for the full
-//     price_sold of that item (or × quantity).
+// Uses the actual live tables:
+//   return  — columns: return_id, order_item_id, reason, return_date, status, approved_at
+//   refund  — columns: refund_id, return_id, refund_amount, refund_date, refund_status
+//
+// Ownership is always verified via order_item → orders.user_id (no user_id on return table).
+// Status lifecycle on "return": 'initiated' → 'approved' | 'rejected'
 
 const pool = require('../config/db');
 
 const RETURN_WINDOW_DAYS = 7;
-
-// ── helpers ────────────────────────────────────────────────────────────────
 
 function withinReturnWindow(deliveredAt) {
   if (!deliveredAt) return false;
@@ -24,26 +19,17 @@ function withinReturnWindow(deliveredAt) {
 }
 
 // ── requestReturn ──────────────────────────────────────────────────────────
-//
-// userId       — from req.userId (JWT)
-// orderItemId  — the specific order_item row the user wants to return
-// reason       — free-text or preset label from the frontend dropdown
-//
-// Returns the newly inserted returns row.
-
 async function requestReturn(userId, orderItemId, reason) {
-  // 1. Verify the order_item exists, belongs to this user's order,
-  //    and the parent order is 'Delivered'.
+  // 1. Verify the item belongs to this user's order and the order is Delivered
   const ownershipRes = await pool.query(
     `SELECT
        oi.order_item_id,
-       oi.copy_id,
        oi.price_sold,
        o.order_id,
        o.status      AS order_status,
        d.delivered_at
      FROM order_item oi
-     JOIN orders     o  ON  o.order_id   = oi.order_id
+     JOIN orders      o  ON  o.order_id   = oi.order_id
      LEFT JOIN deliveries d ON d.order_id = o.order_id
      WHERE oi.order_item_id = $1
        AND o.user_id         = $2`,
@@ -70,10 +56,9 @@ async function requestReturn(userId, orderItemId, reason) {
     };
   }
 
-  // 2. Check for duplicate — DB UNIQUE constraint will also catch this,
-  //    but we give a friendlier error first.
+  // 2. Check for duplicate
   const dupRes = await pool.query(
-    'SELECT return_id, status FROM returns WHERE order_item_id = $1',
+    'SELECT return_id, status FROM "return" WHERE order_item_id = $1',
     [orderItemId]
   );
   if (dupRes.rows.length) {
@@ -83,22 +68,18 @@ async function requestReturn(userId, orderItemId, reason) {
     };
   }
 
-  // 3. Insert the return request.
+  // 3. Insert
   const insertRes = await pool.query(
-    `INSERT INTO returns (order_item_id, user_id, reason, status)
-     VALUES ($1, $2, $3, 'Requested')
+    `INSERT INTO "return" (order_item_id, reason, status)
+     VALUES ($1, $2, 'initiated')
      RETURNING *`,
-    [orderItemId, userId, reason || null]
+    [orderItemId, reason || null]
   );
 
   return insertRes.rows[0];
 }
 
 // ── getReturnsForOrder ─────────────────────────────────────────────────────
-//
-// Returns all return rows (with refund info if present) for a given order,
-// verified to belong to userId.
-
 async function getReturnsForOrder(userId, orderId) {
   // Verify order belongs to user
   const orderRes = await pool.query(
@@ -114,16 +95,16 @@ async function getReturnsForOrder(userId, orderId) {
        r.return_id,
        r.order_item_id,
        r.reason,
-       r.request_date,
+       r.return_date   AS request_date,
        r.status        AS return_status,
        r.approved_at,
        rf.refund_id,
-       rf.amount       AS refund_amount,
-       rf.status       AS refund_status,
-       rf.refunded_at
-     FROM returns r
+       rf.refund_amount,
+       rf.refund_status,
+       rf.refund_date  AS refunded_at
+     FROM "return" r
      JOIN order_item oi ON oi.order_item_id = r.order_item_id
-     LEFT JOIN refunds rf ON rf.return_id = r.return_id
+     LEFT JOIN refund rf ON rf.return_id = r.return_id
      WHERE oi.order_id = $1`,
     [orderId]
   );
@@ -132,16 +113,13 @@ async function getReturnsForOrder(userId, orderId) {
 }
 
 // ── getUserReturns ─────────────────────────────────────────────────────────
-//
-// Full return history for a user, enriched with book title for display.
-
 async function getUserReturns(userId) {
   const res = await pool.query(
     `SELECT
        r.return_id,
        r.order_item_id,
        r.reason,
-       r.request_date,
+       r.return_date   AS request_date,
        r.status        AS return_status,
        r.approved_at,
        b.book_name,
@@ -150,17 +128,17 @@ async function getUserReturns(userId) {
        o.order_id,
        o.order_number,
        rf.refund_id,
-       rf.amount       AS refund_amount,
-       rf.status       AS refund_status,
-       rf.refunded_at
-     FROM returns r
+       rf.refund_amount,
+       rf.refund_status,
+       rf.refund_date  AS refunded_at
+     FROM "return" r
      JOIN order_item  oi  ON  oi.order_item_id = r.order_item_id
      JOIN orders       o  ON  o.order_id        = oi.order_id
      JOIN book_copy   bc  ON  bc.copy_id         = oi.copy_id
      JOIN books        b  ON  b.id               = bc.book_id
-     LEFT JOIN refunds rf ON  rf.return_id        = r.return_id
-     WHERE r.user_id = $1
-     ORDER BY r.request_date DESC`,
+     LEFT JOIN refund rf  ON  rf.return_id        = r.return_id
+     WHERE o.user_id = $1
+     ORDER BY r.return_date DESC`,
     [userId]
   );
 
@@ -168,22 +146,16 @@ async function getUserReturns(userId) {
 }
 
 // ── approveReturn (admin) ──────────────────────────────────────────────────
-//
-// Sets return status → 'Approved', records approved_at, and creates a
-// matching refund row (status = 'Pending') for the full price_sold.
-// Uses a transaction so both writes succeed or neither does.
-
 async function approveReturn(returnId) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
 
-    // 1. Fetch the return + associated item price
     const retRes = await client.query(
       `SELECT r.return_id, r.status, r.order_item_id,
               oi.price_sold, o.order_id,
               p.payment_id
-       FROM returns r
+       FROM "return" r
        JOIN order_item oi ON oi.order_item_id = r.order_item_id
        JOIN orders      o  ON o.order_id       = oi.order_id
        LEFT JOIN payments p ON p.order_id      = o.order_id
@@ -200,34 +172,34 @@ async function approveReturn(returnId) {
 
     const ret = retRes.rows[0];
 
-    if (ret.status !== 'Requested') {
+    if (ret.status !== 'initiated') {
       throw {
         status: 409,
         message: `রিটার্নটি ইতিমধ্যে '${ret.status}' অবস্থায় আছে`,
       };
     }
 
-    // 2. Approve the return
+    // Approve
     await client.query(
-      `UPDATE returns
-       SET status = 'Approved', approved_at = NOW()
+      `UPDATE "return"
+       SET status = 'approved', approved_at = NOW()
        WHERE return_id = $1`,
       [returnId]
     );
 
-    // 3. Check a refund doesn't already exist (idempotency guard)
+    // Create refund row (idempotent)
     const existingRefund = await client.query(
-      'SELECT refund_id FROM refunds WHERE return_id = $1',
+      'SELECT refund_id FROM refund WHERE return_id = $1',
       [returnId]
     );
 
     let refundRow = null;
     if (!existingRefund.rows.length) {
       const refundRes = await client.query(
-        `INSERT INTO refunds (return_id, payment_id, amount, status)
-         VALUES ($1, $2, $3, 'Pending')
+        `INSERT INTO refund (return_id, refund_amount, refund_status)
+         VALUES ($1, $2, 'Pending')
          RETURNING *`,
-        [returnId, ret.payment_id || null, ret.price_sold]
+        [returnId, ret.price_sold]
       );
       refundRow = refundRes.rows[0];
     } else {
@@ -245,12 +217,11 @@ async function approveReturn(returnId) {
 }
 
 // ── rejectReturn (admin) ───────────────────────────────────────────────────
-
 async function rejectReturn(returnId) {
   const res = await pool.query(
-    `UPDATE returns
-     SET status = 'Rejected'
-     WHERE return_id = $1 AND status = 'Requested'
+    `UPDATE "return"
+     SET status = 'rejected'
+     WHERE return_id = $1 AND status = 'initiated'
      RETURNING *`,
     [returnId]
   );
