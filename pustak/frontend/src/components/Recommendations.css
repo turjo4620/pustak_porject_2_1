@@ -33,3 +33,34 @@
 @media (max-width: 1024px) { .reco__grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 720px)  { .reco__grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px)  { .reco__grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-4); } }
+
+/* Skeleton loading cards */
+.reco__skeleton {
+  height: 320px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-tertiary, #e5e7eb) 50%, var(--bg-secondary) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* All-link button */
+.reco__all-link {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-full);
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.reco__all-link:hover {
+  background: var(--accent);
+  color: white;
+}

@@ -6,7 +6,6 @@ import NewlyReleased from '../components/NewlyReleased'
 import Recommendations from '../components/Recommendations'
 import AuthorSpotlight from '../components/AuthorSpotlight'
 import PublisherShowcase from '../components/PublisherShowcase'
-import ReadingInspiration from '../components/ReadingInspiration'
 import Categories from '../components/Categories'
 import Reviews from '../components/Reviews'
 import TopCustomers from '../components/TopCustomers'
@@ -23,7 +22,6 @@ export default function HomePage() {
       <Recommendations />
       <AuthorSpotlight />
       <PublisherShowcase />
-      <ReadingInspiration />
       <Categories />
       <Reviews />
       <TopCustomers />
