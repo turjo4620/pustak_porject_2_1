@@ -242,12 +242,13 @@
 }
 .book-card__price {
   font-size: 1.05rem; font-weight: 700;
-  color: var(--text-primary);
+  color: var(--accent, #1e6b3a);
   font-family: var(--font-sans);
 }
 .book-card__original {
   font-size: 0.82rem; color: var(--text-muted);
   font-family: var(--font-sans);
+  text-decoration: line-through;
 }
 
 /* ── Size Variants ── */

@@ -25,15 +25,23 @@ export default function BookCard({ book, size = 'default' }) {
   const title         = book.book_name || book.title || 'শিরোনাম নেই'
   const cover         = book.cover_image_url || book.cover
   const author        = book.author || 'অজ্ঞাত'
-  const price         = book.price || 0
+  const rawPrice      = Number(book.price) || 0
+  const discountPct   = Number(book.discount_percentage) || 0
   const category      = book.category || null
   const rating        = Number(book.rating) || 0
-  const reviews       = Number(book.reviews) || 0
-  const inStock       = book.inStock !== false
-  const originalPrice = book.originalPrice || null
-  const discount      = book.discount || 0
+  const reviews       = Number(book.num_reviews) || Number(book.reviews) || 0
+  const inStock       = book.availability !== 'Out of Stock' && book.inStock !== false
   const badge         = book.badge || null
   const badgeColor    = book.badgeColor || '#000'
+
+  // Discounted price: use pre-computed field from backend, or calculate from percentage
+  const discountedPrice = discountPct > 0
+    ? (Number(book.discount_price) || Math.round(rawPrice * (1 - discountPct / 100)))
+    : null
+  // What to show as the main (bold) price
+  const displayPrice  = discountedPrice || rawPrice
+  // Original price — only shown when there's a discount
+  const originalPrice = discountedPrice ? rawPrice : null
   // ---------------------------------------------------------
 
   const wished = isWished(bookId)
@@ -119,9 +127,9 @@ export default function BookCard({ book, size = 'default' }) {
             {badge}
           </span>
         )}
-        {discount > 0 && (
-          <span className="book-card__discount" aria-label={`${discount}% ছাড়`}>
-            -{toBn(discount)}%
+        {discountPct > 0 && (
+          <span className="book-card__discount" aria-label={`${discountPct}% ছাড়`}>
+            -{toBn(discountPct)}%
           </span>
         )}
 
@@ -147,8 +155,8 @@ export default function BookCard({ book, size = 'default' }) {
         <h3 className="book-card__title">{title}</h3>
         <p className="book-card__author">{author}</p>
 
-        {/* Rating: show only when reviews exist, else show নতুন badge */}
-        {hasRating ? (
+        {/* Rating: show only when reviews exist */}
+        {hasRating && (
           <div className="book-card__rating" aria-label={`রেটিং: ${rating} / ৫`}>
             <span className="book-card__stars" aria-hidden="true">
               {[...Array(5)].map((_, i) => (
@@ -162,12 +170,10 @@ export default function BookCard({ book, size = 'default' }) {
             <span className="book-card__rating-num">{rating}</span>
             <span className="book-card__reviews">({toBn(reviews)})</span>
           </div>
-        ) : (
-          <div className="book-card__new-badge" aria-label="নতুন প্রকাশনা">নতুন</div>
         )}
 
         <div className="book-card__pricing">
-          <strong className="book-card__price">৳{fmtPrice(price)}</strong>
+          <strong className="book-card__price">৳{fmtPrice(displayPrice)}</strong>
           {originalPrice && (
             <s className="book-card__original">৳{fmtPrice(originalPrice)}</s>
           )}

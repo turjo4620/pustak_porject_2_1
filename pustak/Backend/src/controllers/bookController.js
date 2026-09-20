@@ -347,4 +347,92 @@ const getBestsellers = async (req, res) => {
   }
 };
 
-module.exports = { getBooks, searchBooks, getBooksByAuthor, getBooksByPublication, getBooksByCategory, getBookById, getBestsellers };
+const getNewArrivals = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 20;
+
+    // edition column may contain Bengali digits (২০২৫) or ASCII (2025).
+    // Translate Bengali digits → ASCII, then extract 4-digit year.
+    const query = `
+      WITH translated AS (
+        SELECT
+          b.*,
+          TRANSLATE(
+            b.edition,
+            '০১২৩৪৫৬৭৮৯',
+            '0123456789'
+          ) AS edition_ascii
+        FROM books b
+        WHERE b.edition IS NOT NULL
+      ),
+      with_year AS (
+        SELECT
+          t.*,
+          (regexp_match(t.edition_ascii, '(\\d{4})'))[1]::INTEGER AS pub_year
+        FROM translated t
+        WHERE t.edition_ascii ~ '\\d{4}'
+      )
+      SELECT
+        w.id,
+        w.book_name,
+        w.cover_image_url,
+        w.price,
+        w.discount_percentage,
+        ROUND(w.price * (1 - w.discount_percentage / 100.0), 2) AS discount_price,
+        w.edition,
+        w.availability,
+        w.pub_year,
+        MIN(a.name) AS author
+      FROM with_year w
+      LEFT JOIN book_author ba ON w.id = ba.book_id
+      LEFT JOIN authors a ON ba.author_id = a.author_id
+      WHERE w.pub_year BETWEEN 1900 AND 2030
+      GROUP BY w.id, w.book_name, w.cover_image_url, w.price,
+               w.discount_percentage, w.edition, w.availability, w.pub_year
+      ORDER BY w.pub_year DESC, w.id DESC
+      LIMIT $1
+    `;
+
+    const { rows } = await pool.query(query, [limit]);
+    res.status(200).json({ data: rows, total: rows.length });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: 'Error fetching new arrivals' });
+  }
+};
+
+const getOffers = async (req, res) => {
+  try {
+    const limit  = parseInt(req.query.limit) || 60;
+    const minPct = parseInt(req.query.min_pct) || 1; // minimum discount %
+
+    const query = `
+      SELECT
+        b.id,
+        b.book_name,
+        b.cover_image_url,
+        b.price,
+        b.discount_percentage,
+        ROUND(b.price * (1 - b.discount_percentage / 100.0), 2) AS discount_price,
+        b.availability,
+        b.rating,
+        b.num_reviews,
+        MIN(a.name) AS author
+      FROM books b
+      LEFT JOIN book_author ba ON b.id = ba.book_id
+      LEFT JOIN authors a      ON ba.author_id = a.author_id
+      WHERE b.discount_percentage >= $2
+      GROUP BY b.id
+      ORDER BY b.discount_percentage DESC, b.id ASC
+      LIMIT $1
+    `;
+
+    const { rows } = await pool.query(query, [limit, minPct]);
+    res.status(200).json({ data: rows, total: rows.length });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: 'Error fetching offers' });
+  }
+};
+
+module.exports = { getBooks, searchBooks, getBooksByAuthor, getBooksByPublication, getBooksByCategory, getBookById, getBestsellers, getNewArrivals, getOffers };
