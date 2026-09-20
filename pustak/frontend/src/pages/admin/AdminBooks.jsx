@@ -90,7 +90,7 @@ export default function AdminBooks() {
   };
 
   const handleDelete = async (bookId) => {
-    if (!confirm('Are you sure you want to delete this book?')) return;
+    if (!confirm('Are you sure you want to delete this book? This cannot be undone.')) return;
 
     try {
       const token = localStorage.getItem('adminToken');
@@ -99,13 +99,15 @@ export default function AdminBooks() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
-      if (!response.ok) throw new Error('Failed to delete book');
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || data.message || 'Failed to delete book');
+      }
 
-      alert('Book deleted successfully');
       fetchBooks();
     } catch (error) {
       console.error('Error deleting book:', error);
-      alert('Failed to delete book');
+      alert(error.message || 'Failed to delete book');
     }
   };
 
@@ -146,7 +148,7 @@ export default function AdminBooks() {
           <option value="">All Availability</option>
           <option value="In Stock">In Stock</option>
           <option value="Out of Stock">Out of Stock</option>
-          <option value="Pre-order">Pre-order</option>
+          <option value="Pre-Order">Pre-Order</option>
         </select>
 
         <select 
@@ -299,8 +301,13 @@ function BookModal({ book, categories, authors, publications, onClose, onSuccess
     stock_quantity: book?.total_stock || 0
   });
 
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError('');
+    setSubmitting(true);
 
     try {
       const token = localStorage.getItem('adminToken');
@@ -317,13 +324,15 @@ function BookModal({ book, categories, authors, publications, onClose, onSuccess
         body: JSON.stringify(formData)
       });
 
-      if (!response.ok) throw new Error('Failed to save book');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || data.message || 'Failed to save book');
 
-      alert(`Book ${book ? 'updated' : 'created'} successfully`);
       onSuccess();
     } catch (error) {
       console.error('Error saving book:', error);
-      alert('Failed to save book');
+      setSubmitError(error.message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -530,10 +539,11 @@ function BookModal({ book, categories, authors, publications, onClose, onSuccess
             <button type="button" onClick={onClose} className="btn-secondary">
               Cancel
             </button>
-            <button type="submit" className="btn-primary">
-              {book ? 'Update' : 'Create'} Book
+            <button type="submit" className="btn-primary" disabled={submitting}>
+              {submitting ? 'Saving...' : (book ? 'Update' : 'Create') + ' Book'}
             </button>
           </div>
+          {submitError && <p style={{ color: '#dc2626', marginTop: 8, fontSize: '0.88rem' }}>{submitError}</p>}
         </form>
       </div>
     </div>

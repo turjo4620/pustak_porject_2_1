@@ -25,13 +25,16 @@ export default function LoginPage() {
 
   // Redirect already-logged-in users away from the login page
   useEffect(() => {
+    // Admin session: check adminToken, not authUser
+    const userType = localStorage.getItem('pustak-user-type')
+    const adminToken = localStorage.getItem('adminToken')
+    if (userType === 'admin' && adminToken) {
+      navigate('/admin/dashboard', { replace: true })
+      return
+    }
+    // Customer session
     if (authUser) {
-      const userType = localStorage.getItem('pustak-user-type')
-      if (userType === 'admin') {
-        navigate('/admin/dashboard', { replace: true })
-      } else {
-        navigate('/', { replace: true })
-      }
+      navigate('/', { replace: true })
     }
   }, [authUser, navigate])
 
@@ -63,13 +66,15 @@ export default function LoginPage() {
       // Store user type for future reference
       localStorage.setItem('pustak-user-type', form.userType)
       
-      // If admin, also store as adminToken so admin panel can read it
       if (form.userType === 'admin') {
+        // Admin: only store adminToken, do NOT set authUser
+        // This prevents admin credentials leaking into customer-facing UI
         localStorage.setItem('adminToken', data.token)
+      } else {
+        // Customer: store user in authUser context so customer UI shows login state
+        setAuthUser(data.user)
       }
       
-      // update app context so navigation shows user menu
-      setAuthUser(data.user)
       setMessage({ type: 'success', text: data.message })
       
       // Navigate to appropriate page immediately

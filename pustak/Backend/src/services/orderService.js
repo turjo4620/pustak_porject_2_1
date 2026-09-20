@@ -17,7 +17,7 @@ function generateOrderNumber() {
   return 'PB' + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 1000);
 }
 
-async function placeOrderFromCart(userId, addressId, couponCode = null) {
+async function placeOrderFromCart(userId, addressId, couponCode = null, deliveryCharge = 0) {
   const { cart, items } = await cartService.getCartWithItems(userId);
   if (!items.length) {
     throw { status: 400, message: 'কার্ট খালি, অর্ডার দেওয়া যাবে না' };
@@ -68,7 +68,7 @@ async function placeOrderFromCart(userId, addressId, couponCode = null) {
       discountAmount = discount_amount;
     }
 
-    const totalAmount = Math.max(0, subtotal - discountAmount);
+    const totalAmount = Math.max(0, subtotal - discountAmount) + Number(deliveryCharge);
     const orderNumber = generateOrderNumber();
 
     // Step 4: create the order
@@ -80,6 +80,14 @@ async function placeOrderFromCart(userId, addressId, couponCode = null) {
       [userId, addressId || null, orderNumber, totalAmount, couponId]
     );
     const order = orderRes.rows[0];
+
+    // Step 4b: create a deliveries row immediately so delivery_charge is stored
+    await client.query(
+      `INSERT INTO deliveries (order_id, delivery_charge, status)
+       VALUES ($1, $2, 'Pending')
+       ON CONFLICT DO NOTHING`,
+      [order.order_id, Number(deliveryCharge)]
+    );
 
     // Step 5: one order_item per physical copy, mark each copy sold
     for (const r of reservations) {
@@ -105,8 +113,11 @@ async function placeOrderFromCart(userId, addressId, couponCode = null) {
       }
     }
 
-    // Step 7: empty the cart
-    await client.query('DELETE FROM cart_item WHERE cart_id = $1', [cart.cart_id]);
+    // Step 7: empty the cart — happens AFTER payment is confirmed
+    // Cart is cleared by the payment service, not here, so the user
+    // can go back to checkout and still see their items if they haven't paid yet.
+    // For now we clear it here only if needed by the payment flow.
+    // See paymentService for the actual cart clear on payment confirmation.
 
     await client.query('COMMIT');
     return order;
@@ -251,7 +262,7 @@ async function getTrackingInfo(userId, orderId) {
   };
 }
 
-async function placeBuyNowOrder(userId, bookId, quantity = 1, addressId = null, couponCode = null) {
+async function placeBuyNowOrder(userId, bookId, quantity = 1, addressId = null, deliveryCharge = 0, couponCode = null) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -297,7 +308,7 @@ async function placeBuyNowOrder(userId, bookId, quantity = 1, addressId = null, 
       discountAmount = discount_amount;
     }
 
-    const totalAmount = Math.max(0, subtotal - discountAmount);
+    const totalAmount = Math.max(0, subtotal - discountAmount) + Number(deliveryCharge);
     const orderNumber = generateOrderNumber();
 
     // Create order
@@ -309,6 +320,14 @@ async function placeBuyNowOrder(userId, bookId, quantity = 1, addressId = null, 
       [userId, addressId || null, orderNumber, totalAmount, couponId]
     );
     const order = orderRes.rows[0];
+
+    // Create deliveries row immediately so delivery_charge is stored
+    await client.query(
+      `INSERT INTO deliveries (order_id, delivery_charge, status)
+       VALUES ($1, $2, 'Pending')
+       ON CONFLICT DO NOTHING`,
+      [order.order_id, Number(deliveryCharge)]
+    );
 
     // Insert one order_item per physical copy, mark each sold
     for (const row of copiesRes.rows) {

@@ -10,6 +10,16 @@ const toBn = (n) =>
 const formatBnAmount = (num) =>
   toBn(Number(num).toFixed(2))
 
+// ── Delivery charge ─────────────────────────────────────────────
+const DELIVERY_DHAKA   =  70
+const DELIVERY_OUTSIDE = 120
+function calcDeliveryCharge(division) {
+  if (!division) return DELIVERY_OUTSIDE
+  return division.trim().toLowerCase() === 'ঢাকা' ||
+         division.trim().toLowerCase() === 'dhaka'
+    ? DELIVERY_DHAKA : DELIVERY_OUTSIDE
+}
+
 export default function CheckoutPage() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -38,7 +48,11 @@ export default function CheckoutPage() {
 
   const displayItems = buyNow ? [buyNow] : cartItems
   const subtotal     = buyNow ? Number(buyNow.price_sold) * buyNow.quantity : totalCartPrice
-  const finalTotal   = Math.max(0, subtotal - discountAmount)
+
+  // Delivery charge — recalculates when selected address changes
+  const selectedAddr   = addresses.find(x => x.address_id === selectedAddressId) || null
+  const deliveryCharge = selectedAddr ? calcDeliveryCharge(selectedAddr.division) : 0
+  const finalTotal     = Math.max(0, subtotal - discountAmount) + deliveryCharge
 
   // ── Fetch user's saved addresses ───────────────────────────────
   useEffect(() => {
@@ -127,17 +141,18 @@ export default function CheckoutPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({
-            bookId:     buyNow.book_id,
-            quantity:   buyNow.quantity,
-            addressId:  selectedAddressId,
-            couponCode: couponApplied?.code || null
+            bookId:         buyNow.book_id,
+            quantity:        buyNow.quantity,
+            addressId:       selectedAddressId,
+            deliveryCharge,
+            couponCode:      couponApplied?.code || null
           })
         })
         const data = await res.json()
         if (!res.ok) throw new Error(data.message || 'অর্ডার দিতে সমস্যা হয়েছে')
         order = data
       } else {
-        order = await placeOrder(selectedAddressId, couponApplied?.code || null)
+        order = await placeOrder(selectedAddressId, couponApplied?.code || null, deliveryCharge)
       }
       navigate(`/payment/${order.order_id}`)
     } catch (err) {
@@ -148,9 +163,6 @@ export default function CheckoutPage() {
   }
 
   const isEmpty = displayItems.length === 0
-
-  // ── Selected address object ────────────────────────────────────
-  const selectedAddr = addresses.find(x => x.address_id === selectedAddressId)
 
   return (
     <div className="checkout-page">
@@ -379,8 +391,13 @@ export default function CheckoutPage() {
               )}
 
               <div className="checkout-page__summary-row">
-                <span>ডেলিভারি</span>
-                <span>বিনামূল্যে</span>
+                <span>ডেলিভারি চার্জ</span>
+                <span className={deliveryCharge === DELIVERY_DHAKA ? '' : 'checkout-delivery__outside'}>
+                  {!selectedAddr
+                    ? <em style={{ color: '#9ca3af', fontSize: '0.85rem' }}>ঠিকানা বাছুন</em>
+                    : `৳${deliveryCharge} (${deliveryCharge === DELIVERY_DHAKA ? 'ঢাকা বিভাগ' : 'ঢাকার বাইরে'})`
+                  }
+                </span>
               </div>
 
               <div className="checkout-page__summary-total">

@@ -64,6 +64,13 @@ async function createPayment(userId, orderId, data) {
     [method === 'cod' ? 'Confirmed' : 'Paid', orderId]
   );
 
+  // Clear the user's cart now that payment is confirmed
+  await pool.query(
+    `DELETE FROM cart_item
+     WHERE cart_id = (SELECT cart_id FROM cart WHERE user_id = $1)`,
+    [userId]
+  );
+
   return payment;
 }
 
