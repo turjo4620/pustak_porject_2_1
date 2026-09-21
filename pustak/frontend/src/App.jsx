@@ -45,6 +45,7 @@ import AdminPublications from './pages/admin/AdminPublications.jsx'
 import AdminCategories from './pages/admin/AdminCategories.jsx'
 import AdminUsers from './pages/admin/AdminUsers.jsx'
 import AdminOrders      from './pages/admin/AdminOrders.jsx'
+import AdminReturns     from './pages/admin/AdminReturns.jsx'
 import AdminReviews     from './pages/admin/AdminReviews.jsx'
 import AdminAnalytics   from './pages/admin/AdminAnalytics.jsx'
 import AdminCoupons     from './pages/admin/AdminCoupons.jsx'
@@ -144,6 +145,7 @@ export default function App() {
               <Route path="coupons"      element={<AdminCoupons />} />
               <Route path="users"        element={<AdminUsers />} />
               <Route path="orders" element={<AdminOrders />} />
+              <Route path="returns" element={<AdminReturns />} />
               <Route path="reviews" element={<AdminReviews />} />
               <Route path="analytics" element={<AdminAnalytics />} />
             </Route>

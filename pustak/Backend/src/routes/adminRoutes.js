@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
+const returnController = require('../controllers/returnController');
 const { verifyAdmin } = require('../middlewares/adminAuth');
 
 // Apply admin authentication to all routes
@@ -26,6 +27,12 @@ router.patch('/users/:id/status', adminController.updateUserStatus);
 router.get('/orders', adminController.getAllOrders);
 router.get('/orders/:id', adminController.getOrderDetails);
 router.patch('/orders/:id/status', adminController.updateOrderStatus);
+
+// ============= RETURN MANAGEMENT =============
+router.get('/returns', returnController.getAllReturns);
+router.patch('/returns/:returnId/approve', returnController.approveReturn);
+router.patch('/returns/:returnId/reject', returnController.rejectReturn);
+router.patch('/returns/refunds/:refundId', returnController.updateRefundStatus);
 
 // ============= REVIEW MANAGEMENT =============
 router.get('/reviews', adminController.getAllReviews);

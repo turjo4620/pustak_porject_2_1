@@ -177,6 +177,8 @@ function ReturnItemCell({ item, returnRow, onRequest }) {
         ? ' · রিফান্ড সম্পন্ন'
         : returnRow.refund_status === 'Pending' && returnRow.return_status === 'approved'
         ? ' · রিফান্ড প্রক্রিয়াধীন'
+        : returnRow.refund_status === 'Failed'
+        ? ' · রিফান্ড ব্যর্থ'
         : ''
 
     return (

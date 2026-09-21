@@ -395,6 +395,15 @@
   border-color: var(--color-forest);
 }
 
+.admin-error {
+  margin-bottom: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-burgundy);
+  background: rgba(107,39,55,0.1);
+  border: 1px solid rgba(107,39,55,0.2);
+  border-radius: var(--radius-sm);
+}
+
 /* ============= Tables ============= */
 .admin-table-container {
   background: var(--bg-card);
@@ -461,6 +470,16 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 500;
+}
+
+.admin-table-note {
+  max-width: 220px;
+  margin-top: var(--space-2);
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .price-original {
@@ -554,6 +573,11 @@
 .btn-icon.success { color: var(--color-forest); }
 .btn-icon.success:hover {
   background: rgba(30,58,47,0.1);
+}
+
+.btn-icon:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 /* ============= Pagination ============= */

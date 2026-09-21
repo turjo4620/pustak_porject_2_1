@@ -45,12 +45,25 @@ async function getReturnsForOrder(req, res, next) {
   }
 }
 
-// PATCH /api/returns/:returnId/approve  (admin only)
+async function getAllReturns(req, res, next) {
+  try {
+    const result = await returnService.getAllReturns(
+      Number(req.query.page) || 1,
+      Number(req.query.limit) || 20,
+      {
+        search: req.query.search,
+        status: req.query.status,
+        refundStatus: req.query.refundStatus,
+      }
+    );
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function approveReturn(req, res, next) {
   try {
-    if (req.userRole !== 'admin') {
-      return res.status(403).json({ message: 'অ্যাডমিন অ্যাক্সেস প্রয়োজন' });
-    }
     const result = await returnService.approveReturn(Number(req.params.returnId));
     res.json({ success: true, data: result });
   } catch (err) {
@@ -58,14 +71,22 @@ async function approveReturn(req, res, next) {
   }
 }
 
-// PATCH /api/returns/:returnId/reject  (admin only)
 async function rejectReturn(req, res, next) {
   try {
-    if (req.userRole !== 'admin') {
-      return res.status(403).json({ message: 'অ্যাডমিন অ্যাক্সেস প্রয়োজন' });
-    }
     const ret = await returnService.rejectReturn(Number(req.params.returnId));
     res.json({ success: true, data: ret });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function updateRefundStatus(req, res, next) {
+  try {
+    const refund = await returnService.updateRefundStatus(
+      Number(req.params.refundId),
+      req.body.status
+    );
+    res.json({ success: true, data: refund });
   } catch (err) {
     next(err);
   }
@@ -75,6 +96,8 @@ module.exports = {
   requestReturn,
   getUserReturns,
   getReturnsForOrder,
+  getAllReturns,
   approveReturn,
   rejectReturn,
+  updateRefundStatus,
 };

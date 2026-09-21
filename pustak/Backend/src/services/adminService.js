@@ -539,50 +539,66 @@ class AdminService {
   }
 
   async updateOrderStatus(orderId, status) {
-    // Build the SET clause: always update status, conditionally stamp a timestamp
     const tsColumn = {
       Confirmed:  'confirmed_at',
       Processing: 'packed_at',
       Cancelled:  'cancelled_at',
     }[status];
+    const client = await pool.connect();
 
-    const result = tsColumn
-      ? await pool.query(
-          `UPDATE orders
+    try {
+      await client.query('BEGIN');
+
+      const result = tsColumn
+        ? await client.query(
+            `UPDATE orders
+             SET status = $1,
+                 ${tsColumn} = COALESCE(${tsColumn}, CURRENT_TIMESTAMP)
+             WHERE order_id = $2
+             RETURNING *`,
+            [status, orderId]
+          )
+        : await client.query(
+            `UPDATE orders SET status = $1 WHERE order_id = $2 RETURNING *`,
+            [status, orderId]
+          );
+
+      if (!result.rows.length) {
+        throw { status: 404, message: 'Order not found' };
+      }
+
+      if (status === 'Delivered' || status === 'Shipped') {
+        const timestampColumn = status === 'Delivered' ? 'delivered_at' : 'dispatch_date';
+        const deliveryUpdate = await client.query(
+          `UPDATE deliveries
            SET status = $1,
-               ${tsColumn} = COALESCE(${tsColumn}, CURRENT_TIMESTAMP)
-           WHERE order_id = $2
-           RETURNING *`,
-          [status, orderId]
-        )
-      : await pool.query(
-          `UPDATE orders SET status = $1 WHERE order_id = $2 RETURNING *`,
+               ${timestampColumn} = COALESCE(${timestampColumn}, CURRENT_TIMESTAMP)
+           WHERE order_id = $2`,
           [status, orderId]
         );
 
-    // Keep the deliveries row in sync with the order status
-    if (status === 'Delivered') {
-      await pool.query(
-        `UPDATE deliveries
-         SET status = 'Delivered', delivered_at = COALESCE(delivered_at, CURRENT_TIMESTAMP)
-         WHERE order_id = $1`,
-        [orderId]
-      );
-    } else if (status === 'Shipped') {
-      await pool.query(
-        `UPDATE deliveries
-         SET status = 'Shipped', dispatch_date = COALESCE(dispatch_date, CURRENT_TIMESTAMP)
-         WHERE order_id = $1`,
-        [orderId]
-      );
-    } else if (status === 'Cancelled' || status === 'Returned') {
-      await pool.query(
-        `UPDATE deliveries SET status = $1 WHERE order_id = $2`,
-        [status, orderId]
-      );
-    }
+        if (!deliveryUpdate.rowCount) {
+          await client.query(
+            `INSERT INTO deliveries (order_id, status, ${timestampColumn})
+             VALUES ($1, $2, CURRENT_TIMESTAMP)`,
+            [orderId, status]
+          );
+        }
+      } else if (status === 'Cancelled' || status === 'Returned') {
+        await client.query(
+          'UPDATE deliveries SET status = $1 WHERE order_id = $2',
+          [status, orderId]
+        );
+      }
 
-    return result.rows[0];
+      await client.query('COMMIT');
+      return result.rows[0];
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   // ============= REVIEW MANAGEMENT =============
