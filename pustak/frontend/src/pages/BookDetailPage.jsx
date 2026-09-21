@@ -663,7 +663,12 @@ export default function BookDetailPage() {
     setSubmitting(true)
     try {
       const res = await api.post('/reviews', { bookId: Number(id), rating, comment })
-      setMyReview(res.data)
+      setMyReview(res.data.review)
+      setBook((current) => current && ({
+        ...current,
+        rating: res.data.average_rating,
+        num_reviews: res.data.review_count,
+      }))
       setModalOpen(false)
       setReviewSuccess(true)
       setTimeout(() => setReviewSuccess(false), 3500)
@@ -680,8 +685,13 @@ export default function BookDetailPage() {
   const handleDeleteReview = useCallback(async () => {
     if (!myReview || !window.confirm('রিভিউটি মুছে দিতে চান?')) return
     try {
-      await api.del(`/reviews/${myReview.review_id}`)
+      const result = await api.del(`/reviews/${myReview.review_id}`)
       setMyReview(null)
+      setBook((current) => current && ({
+        ...current,
+        rating: result.average_rating,
+        num_reviews: result.review_count,
+      }))
       setModalOpen(false)
       const updated = await api.get(`/reviews/book/${id}`)
       setReviews(updated?.data || [])

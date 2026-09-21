@@ -1,57 +1,81 @@
-// services/reviewService.js
-// Table: reviews (review_id, user_id, book_id, rating 1-5, comment)
 const pool = require('../config/db');
 
-// Upsert — one review per user per book
-async function submitReview(userId, bookId, rating, comment) {
-  const bookRes = await pool.query('SELECT id FROM books WHERE id = $1', [bookId]);
-  if (!bookRes.rows.length) {
-    throw { status: 404, message: 'বইটি পাওয়া যায়নি' };
-  }
+async function refreshBookRating(client, bookId) {
+  const aggregate = await client.query(
+    `SELECT
+       COALESCE(ROUND(AVG(rating), 1), 0) AS average_rating,
+       COUNT(*)::int AS review_count
+     FROM reviews
+     WHERE book_id = $1 AND COALESCE(is_hidden, FALSE) = FALSE`,
+    [bookId]
+  );
+  const { average_rating, review_count } = aggregate.rows[0];
 
-  // Check if user already reviewed this book
-  const existing = await pool.query(
-    'SELECT review_id FROM reviews WHERE user_id = $1 AND book_id = $2',
-    [userId, bookId]
+  await client.query(
+    'UPDATE books SET rating = $1, num_reviews = $2 WHERE id = $3',
+    [average_rating, review_count, bookId]
   );
 
-  let res;
-  if (existing.rows.length) {
-    // Update existing review
-    res = await pool.query(
-      `UPDATE reviews SET rating = $1, comment = $2
-       WHERE user_id = $3 AND book_id = $4
-       RETURNING *`,
-      [rating, comment || null, userId, bookId]
-    );
-  } else {
-    // Insert new review
-    res = await pool.query(
-      `INSERT INTO reviews (user_id, book_id, rating, comment)
-       VALUES ($1, $2, $3, $4)
-       RETURNING *`,
-      [userId, bookId, rating, comment || null]
-    );
-  }
-
-  return res.rows[0];
+  return {
+    average_rating: Number(average_rating),
+    review_count: Number(review_count),
+  };
 }
 
-// All reviews for a book (public)
+async function submitReview(userId, bookId, rating, comment) {
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+    const bookRes = await client.query('SELECT id FROM books WHERE id = $1 FOR UPDATE', [bookId]);
+    if (!bookRes.rows.length) {
+      throw { status: 404, message: 'বইটি পাওয়া যায়নি' };
+    }
+
+    const existing = await client.query(
+      'SELECT review_id FROM reviews WHERE user_id = $1 AND book_id = $2',
+      [userId, bookId]
+    );
+
+    const result = existing.rows.length
+      ? await client.query(
+          `UPDATE reviews SET rating = $1, comment = $2
+           WHERE user_id = $3 AND book_id = $4
+           RETURNING *`,
+          [rating, comment || null, userId, bookId]
+        )
+      : await client.query(
+          `INSERT INTO reviews (user_id, book_id, rating, comment)
+           VALUES ($1, $2, $3, $4)
+           RETURNING *`,
+          [userId, bookId, rating, comment || null]
+        );
+
+    const aggregate = await refreshBookRating(client, bookId);
+    await client.query('COMMIT');
+
+    return { review: result.rows[0], ...aggregate };
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 async function getBookReviews(bookId) {
   const res = await pool.query(
     `SELECT r.review_id, r.rating, r.comment,
             u.name AS reviewer_name
      FROM reviews r
      JOIN users u ON u.user_id = r.user_id
-     WHERE r.book_id = $1
+     WHERE r.book_id = $1 AND COALESCE(r.is_hidden, FALSE) = FALSE
      ORDER BY r.review_id DESC`,
     [bookId]
   );
   return res.rows;
 }
 
-// The logged-in user's own review for one book (or null)
 async function getUserReview(userId, bookId) {
   const res = await pool.query(
     'SELECT * FROM reviews WHERE user_id = $1 AND book_id = $2',
@@ -60,7 +84,6 @@ async function getUserReview(userId, bookId) {
   return res.rows[0] || null;
 }
 
-// All reviews written by a user, with book info
 async function getUserReviews(userId) {
   const res = await pool.query(
     `SELECT r.review_id, r.book_id, r.rating, r.comment,
@@ -79,14 +102,35 @@ async function getUserReviews(userId) {
 }
 
 async function deleteReview(userId, reviewId) {
-  const res = await pool.query(
-    'DELETE FROM reviews WHERE review_id = $1 AND user_id = $2 RETURNING review_id',
-    [reviewId, userId]
-  );
-  if (!res.rows.length) {
-    throw { status: 404, message: 'রিভিউটি পাওয়া যায়নি' };
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+    const existing = await client.query(
+      'SELECT book_id FROM reviews WHERE review_id = $1 AND user_id = $2',
+      [reviewId, userId]
+    );
+    if (!existing.rows.length) {
+      throw { status: 404, message: 'রিভিউটি পাওয়া যায়নি' };
+    }
+
+    const bookId = existing.rows[0].book_id;
+    await client.query('SELECT id FROM books WHERE id = $1 FOR UPDATE', [bookId]);
+    await client.query(
+      'DELETE FROM reviews WHERE review_id = $1 AND user_id = $2',
+      [reviewId, userId]
+    );
+
+    const aggregate = await refreshBookRating(client, bookId);
+    await client.query('COMMIT');
+
+    return { deleted: true, ...aggregate };
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
   }
-  return { deleted: true };
 }
 
 module.exports = { submitReview, getBookReviews, getUserReview, getUserReviews, deleteReview };

@@ -6,6 +6,15 @@
   overflow: hidden;
 }
 
+.am-top-book {
+  padding-bottom: var(--space-10);
+}
+
+.am-top-book__card {
+  width: 190px;
+  margin: var(--space-6) auto 0;
+}
+
 /* ── Marquee track ── */
 .am-track-wrap {
   overflow: hidden;
