@@ -9,14 +9,31 @@ async function submitReview(userId, bookId, rating, comment) {
     throw { status: 404, message: 'বইটি পাওয়া যায়নি' };
   }
 
-  const res = await pool.query(
-    `INSERT INTO reviews (user_id, book_id, rating, comment)
-     VALUES ($1, $2, $3, $4)
-     ON CONFLICT ON CONSTRAINT uq_review_user_book
-     DO UPDATE SET rating = EXCLUDED.rating, comment = EXCLUDED.comment
-     RETURNING *`,
-    [userId, bookId, rating, comment || null]
+  // Check if user already reviewed this book
+  const existing = await pool.query(
+    'SELECT review_id FROM reviews WHERE user_id = $1 AND book_id = $2',
+    [userId, bookId]
   );
+
+  let res;
+  if (existing.rows.length) {
+    // Update existing review
+    res = await pool.query(
+      `UPDATE reviews SET rating = $1, comment = $2
+       WHERE user_id = $3 AND book_id = $4
+       RETURNING *`,
+      [rating, comment || null, userId, bookId]
+    );
+  } else {
+    // Insert new review
+    res = await pool.query(
+      `INSERT INTO reviews (user_id, book_id, rating, comment)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      [userId, bookId, rating, comment || null]
+    );
+  }
+
   return res.rows[0];
 }
 

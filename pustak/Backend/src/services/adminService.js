@@ -739,6 +739,27 @@ class AdminService {
     `);
     return result.rows;
   }
+
+  // ============= BEST CUSTOMERS =============
+  async getBestCustomers(limit = 10) {
+    const result = await pool.query(`
+      SELECT
+        u.user_id,
+        u.name,
+        u.email,
+        COUNT(DISTINCT o.order_id)                                    AS total_orders,
+        SUM(o.total_amount)                                           AS total_spent,
+        MAX(o.order_date)                                             AS last_order_date,
+        COUNT(DISTINCT o.order_id) FILTER (WHERE o.status = 'Delivered') AS delivered_orders
+      FROM users u
+      JOIN orders o ON o.user_id = u.user_id
+      WHERE o.status NOT IN ('Cancelled')
+      GROUP BY u.user_id, u.name, u.email
+      ORDER BY total_orders DESC, total_spent DESC
+      LIMIT $1
+    `, [limit]);
+    return result.rows;
+  }
 }
 
 module.exports = new AdminService();

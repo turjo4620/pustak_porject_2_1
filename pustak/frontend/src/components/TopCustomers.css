@@ -1,0 +1,98 @@
+/* ── Top Customers Section ───────────────────────────────── */
+.top-customers__list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+.top-customers__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.5rem 1.25rem;
+  border-radius: 12px;
+  background: var(--bg-secondary, #f9fafb);
+  border: 1px solid var(--border-color, #e5e7eb);
+  min-width: 140px;
+  flex: 0 0 auto;
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-align: center;
+}
+
+.top-customers__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Top 3 get special treatment */
+.rank-card--1 {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.15);
+}
+.rank-card--2 {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+.rank-card--3 {
+  border-color: #cd7c2e;
+  background: #fff7ed;
+}
+
+.top-customers__rank {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.top-customers__avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  flex-shrink: 0;
+}
+
+.rank-card--1 .top-customers__avatar {
+  width: 62px;
+  height: 62px;
+  font-size: 1.5rem;
+  box-shadow: 0 0 0 3px #f59e0b;
+}
+
+.top-customers__name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  margin: 0;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.top-customers__orders {
+  font-size: 0.8rem;
+  color: var(--text-muted, #9ca3af);
+  font-family: var(--font-sans);
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .top-customers__list {
+    gap: 0.75rem;
+  }
+  .top-customers__card {
+    min-width: 110px;
+    padding: 1rem 0.75rem;
+  }
+}

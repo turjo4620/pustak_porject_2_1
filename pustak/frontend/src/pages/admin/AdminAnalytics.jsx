@@ -114,6 +114,48 @@ export default function AdminAnalytics() {
         </table>
       </div>
 
+      {/* ── Best Customers ── */}
+      <div className="analytics-section">
+        <h2>Best Customers</h2>
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Customer</th>
+              <th>Email</th>
+              <th>Total Orders</th>
+              <th>Delivered</th>
+              <th>Total Spent</th>
+              <th>Last Order</th>
+            </tr>
+          </thead>
+          <tbody>
+            {analytics?.bestCustomers?.map((c, idx) => (
+              <tr key={c.user_id}>
+                <td>
+                  <span className={`rank-badge rank-${idx + 1}`}>#{idx + 1}</span>
+                </td>
+                <td>
+                  <div className="customer-info">
+                    <div className="customer-avatar">
+                      {(c.name || c.email || '?').charAt(0).toUpperCase()}
+                    </div>
+                    <strong>{c.name || '—'}</strong>
+                  </div>
+                </td>
+                <td style={{ fontSize: '0.85rem', color: '#6b7280' }}>{c.email}</td>
+                <td><strong>{c.total_orders}</strong></td>
+                <td>{c.delivered_orders}</td>
+                <td>৳{parseFloat(c.total_spent || 0).toFixed(2)}</td>
+                <td style={{ fontSize: '0.82rem', color: '#9ca3af' }}>
+                  {c.last_order_date ? new Date(c.last_order_date).toLocaleDateString() : '—'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       <div className="analytics-section">
         <h2>Popular Categories</h2>
         <table className="admin-table">
