@@ -144,9 +144,9 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
             {authUser ? (
               <button
                 className={`nav__icon-btn nav__icon-btn--user ${userOpen ? 'nav__icon-btn--open' : ''}`}
-                aria-label="Profile"
+                aria-label="আমার অ্যাকাউন্ট"
                 aria-expanded={userOpen}
-                onClick={() => { setUserOpen(!userOpen); setCartOpen(false); setWishOpen(false) }}
+                onClick={() => { navigate('/account'); setCartOpen(false); setWishOpen(false) }}
               >
                 <User size={20} />
               </button>

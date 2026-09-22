@@ -24,6 +24,7 @@ async function requestReturn(userId, orderItemId, reason) {
   const ownershipRes = await pool.query(
     `SELECT
        oi.order_item_id,
+       oi.copy_id,
        oi.price_sold,
        o.order_id,
        o.status      AS order_status,
@@ -70,10 +71,10 @@ async function requestReturn(userId, orderItemId, reason) {
 
   // 3. Insert
   const insertRes = await pool.query(
-    `INSERT INTO "return" (order_item_id, reason, status)
-     VALUES ($1, $2, 'initiated')
+    `INSERT INTO "return" (order_item_id, copy_id, user_id, reason, status)
+     VALUES ($1, $2, $3, $4, 'initiated')
      RETURNING *`,
-    [orderItemId, reason || null]
+    [orderItemId, row.copy_id, userId, reason || null]
   );
 
   return insertRes.rows[0];

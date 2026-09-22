@@ -626,7 +626,7 @@ class AdminService {
       JOIN users u ON r.user_id = u.user_id
       JOIN books b ON r.book_id = b.id
       WHERE ${whereClause}
-      ORDER BY r.created_at DESC
+      ORDER BY r.review_date DESC
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `;
     queryParams.push(limit, offset);

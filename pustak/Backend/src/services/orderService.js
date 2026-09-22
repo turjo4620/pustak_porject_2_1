@@ -246,8 +246,7 @@ async function listOrders(userId) {
 
 async function getTrackingInfo(userId, orderId) {
   const orderRes = await pool.query(
-    `SELECT order_id, order_number, status,
-            order_date, confirmed_at, packed_at, cancelled_at
+    `SELECT order_id, order_number, status, order_date
      FROM orders WHERE order_id = $1 AND user_id = $2`,
     [orderId, userId]
   );
