@@ -30,7 +30,9 @@ export default function BookCard({ book, size = 'default' }) {
   const category      = book.category || null
   const rating        = Number(book.rating) || 0
   const reviews       = Number(book.num_reviews) || Number(book.reviews) || 0
-  const inStock       = book.availability !== 'Out of Stock' && book.inStock !== false
+  const inStock       = book.in_stock != null
+    ? Boolean(book.in_stock)
+    : book.availability !== 'Out of Stock' && book.inStock !== false
   const badge         = book.badge || null
   const badgeColor    = book.badgeColor || '#000'
 

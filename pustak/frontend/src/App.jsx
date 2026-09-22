@@ -31,6 +31,8 @@ import AccountOrders          from './pages/AccountOrders'
 import AccountWishlist        from './pages/AccountWishlist'
 import AccountReviews         from './pages/AccountReviews'
 import AccountReturns         from './pages/AccountReturns'
+import OrderDinPage           from './pages/OrderDinPage'
+import AccountHomePage        from './pages/AccountHomePage'
 import PaymentPage            from './pages/PaymentPage'
 import OrderSuccessPage       from './pages/OrderSuccessPage'
 import OrderDetailPage        from './pages/OrderDetailPage'
@@ -124,8 +126,10 @@ export default function App() {
             
             {/* --- NEW NESTED ACCOUNT ROUTES --- */}
             <Route path="/account" element={<AccountDashboardLayout />}>
-              <Route index element={<AccountProfileCard />} /> 
+              <Route index element={<AccountHomePage />} />
+              <Route path="profile" element={<AccountProfileCard />} />
               <Route path="info" element={<AccountProfileCard />} />
+              <Route path="order" element={<OrderDinPage />} />
               <Route path="orders" element={<AccountOrders />} />
               <Route path="orders/:orderId" element={<OrderDetailPage />} />
               <Route path="wishlist" element={<AccountWishlist />} />

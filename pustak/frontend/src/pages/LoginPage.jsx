@@ -34,7 +34,7 @@ export default function LoginPage() {
     }
     // Customer session
     if (authUser) {
-      navigate('/', { replace: true })
+      navigate('/account', { replace: true })
     }
   }, [authUser, navigate])
 
@@ -78,7 +78,7 @@ export default function LoginPage() {
       setMessage({ type: 'success', text: data.message })
       
       // Navigate to appropriate page immediately
-      const destination = form.userType === 'admin' ? '/admin/dashboard' : '/'
+      const destination = form.userType === 'admin' ? '/admin/dashboard' : '/account'
       navigate(destination, { replace: true })
     } catch (error) {
       const friendlyMessage = error.message.includes('Unexpected token')

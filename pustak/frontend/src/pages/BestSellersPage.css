@@ -72,6 +72,13 @@
   align-items: start;
 }
 
+/* ── Grid loading state (server-side pagination) ─────────────── */
+.bsp__grid--loading {
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
 /* ── Desktop sidebar ─────────────────────────────────────────── */
 .bsp__sidebar {
   position: sticky;

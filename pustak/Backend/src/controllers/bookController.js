@@ -315,6 +315,270 @@ const getBookById = async (req, res) => {
   }
 };
 
+// ─────────────────────────────────────────────────────────────────
+// Canonical catalog endpoint used by every customer-facing list page.
+// Supports: scopes (bestsellers / new_arrivals / offers / all),
+// locked dimensions (author_id / category_id / publisher_id),
+// facet filters (author_ids / category_ids / publisher_ids),
+// search q, price range, in-stock toggle, safe sorting, pagination,
+// facet counts and price bounds.
+// ─────────────────────────────────────────────────────────────────
+const CATALOG_SORTS = {
+  popularity:  'COALESCE(sales.sales_count, 0) DESC, books.id ASC',
+  newest:      'pub_year DESC NULLS LAST, books.id DESC',
+  price_asc:   'books.price ASC, books.id ASC',
+  price_desc:  'books.price DESC, books.id DESC',
+  discount:    'books.discount_percentage::numeric DESC, books.id ASC',
+  rating:      'books.rating DESC NULLS LAST, books.num_reviews DESC, books.id ASC',
+};
+const CATALOG_DEFAULT_SORT = {
+  bestsellers: 'popularity',
+  new_arrivals: 'newest',
+  offers: 'discount',
+  all: 'popularity',
+};
+const BN_YEAR_EXPR = `(regexp_match(TRANSLATE(COALESCE(books.edition, ''), '০১২৩৪৫৬৭৮৯', '0123456789'), '(\\d{4})'))[1]::INTEGER`;
+
+const parseIdList = (raw) => String(raw || '')
+  .split(',')
+  .map((v) => parseInt(v.trim(), 10))
+  .filter(Number.isInteger);
+
+function buildCatalogWhere(opts, skipDimension) {
+  const conds = [];
+  const params = [];
+  const push = (sql, ...vals) => {
+    let i = params.length;
+    conds.push(sql.replace(/\?/g, () => `$${++i}`));
+    params.push(...vals);
+  };
+
+  if (opts.q) {
+    const pattern = `%${opts.q}%`;
+    push(
+      `(books.book_name ILIKE ? OR EXISTS (
+        SELECT 1 FROM book_author ba
+        JOIN authors a ON a.author_id = ba.author_id
+        WHERE ba.book_id = books.id AND a.name ILIKE ?
+      ))`,
+      pattern, pattern
+    );
+  }
+  if (opts.authorId) {
+    push(`EXISTS (SELECT 1 FROM book_author ba WHERE ba.book_id = books.id AND ba.author_id = ?)`, opts.authorId);
+  } else if (opts.authorIds.length && skipDimension !== 'authors') {
+    push(`EXISTS (SELECT 1 FROM book_author ba WHERE ba.book_id = books.id AND ba.author_id = ANY(?))`, opts.authorIds);
+  }
+  if (opts.categoryId) {
+    push(`EXISTS (SELECT 1 FROM book_category bc WHERE bc.book_id = books.id AND bc.category_id = ?)`, opts.categoryId);
+  } else if (opts.categoryIds.length && skipDimension !== 'categories') {
+    push(`EXISTS (SELECT 1 FROM book_category bc WHERE bc.book_id = books.id AND bc.category_id = ANY(?))`, opts.categoryIds);
+  }
+  if (opts.publisherId) {
+    push(`books.publication_id = ?`, opts.publisherId);
+  } else if (opts.publisherIds.length && skipDimension !== 'publishers') {
+    push(`books.publication_id = ANY(?)`, opts.publisherIds);
+  }
+  if (opts.scope === 'offers') {
+    push(`books.discount_percentage::numeric >= ?`, opts.minPct);
+  }
+  if (opts.scope === 'new_arrivals') {
+    push(`${BN_YEAR_EXPR} BETWEEN 1900 AND 2030`);
+  }
+  if (opts.inStock) {
+    push(`COALESCE(stock.in_stock, 0) > 0`);
+  }
+  if (skipDimension !== 'price') {
+    if (opts.priceMin != null) push(`books.price >= ?`, opts.priceMin);
+    if (opts.priceMax != null) push(`books.price <= ?`, opts.priceMax);
+  }
+
+  return { conds, params };
+}
+
+const getCatalog = async (req, res) => {
+  try {
+    const scope      = ['bestsellers', 'new_arrivals', 'offers'].includes(req.query.scope) ? req.query.scope : 'all';
+    const sort       = CATALOG_SORTS[req.query.sort] ? req.query.sort : CATALOG_DEFAULT_SORT[scope];
+    const page       = Math.max(parseInt(req.query.page)  || 1, 1);
+    const limit      = Math.min(Math.max(parseInt(req.query.limit) || 20, 1), 100);
+    const offset     = (page - 1) * limit;
+    const q          = req.query.q ? req.query.q.trim() : '';
+    const authorId   = parseInt(req.query.author_id)   || null;
+    const categoryId = parseInt(req.query.category_id) || null;
+    const publisherId= parseInt(req.query.publisher_id)|| null;
+    const authorIds    = parseIdList(req.query.author_ids);
+    const categoryIds  = parseIdList(req.query.category_ids);
+    const publisherIds = parseIdList(req.query.publisher_ids);
+    const priceMin   = req.query.price_min != null && req.query.price_min !== '' ? Number(req.query.price_min) : null;
+    const priceMax   = req.query.price_max != null && req.query.price_max !== '' ? Number(req.query.price_max) : null;
+    const inStock    = req.query.in_stock === 'true' || req.query.in_stock === '1';
+    const minPct     = parseInt(req.query.min_pct) || 1;
+
+    if ([priceMin, priceMax].some((v) => v != null && !Number.isFinite(v))) {
+      return res.status(400).json({ error: 'Invalid price range' });
+    }
+
+    const opts = { q, authorId, categoryId, publisherId, authorIds, categoryIds, publisherIds,
+                   priceMin, priceMax, inStock, scope, minPct };
+
+    const where = buildCatalogWhere(opts);
+    const whereSql = where.conds.length ? `WHERE ${where.conds.join('\n        AND ')}` : '';
+
+    const dataQuery = `
+      WITH sales AS (
+        SELECT bc.book_id, COUNT(oi.order_item_id)::int AS sales_count
+        FROM book_copy bc
+        LEFT JOIN order_item oi ON oi.copy_id = bc.copy_id
+        GROUP BY bc.book_id
+      ),
+      stock AS (
+        SELECT bc.book_id, COUNT(*) FILTER (WHERE bc.status = 'in_stock')::int AS in_stock
+        FROM book_copy bc
+        GROUP BY bc.book_id
+      )
+      SELECT
+        books.id,
+        books.book_name,
+        books.cover_image_url,
+        books.price,
+        books.discount_percentage,
+        ROUND(books.price * (1 - books.discount_percentage / 100.0), 2) AS discount_price,
+        books.rating,
+        books.num_reviews,
+        books.availability,
+        books.edition,
+        books.publication_id,
+        pub.title AS publisher,
+        cat_names.category_list AS category,
+        ${BN_YEAR_EXPR} AS pub_year,
+        COALESCE(sales.sales_count, 0)::int AS sales_count,
+        (COALESCE(stock.in_stock, 0) > 0) AS in_stock,
+        STRING_AGG(a.name, ', ' ORDER BY a.name) AS author
+      FROM books
+      LEFT JOIN book_author ba ON ba.book_id = books.id
+      LEFT JOIN authors a ON a.author_id = ba.author_id
+      LEFT JOIN publications pub ON pub.publication_id = books.publication_id
+      LEFT JOIN LATERAL (
+        SELECT STRING_AGG(c.category_name, ', ' ORDER BY c.category_name) AS category_list
+        FROM book_category bc
+        JOIN categories c ON c.category_id = bc.category_id
+        WHERE bc.book_id = books.id
+      ) cat_names ON TRUE
+      LEFT JOIN sales ON sales.book_id = books.id
+      LEFT JOIN stock ON stock.book_id = books.id
+      ${whereSql}
+      GROUP BY books.id, pub.title, cat_names.category_list, sales.sales_count, stock.in_stock
+      ORDER BY ${CATALOG_SORTS[sort]}
+      LIMIT ${limit} OFFSET ${offset}
+    `;
+    const dataParams = [...where.params];
+
+    // Count + facet queries only need the stock CTE when the in-stock filter is active.
+    const needsStock = opts.inStock;
+    const stockCte = `
+      stock AS (
+        SELECT bc.book_id, COUNT(*) FILTER (WHERE bc.status = 'in_stock')::int AS in_stock
+        FROM book_copy bc
+        GROUP BY bc.book_id
+      )`;
+    const filteredFrom = `
+      FROM books
+      ${needsStock ? 'LEFT JOIN stock ON stock.book_id = books.id' : ''}
+      ${whereSql}`;
+
+    const [dataResult, countResult] = await Promise.all([
+      pool.query(dataQuery, dataParams),
+      pool.query(
+        `${needsStock ? `WITH ${stockCte}` : ''}
+         SELECT COUNT(DISTINCT books.id)::int AS total
+         ${filteredFrom}`,
+        where.params
+      ),
+    ]);
+
+    const total      = countResult.rows[0]?.total || 0;
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
+    // ── Facets (each excludes its own dimension so counts stay meaningful) ──
+    const runFacet = async (sql, params) => {
+      try { return (await pool.query(sql, params)).rows; } catch (e) {
+        console.error('facet error:', e.message);
+        return [];
+      }
+    };
+
+    const [categoryFacets, authorFacets, publisherFacets, priceBounds] = await Promise.all([
+      categoryId ? Promise.resolve([]) : runFacet(`
+        ${needsStock ? `WITH ${stockCte}` : ''}
+        SELECT c.category_id AS id, c.category_name AS name, COUNT(DISTINCT books.id)::int AS count
+        FROM books
+        JOIN book_category bc ON bc.book_id = books.id
+        JOIN categories c ON c.category_id = bc.category_id
+        ${needsStock ? 'LEFT JOIN stock ON stock.book_id = books.id' : ''}
+        ${buildWhereSql(opts, 'categories')}
+        GROUP BY c.category_id, c.category_name
+        ORDER BY count DESC, c.category_name ASC
+        LIMIT 40`,
+        buildCatalogWhere(opts, 'categories').params),
+      authorId ? Promise.resolve([]) : runFacet(`
+        ${needsStock ? `WITH ${stockCte}` : ''}
+        SELECT a.author_id AS id, a.name AS name, COUNT(DISTINCT books.id)::int AS count
+        FROM books
+        JOIN book_author ba ON ba.book_id = books.id
+        JOIN authors a ON a.author_id = ba.author_id
+        ${needsStock ? 'LEFT JOIN stock ON stock.book_id = books.id' : ''}
+        ${buildWhereSql(opts, 'authors')}
+        GROUP BY a.author_id, a.name
+        ORDER BY count DESC, a.name ASC
+        LIMIT 40`,
+        buildCatalogWhere(opts, 'authors').params),
+      publisherId ? Promise.resolve([]) : runFacet(`
+        ${needsStock ? `WITH ${stockCte}` : ''}
+        SELECT p.publication_id AS id, p.title AS name, COUNT(DISTINCT books.id)::int AS count
+        FROM books
+        JOIN publications p ON p.publication_id = books.publication_id
+        ${needsStock ? 'LEFT JOIN stock ON stock.book_id = books.id' : ''}
+        ${buildWhereSql(opts, 'publishers')}
+        GROUP BY p.publication_id, p.title
+        ORDER BY count DESC, p.title ASC
+        LIMIT 40`,
+        buildCatalogWhere(opts, 'publishers').params),
+      runFacet(`
+        ${needsStock ? `WITH ${stockCte}` : ''}
+        SELECT COALESCE(MIN(books.price), 0)::numeric AS min, COALESCE(MAX(books.price), 0)::numeric AS max
+        FROM books
+        ${needsStock ? 'LEFT JOIN stock ON stock.book_id = books.id' : ''}
+        ${buildWhereSql(opts, 'price')}`,
+        buildCatalogWhere(opts, 'price').params),
+    ]);
+
+    res.status(200).json({
+      data: dataResult.rows,
+      total,
+      currentPage: page,
+      totalPages,
+      facets: {
+        categories: categoryFacets,
+        authors: authorFacets,
+        publishers: publisherFacets,
+      },
+      priceRange: {
+        min: Math.floor(Number(priceBounds[0]?.min || 0)),
+        max: Math.ceil(Number(priceBounds[0]?.max || 2000)),
+      },
+    });
+  } catch (error) {
+    console.error('getCatalog error:', error.message);
+    res.status(500).json({ error: 'Error fetching catalog' });
+  }
+};
+
+function buildWhereSql(opts, skipDimension) {
+  const { conds } = buildCatalogWhere(opts, skipDimension);
+  return conds.length ? `WHERE ${conds.join('\n          AND ')}` : '';
+}
+
 const getBestsellers = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 20;
@@ -435,4 +699,4 @@ const getOffers = async (req, res) => {
   }
 };
 
-module.exports = { getBooks, searchBooks, getBooksByAuthor, getBooksByPublication, getBooksByCategory, getBookById, getBestsellers, getNewArrivals, getOffers };
+module.exports = { getBooks, searchBooks, getBooksByAuthor, getBooksByPublication, getBooksByCategory, getBookById, getBestsellers, getNewArrivals, getOffers, getCatalog };

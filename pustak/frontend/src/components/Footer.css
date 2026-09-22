@@ -53,6 +53,14 @@
 }
 .footer__link:hover { color: rgba(250,247,242,0.95); padding-left: 4px; }
 
+/* "সব বিভাগ →" subtle accent */
+.footer__link--all {
+  color: rgba(250,247,242,0.5);
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
+.footer__link--all:hover { color: rgba(250,247,242,0.95); }
+
 /* Divider */
 .footer__divider {
   height: 1px;

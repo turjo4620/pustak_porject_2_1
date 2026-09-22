@@ -1,14 +1,15 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { User, Package, Heart, Star, LogOut, Camera, RotateCcw } from 'lucide-react'
+import { User, Package, Heart, Star, LogOut, Camera, RotateCcw, ShoppingBag } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import './account-dashboard.css'
 
 const NAV_ITEMS = [
-  { to: '/account/info',     icon: User,       label: 'আমার তথ্য'        },
-  { to: '/account/orders',   icon: Package,    label: 'অর্ডার ও ট্র্যাকিং' },
-  { to: '/account/wishlist', icon: Heart,      label: 'পছন্দের তালিকা'   },
-  { to: '/account/returns',  icon: RotateCcw,  label: 'রিটার্ন ও রিফান্ড' },
-  { to: '/account/reviews',  icon: Star,       label: 'রিভিউ ও রেটিং'    },
+  { to: '/account/profile',  icon: User,        label: 'আমার তথ্য'        },
+  { to: '/account/order',    icon: ShoppingBag,  label: 'অর্ডার দিন'       },
+  { to: '/account/orders',   icon: Package,     label: 'অর্ডার ট্র্যাকিং'  },
+  { to: '/account/wishlist', icon: Heart,       label: 'পছন্দের তালিকা'   },
+  { to: '/account/returns',  icon: RotateCcw,   label: 'রিটার্ন ও রিফান্ড' },
+  { to: '/account/reviews',  icon: Star,        label: 'রিভিউ ও রেটিং'    },
 ]
 
 export default function AccountSidebar() {
@@ -36,7 +37,7 @@ export default function AccountSidebar() {
             className="sidebar-avatar-edit"
             aria-label="প্রোফাইল ছবি পরিবর্তন করুন"
             title="প্রোফাইল এডিট করুন"
-            onClick={() => navigate('/account/info')}
+            onClick={() => navigate('/account/profile')}
           >
             <Camera size={13} />
           </button>
@@ -55,7 +56,11 @@ export default function AccountSidebar() {
           <NavLink
             key={to}
             to={to}
-            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+            // /account/profile and legacy /account/info both highlight the first item
+            className={({ isActive }) => {
+              const legacyActive = to === '/account/profile' && window.location.pathname === '/account/info'
+              return `nav-item${isActive || legacyActive ? ' active' : ''}`
+            }}
           >
             <Icon size={16} strokeWidth={1.8} className="nav-item__icon" />
             {label}

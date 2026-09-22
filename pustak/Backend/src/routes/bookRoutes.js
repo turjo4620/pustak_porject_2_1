@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-const { getBooks, searchBooks, getBooksByAuthor, getBooksByPublication, getBooksByCategory, getBookById, getBestsellers, getNewArrivals, getOffers } = require('../controllers/bookController');
+const { getBooks, searchBooks, getBooksByAuthor, getBooksByPublication, getBooksByCategory, getBookById, getBestsellers, getNewArrivals, getOffers, getCatalog } = require('../controllers/bookController');
 
 router.get('/search',        searchBooks);
+router.get('/catalog',       getCatalog);
 router.get('/bestsellers',   getBestsellers);
 router.get('/new-arrivals',  getNewArrivals);
 router.get('/offers',        getOffers);
