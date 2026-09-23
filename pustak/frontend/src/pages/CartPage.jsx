@@ -1,19 +1,24 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Minus, Plus, Trash2 } from 'lucide-react'
+import { Minus, Plus, Trash2, Info } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import './CartPage.css'
+
+// Delivery charge constants — must match CheckoutPage
+const DELIVERY_DHAKA   = 70
+const DELIVERY_OUTSIDE = 120
+
+const toBn = (n) => String(n).replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d])
 
 export default function CartPage() {
   const navigate = useNavigate()
   const {
     cartItems, cartLoading, cartTotal,
     incrementItem, decrementItem, removeFromCart,
-    placeOrder, authUser
+    authUser
   } = useApp()
 
   const [busyItemId, setBusyItemId] = useState(null)
-  const [placing, setPlacing] = useState(false)
   const [error, setError] = useState('')
 
   const guard = async (item, fn) => {
@@ -29,24 +34,15 @@ export default function CartPage() {
 
   const handleIncrement = (item) => guard(item, () => incrementItem(item))
   const handleDecrement = (item) => guard(item, () => decrementItem(item))
-  const handleRemove = (item) => guard(item, () => removeFromCart(item.cart_item_id))
+  const handleRemove    = (item) => guard(item, () => removeFromCart(item.cart_item_id))
 
-  const handlePlaceOrder = async () => {
-    if (!authUser) {
-      navigate('/login')
-      return
-    }
-    setError('')
-    try {
-      setPlacing(true)
-      const order = await placeOrder()
-      navigate(`/payment/${order.order_id}`)
-    } catch (err) {
-      setError(err.message || 'অর্ডার দিতে সমস্যা হয়েছে')
-    } finally {
-      setPlacing(false)
-    }
+  const handleCheckout = () => {
+    if (!authUser) { navigate('/login'); return }
+    navigate('/checkout')
   }
+
+  // Delivery range for display — show both rates before address is known
+  const totalItems = cartItems.reduce((s, i) => s + i.quantity, 0)
 
   return (
     <div className="cart-page">
@@ -67,9 +63,10 @@ export default function CartPage() {
           </div>
         ) : (
           <div className="cart-page__layout">
-            {/* Items */}
+
+            {/* ── Items ── */}
             <div className="cart-page__items">
-              <h2>বইয়ের তালিকা ({cartItems.length})</h2>
+              <h2>বইয়ের তালিকা ({toBn(cartItems.length)})</h2>
 
               {cartItems.map((item) => {
                 const busy = busyItemId === item.cart_item_id
@@ -90,19 +87,11 @@ export default function CartPage() {
                     </div>
 
                     <div className="cart-item__qty">
-                      <button
-                        onClick={() => handleDecrement(item)}
-                        disabled={busy}
-                        aria-label="পরিমাণ কমান"
-                      >
+                      <button onClick={() => handleDecrement(item)} disabled={busy} aria-label="পরিমাণ কমান">
                         <Minus size={14} />
                       </button>
-                      <span className="cart-item__qty-value">{item.quantity}</span>
-                      <button
-                        onClick={() => handleIncrement(item)}
-                        disabled={busy}
-                        aria-label="পরিমাণ বাড়ান"
-                      >
+                      <span className="cart-item__qty-value">{toBn(item.quantity)}</span>
+                      <button onClick={() => handleIncrement(item)} disabled={busy} aria-label="পরিমাণ বাড়ান">
                         <Plus size={14} />
                       </button>
                     </div>
@@ -124,32 +113,48 @@ export default function CartPage() {
               })}
             </div>
 
-            {/* Summary */}
+            {/* ── Summary ── */}
             <div className="cart-page__summary">
               <h2>অর্ডার সারসংক্ষেপ</h2>
+
               <div className="cart-page__summary-row">
                 <span>মোট বই</span>
-                <span>{cartItems.reduce((s, i) => s + i.quantity, 0)} টি</span>
+                <span>{toBn(totalItems)}টি</span>
               </div>
+
               <div className="cart-page__summary-row">
                 <span>উপমোট</span>
                 <span>৳{cartTotal.toFixed(2)}</span>
               </div>
-              <div className="cart-page__summary-row">
-                <span>ডেলিভারি</span>
-                <span>বিনামূল্যে</span>
+
+              <div className="cart-page__summary-row cart-page__delivery-row">
+                <span className="cart-page__delivery-label">
+                  ডেলিভারি চার্জ
+                  <span className="cart-page__delivery-tip" title="ঢাকা বিভাগ: ৭০ টাকা | ঢাকার বাইরে: ১২০ টাকা">
+                    <Info size={13} />
+                  </span>
+                </span>
+                <span className="cart-page__delivery-value">
+                  <span className="cart-page__delivery-dhaka">ঢাকা: ৳{toBn(DELIVERY_DHAKA)}</span>
+                  <span className="cart-page__delivery-sep"> / </span>
+                  <span className="cart-page__delivery-outside">বাইরে: ৳{toBn(DELIVERY_OUTSIDE)}</span>
+                </span>
               </div>
-              <div className="cart-page__summary-total">
-                <strong>মোট</strong>
-                <strong>৳{cartTotal.toFixed(2)}</strong>
+
+              <div className="cart-page__delivery-note">
+                <Info size={12} />
+                চেকআউটে ঠিকানা দেওয়ার পর সঠিক চার্জ যোগ হবে
               </div>
+
+              <div className="cart-page__summary-divider" />
+
               <button
                 className="cart-page__order-btn"
-                onClick={handlePlaceOrder}
-                disabled={placing}
+                onClick={handleCheckout}
               >
-                {placing ? 'অর্ডার দেওয়া হচ্ছে...' : 'অর্ডার দিন'}
+                চেকআউটে যান →
               </button>
+
               <p className="cart-page__note">
                 বাংলাদেশের যেকোনো ঠিকানায় ৩-৫ কার্যদিবসে ডেলিভারি
               </p>

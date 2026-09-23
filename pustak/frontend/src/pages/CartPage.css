@@ -165,3 +165,77 @@
   color: var(--color-muted, #888);
   text-align: center;
 }
+
+/* ── Delivery charge row ── */
+.cart-page__delivery-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  margin-bottom: var(--space-2);
+}
+
+.cart-page__delivery-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-muted, #555);
+  font-size: 0.9rem;
+}
+
+.cart-page__delivery-tip {
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  cursor: help;
+}
+
+.cart-page__delivery-value {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.cart-page__delivery-dhaka   { color: #0f766e; font-weight: 600; }
+.cart-page__delivery-outside { color: #6b7280; }
+.cart-page__delivery-sep     { color: #d1d5db; margin: 0 2px; }
+
+/* Helper note below delivery row */
+.cart-page__delivery-note {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin-bottom: var(--space-3);
+  line-height: 1.4;
+}
+
+/* Divider before total */
+.cart-page__summary-divider {
+  border: none;
+  border-top: 1px dashed #e5e7eb;
+  margin: var(--space-2) 0 var(--space-3);
+}
+
+/* Estimated total range */
+.cart-page__summary-total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: var(--space-3);
+  margin: 0 0 var(--space-5);
+  font-size: 1rem;
+}
+
+/* Checkout button — teal to match Pustak theme */
+.cart-page__order-btn {
+  width: 100%;
+  padding: var(--space-4);
+  background: #0f766e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cart-page__order-btn:hover { background: #0d6560; }

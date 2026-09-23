@@ -13,11 +13,19 @@ const formatBnAmount = (num) =>
 // ── Delivery charge ─────────────────────────────────────────────
 const DELIVERY_DHAKA   =  70
 const DELIVERY_OUTSIDE = 120
-function calcDeliveryCharge(division) {
-  if (!division) return DELIVERY_OUTSIDE
-  return division.trim().toLowerCase() === 'ঢাকা' ||
-         division.trim().toLowerCase() === 'dhaka'
-    ? DELIVERY_DHAKA : DELIVERY_OUTSIDE
+const DHAKA_VARIANTS   = ['ঢাকা', 'dhaka', 'dhaka division', 'dhaka vibhag']
+
+function isDhaka(value) {
+  if (!value) return false
+  return DHAKA_VARIANTS.includes(value.trim().toLowerCase())
+}
+
+function calcDeliveryCharge(addr) {
+  // Check division first, fall back to district (handles both field patterns)
+  if (isDhaka(addr?.division))  return DELIVERY_DHAKA
+  if (isDhaka(addr?.district))  return DELIVERY_DHAKA
+  if (isDhaka(addr?.city))      return DELIVERY_DHAKA
+  return DELIVERY_OUTSIDE
 }
 
 export default function CheckoutPage() {
@@ -51,7 +59,7 @@ export default function CheckoutPage() {
 
   // Delivery charge — recalculates when selected address changes
   const selectedAddr   = addresses.find(x => x.address_id === selectedAddressId) || null
-  const deliveryCharge = selectedAddr ? calcDeliveryCharge(selectedAddr.division) : 0
+  const deliveryCharge = selectedAddr ? calcDeliveryCharge(selectedAddr) : 0
   const finalTotal     = Math.max(0, subtotal - discountAmount) + deliveryCharge
 
   // ── Fetch user's saved addresses ───────────────────────────────

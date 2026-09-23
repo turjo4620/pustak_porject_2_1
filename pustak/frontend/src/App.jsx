@@ -129,7 +129,7 @@ export default function App() {
               <Route index element={<AccountHomePage />} />
               <Route path="profile" element={<AccountProfileCard />} />
               <Route path="info" element={<AccountProfileCard />} />
-              <Route path="order" element={<OrderDinPage />} />
+              <Route path="order" element={<AccountHomePage />} />
               <Route path="orders" element={<AccountOrders />} />
               <Route path="orders/:orderId" element={<OrderDetailPage />} />
               <Route path="wishlist" element={<AccountWishlist />} />

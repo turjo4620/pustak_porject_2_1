@@ -1551,3 +1551,311 @@
     padding: 0 0.75rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   ACCOUNT REVIEWS  (.ar-*)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.account-reviews-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Header card */
+.ar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+}
+.ar-header__left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.ar-header__icon { color: #0f766e; flex-shrink: 0; }
+.ar-header__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+.ar-header__sub {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Review list */
+.ar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* Individual review card */
+.ar-card {
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: box-shadow 0.15s;
+}
+.ar-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+
+.ar-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+/* Book cover thumbnail */
+.ar-card__cover {
+  width: 52px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.ar-card__cover:hover { opacity: 0.85; }
+.ar-card__cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.ar-card__meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.ar-card__title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ar-card__title:hover { color: #0f766e; }
+.ar-card__author {
+  font-size: 0.78rem;
+  color: #6b7280;
+  margin: 0;
+}
+.ar-card__rating-text {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin: 1px 0 0;
+}
+
+/* Stars display */
+.ar-stars { display: flex; gap: 1px; }
+.ar-star {
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: 1;
+  color: #d1d5db;
+  cursor: default;
+  transition: color 0.1s;
+}
+.ar-star--on { color: #f59e0b; }
+.ar-star--btn { cursor: pointer; }
+.ar-star--btn:hover { color: #f59e0b; transform: scale(1.15); }
+
+/* Action buttons */
+.ar-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.ar-action-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.15s;
+}
+.ar-action-btn--edit:hover { border-color: #0f766e; color: #0f766e; background: #f0fdf4; }
+.ar-action-btn--del:hover  { border-color: #ef4444; color: #ef4444; background: #fef2f2; }
+
+/* Comment quote */
+.ar-card__comment {
+  font-size: 0.875rem;
+  color: #374151;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0.6rem 0.85rem;
+  background: #f9fafb;
+  border-left: 3px solid #d1fae5;
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+}
+
+/* Skeleton */
+.ar-skeleton {
+  height: 96px;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: ar-shimmer 1.4s infinite;
+  border-radius: 8px;
+}
+@keyframes ar-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Empty state */
+.ar-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+.ar-empty__icon { color: #d1d5db; }
+.ar-empty__title { font-size: 1rem; font-weight: 600; color: #374151; margin: 0; }
+.ar-empty__sub   { font-size: 0.85rem; color: #6b7280; margin: 0; }
+
+/* Shared buttons */
+.ar-btn {
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.ar-btn--primary {
+  background: #0f766e;
+  color: #fff;
+  border: none;
+}
+.ar-btn--primary:hover { background: #0d6560; }
+.ar-btn--ghost {
+  background: #fff;
+  color: #374151;
+  border: 1.5px solid #e5e7eb;
+}
+.ar-btn--ghost:hover { background: #f9fafb; }
+
+/* Edit modal */
+.ar-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.ar-modal {
+  background: #fff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 440px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.ar-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ar-modal__header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+.ar-modal__close {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+}
+.ar-modal__close:hover { color: #111827; }
+.ar-modal__book {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  background: #f3f4f6;
+  border-radius: 6px;
+}
+.ar-modal__rating {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.ar-modal__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+.ar-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.ar-modal__textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+.ar-modal__textarea:focus { border-color: #0f766e; }
+.ar-modal__err {
+  font-size: 0.82rem;
+  color: #dc2626;
+  margin: 0;
+}
+.ar-modal__footer {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 480px) {
+  .ar-card__header { flex-wrap: wrap; }
+  .ar-card__actions { flex-direction: row; }
+  .ar-modal { padding: 1.25rem; }
+}
