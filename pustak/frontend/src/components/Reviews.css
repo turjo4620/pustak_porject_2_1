@@ -23,6 +23,9 @@
   display: flex; align-items: center; gap: var(--space-3);
   margin-bottom: var(--space-4);
 }
+.review-card__text {
+  padding-left: var(--space-4);
+}
 .review-card__avatar {
   width: 44px; height: 44px; border-radius: 50%;
   background: linear-gradient(135deg, var(--color-forest), var(--color-forest-light));

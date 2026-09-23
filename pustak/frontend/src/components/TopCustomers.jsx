@@ -4,6 +4,8 @@ import './TopCustomers.css'
 
 const MEDALS = ['🥇', '🥈', '🥉']
 const toBn = (n) => String(n).replace(/[0-9]/g, (d) => '০১২৩৪৫৬৭৮৯'[d])
+const formatCustomerName = (name = '') =>
+  /^turjo sarker$/i.test(name.trim()) ? 'Turjo Sarkar Prince' : name
 
 // Generate a consistent colour from a name string
 function avatarColor(name = '') {
@@ -55,7 +57,7 @@ export default function TopCustomers() {
             <div
               key={idx}
               className={`top-customers__card rank-card--${idx + 1}`}
-              aria-label={`${idx + 1} নম্বর: ${c.name}`}
+              aria-label={`${idx + 1} নম্বর: ${formatCustomerName(c.name)}`}
             >
               {/* Rank badge */}
               <div className="top-customers__rank">
@@ -68,12 +70,12 @@ export default function TopCustomers() {
                 style={{ background: avatarColor(c.name) }}
                 aria-hidden="true"
               >
-                {(c.name || '?').charAt(0).toUpperCase()}
+                {formatCustomerName(c.name || '?').charAt(0).toUpperCase()}
               </div>
 
               {/* Info */}
               <div className="top-customers__info">
-                <p className="top-customers__name">{c.name}</p>
+                <p className="top-customers__name">{formatCustomerName(c.name)}</p>
                 <p className="top-customers__orders">
                   {toBn(c.total_orders)} টি অর্ডার
                 </p>

@@ -17,20 +17,22 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <SearchBar />
-      <AuthorsMarquee />
-      <div className="landing-highlights">
-        <RankedBestsellers />
-        <TopCustomers />
+      <div className="homepage-shell">
+        <SearchBar />
+        <AuthorsMarquee />
+        <div className="landing-highlights">
+          <RankedBestsellers />
+          <TopCustomers />
+        </div>
+        <BestSellers />
+        <NewlyReleased />
+        <Recommendations />
+        <AuthorSpotlight />
+        <Categories />
+        <PublisherShowcase />
+        <Reviews />
+        <Newsletter />
       </div>
-      <BestSellers />
-      <NewlyReleased />
-      <Recommendations />
-      <AuthorSpotlight />
-      <PublisherShowcase />
-      <Categories />
-      <Reviews />
-      <Newsletter />
     </>
   )
 }

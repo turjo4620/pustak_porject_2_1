@@ -5,6 +5,8 @@ import SectionHeader from './SectionHeader'
 import './Reviews.css'
 
 const BASE = 'http://localhost:5000/api'
+const formatReviewerName = (name = '') =>
+  /^turjo sarker$/i.test(name.trim()) ? 'Turjo Sarkar Prince' : name
 
 function StarRow({ rating }) {
   return (
@@ -24,29 +26,36 @@ export default function Reviews() {
   const [reviews, setReviews] = useState([])
 
   useEffect(() => {
-    // Fetch the 3 most recent non-empty reviews across all books
-    // We use the admin endpoint if available, else fall back to a direct reviews approach.
-    // Since there's no public "all reviews" endpoint we fetch bestsellers first,
-    // then collect reviews for the top book.
+    // Fetch the highest-rated non-empty reviews from the current bestseller set.
     const loadReviews = async () => {
       try {
-        // Get bestseller book IDs
-        const bsRes  = await fetch(`${BASE}/books/bestsellers?limit=6`)
+        const bsRes  = await fetch(`${BASE}/books/bestsellers?limit=12`)
         const bsJson = await bsRes.json()
-        const topBooks = (bsJson.data || []).slice(0, 6)
+        const topBooks = bsJson.data || []
 
-        // Collect reviews from those books in parallel, stop when we have 3
-        const collected = []
-        for (const book of topBooks) {
-          if (collected.length >= 3) break
-          const rRes  = await fetch(`${BASE}/reviews/book/${book.id}`)
-          const rJson = await rRes.json()
-          const rows  = (rJson.data || []).filter(r => r.comment)
-          rows.slice(0, 3 - collected.length).forEach(r =>
-            collected.push({ ...r, book_name: book.book_name, book_id: book.id })
-          )
-        }
-        setReviews(collected)
+        const reviewGroups = await Promise.all(
+          topBooks.map(async (book) => {
+            const response = await fetch(`${BASE}/reviews/book/${book.id}`)
+            const data = await response.json()
+            return (data.data || [])
+              .filter(review => review.comment)
+              .map(review => ({
+                ...review,
+                book_name: book.book_name,
+                book_id: book.id
+              }))
+          })
+        )
+
+        const bestReviews = reviewGroups
+          .flat()
+          .sort((a, b) => {
+            const ratingDifference = Number(b.rating || 0) - Number(a.rating || 0)
+            return ratingDifference || Number(b.review_id || 0) - Number(a.review_id || 0)
+          })
+          .slice(0, 3)
+
+        setReviews(bestReviews)
       } catch {
         setReviews([])
       }
@@ -69,14 +78,16 @@ export default function Reviews() {
             <article
               key={r.review_id}
               className="review-card"
-              aria-label={`${r.reviewer_name} এর রিভিউ`}
+              aria-label={`${formatReviewerName(r.reviewer_name)} এর রিভিউ`}
             >
               <div className="review-card__header">
                 <div className="review-card__avatar" aria-hidden="true">
-                  {(r.reviewer_name || '?')[0].toUpperCase()}
+                  {formatReviewerName(r.reviewer_name || '?')[0].toUpperCase()}
                 </div>
                 <div className="review-card__info">
-                  <strong className="review-card__name">{r.reviewer_name || 'পাঠক'}</strong>
+                  <strong className="review-card__name">
+                    {formatReviewerName(r.reviewer_name || 'পাঠক')}
+                  </strong>
                 </div>
                 <StarRow rating={r.rating} />
               </div>

@@ -1,13 +1,13 @@
 /* ── Hero ── */
 .hero {
-  min-height: 100vh;
+  min-height: clamp(560px, 72vh, 820px);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
   background: var(--bg-primary);
-  padding: 100px var(--space-6) var(--space-20);
+  padding: 72px var(--space-6) 48px;
 }
 
 /* ── Ambient Background ── */
@@ -254,7 +254,10 @@
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .hero { padding: 80px var(--space-4) var(--space-16); }
+  .hero {
+    min-height: 620px;
+    padding: 64px var(--space-4) 40px;
+  }
   .hero__book { display: none; }
   .hero__title { font-size: 2.5rem; }
   .hero__stats { gap: var(--space-5); }

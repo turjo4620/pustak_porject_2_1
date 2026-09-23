@@ -37,7 +37,7 @@
 
   /* ── Typography ── */
   --font-serif: 'Noto Serif Bengali', 'Tiro Bangla', serif;
-  --font-sans:  'Hind Siliguri', 'Noto Serif Bengali', 'Tiro Bangla', sans-serif;
+  --font-sans:  'Hind Siliguri', 'Kalpurush', 'Noto Serif Bengali', system-ui, sans-serif;
 
   /* ── Spacing Scale ── */
   --space-1:  0.25rem;
@@ -254,9 +254,9 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   .container { padding: 0 var(--space-4); }
 }
 
-.section    { padding: var(--space-20) 0; }
-.section-sm { padding: var(--space-12) 0; }
-.section-lg { padding: var(--space-32) 0; }
+.section    { padding: var(--space-12) 0; }
+.section-sm { padding: var(--space-10) 0; }
+.section-lg { padding: var(--space-16) 0; }
 
 .sr-only {
   position: absolute; width: 1px; height: 1px;

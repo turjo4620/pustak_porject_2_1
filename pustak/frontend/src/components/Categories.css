@@ -9,14 +9,18 @@
 
 .cat-card {
   display: flex; flex-direction: column; align-items: center; gap: var(--space-3);
-  padding: var(--space-5) var(--space-3);
+  padding: var(--space-5);
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   text-align: center;
   cursor: pointer;
   transition: all var(--transition-base);
-  opacity: 0; transform: scale(0.95) translateY(10px);
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+@media (min-width: 768px) {
+  .cat-card { padding: var(--space-6); }
 }
 .categories__grid--visible .cat-card {
   opacity: 1; transform: scale(1) translateY(0);
@@ -29,7 +33,7 @@
 }
 
 .cat-card__icon {
-  width: 52px; height: 52px;
+  width: 48px; height: 48px;
   border-radius: var(--radius-lg);
   display: flex; align-items: center; justify-content: center;
   font-size: 1.4rem;

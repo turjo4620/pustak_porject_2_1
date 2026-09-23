@@ -18,6 +18,7 @@
 /* ── Marquee track ── */
 .am-track-wrap {
   overflow: hidden;
+  padding: 0 var(--space-4);
   /* Fade edges */
   -webkit-mask-image: linear-gradient(
     to right,
@@ -38,7 +39,7 @@
 
 .am-track {
   display: flex;
-  gap: var(--space-5);
+  gap: var(--space-6);
   width: max-content;
   /* Scroll the full single-set width — doubled list means seamless loop */
   animation: am-scroll 32s linear infinite;
@@ -59,7 +60,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-2);
-  width: 120px;
+  width: 112px;
   flex-shrink: 0;
   text-decoration: none;
   cursor: pointer;
@@ -71,8 +72,8 @@
 }
 
 .am-card__photo-wrap {
-  width: 88px;
-  height: 88px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   overflow: hidden;
   border: 2.5px solid var(--border-color);
@@ -135,6 +136,7 @@
   font-size: 0.72rem;
   font-family: var(--font-sans);
   color: var(--text-muted);
+  text-align: center;
 }
 
 /* Respect prefers-reduced-motion */

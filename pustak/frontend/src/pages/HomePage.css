@@ -1,22 +1,45 @@
-.landing-highlights {
-  display: grid;
-  grid-template-columns: minmax(0, 7fr) minmax(280px, 5fr);
-  align-items: start;
-  max-width: 1320px;
+.homepage-shell {
+  width: min(100%, 1320px);
   margin: 0 auto;
   padding: 0 var(--space-6);
-  gap: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+  overflow: hidden;
+}
+
+.homepage-shell > .section,
+.homepage-shell > .section-sm,
+.homepage-shell > .section-lg,
+.homepage-shell > .search-section,
+.homepage-shell > .authors-marquee {
+  width: 100%;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.landing-highlights {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: start;
+  gap: var(--space-8);
+  width: 100%;
 }
 
 .landing-highlights > * {
   min-width: 0;
   height: 100%;
+  grid-column: span 7;
+}
+
+.landing-highlights .top-customers {
+  grid-column: span 5;
 }
 
 .landing-highlights .ranked-bestsellers,
 .landing-highlights .top-customers {
   margin: 0;
-  padding: var(--space-8) 0;
+  padding: var(--space-6) 0;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   background: var(--bg-card);
@@ -47,6 +70,11 @@
   text-align: left;
 }
 
+.landing-highlights .top-customers {
+  position: sticky;
+  top: var(--space-6);
+}
+
 .landing-highlights .top-customers__card:hover {
   box-shadow: var(--shadow-sm);
 }
@@ -72,14 +100,16 @@
 
 @media (max-width: 1024px) {
   .landing-highlights {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
   }
 
+  .landing-highlights > *,
   .landing-highlights .top-customers {
+    grid-column: 1;
     height: auto;
     margin: 0;
-    border-width: 1px 0;
-    border-radius: 0;
+    position: static;
   }
 
   .landing-highlights .top-customers__list {
@@ -95,13 +125,8 @@
 }
 
 @media (max-width: 768px) {
-  .landing-highlights {
+  .homepage-shell {
     padding: 0 var(--space-4);
-  }
-}
-
-@media (max-width: 640px) {
-  .landing-highlights .top-customers__card {
-    width: 190px;
+    gap: var(--space-10);
   }
 }
