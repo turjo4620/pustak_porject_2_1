@@ -10,6 +10,9 @@ export default function AdminOrders() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [courierOptions, setCourierOptions] = useState([]);
+  const [selectedCourierId, setSelectedCourierId] = useState('');
+  const [couriersLoading, setCouriersLoading] = useState(false);
 
   const orderStatuses = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'];
 
@@ -50,13 +53,27 @@ export default function AdminOrders() {
       if (!response.ok) throw new Error('Failed to fetch order details');
       const data = await response.json();
       setSelectedOrder(data);
+      setSelectedCourierId(data.delivery?.courier_id ? String(data.delivery.courier_id) : '');
+      setCouriersLoading(true);
+      const courierResponse = await fetch(`http://localhost:5000/api/admin/orders/${orderId}/couriers`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!courierResponse.ok) throw new Error('Failed to fetch available couriers');
+      setCourierOptions(await courierResponse.json());
     } catch (error) {
       console.error('Error fetching order details:', error);
+      setCourierOptions([]);
+    } finally {
+      setCouriersLoading(false);
     }
   };
 
-  const updateOrderStatus = async (orderId, newStatus) => {
+  const updateOrderStatus = async (orderId, newStatus, courierId = null) => {
     try {
+      if (newStatus === 'Shipped' && !courierId) {
+        alert('Please select a courier before shipping the order');
+        return;
+      }
       const token = localStorage.getItem('adminToken');
       const response = await fetch(`http://localhost:5000/api/admin/orders/${orderId}/status`, {
         method: 'PATCH',
@@ -64,7 +81,7 @@ export default function AdminOrders() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus, ...(courierId && { courier_id: Number(courierId) }) })
       });
       if (!response.ok) throw new Error('Failed to update order status');
 
@@ -72,7 +89,17 @@ export default function AdminOrders() {
       if (selectedOrder) {
         setSelectedOrder(prev => ({
           ...prev,
-          order: { ...prev.order, status: newStatus }
+          order: { ...prev.order, status: newStatus },
+          delivery: newStatus === 'Shipped'
+            ? {
+                ...(prev.delivery || {}),
+                status: newStatus,
+                courier_id: Number(courierId),
+                courier_name: courierOptions.find(
+                  courier => courier.courier_id === Number(courierId)
+                )?.name
+              }
+            : prev.delivery
         }));
       }
       fetchOrders();
@@ -169,17 +196,13 @@ export default function AdminOrders() {
                           ✅
                         </button>
                       )}
-                      {/* Quick ship — only for Confirmed orders */}
+                      {/* Quick ship opens the address-aware courier selector */}
                       {order.status === 'Confirmed' && (
                         <button
                           className="btn-icon"
                           title="Mark as Shipped"
                           style={{ color: '#0369a1', marginRight: '4px' }}
-                          onClick={() => {
-                            if (window.confirm(`Mark order ${order.order_number} as Shipped?`)) {
-                              updateOrderStatus(order.order_id, 'Shipped');
-                            }
-                          }}
+                          onClick={() => fetchOrderDetails(order.order_id)}
                         >
                           🚚
                         </button>
@@ -333,12 +356,31 @@ export default function AdminOrders() {
 
                   {/* Ship — visible when Confirmed or Processing */}
                   {(selectedOrder.order.status === 'Confirmed' || selectedOrder.order.status === 'Processing') && (
-                    <button
-                      className="order-action-btn courier"
-                      onClick={() => updateOrderStatus(selectedOrder.order.order_id, 'Shipped')}
-                    >
-                      🚚 Ship Order
-                    </button>
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                      <select
+                        value={selectedCourierId}
+                        onChange={(e) => setSelectedCourierId(e.target.value)}
+                        disabled={couriersLoading}
+                        aria-label="Select courier"
+                        style={{ minWidth: '220px', padding: '9px 12px', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                      >
+                        <option value="">
+                          {couriersLoading ? 'Loading couriers...' : 'Select courier'}
+                        </option>
+                        {courierOptions.map(courier => (
+                          <option key={courier.courier_id} value={courier.courier_id}>
+                            {courier.name}
+                          </option>
+                        ))}
+                      </select>
+                      <button
+                        className="order-action-btn courier"
+                        disabled={couriersLoading || !selectedCourierId}
+                        onClick={() => updateOrderStatus(selectedOrder.order.order_id, 'Shipped', selectedCourierId)}
+                      >
+                        🚚 Ship Order
+                      </button>
+                    </div>
                   )}
 
                   {/* Mark Delivered — visible when Shipped */}

@@ -157,14 +157,28 @@ class AdminController {
     }
   }
 
+  async getOrderCouriers(req, res) {
+    try {
+      const couriers = await adminService.getCouriersForOrder(req.params.id);
+      res.json(couriers);
+    } catch (error) {
+      console.error('Get order couriers error:', error);
+      res.status(error.status || 500).json({ error: error.message || 'Failed to fetch couriers' });
+    }
+  }
+
   async updateOrderStatus(req, res) {
     try {
-      const { status } = req.body;
-      const order = await adminService.updateOrderStatus(req.params.id, status);
+      const { status, courier_id } = req.body;
+      const order = await adminService.updateOrderStatus(
+        req.params.id,
+        status,
+        courier_id ? parseInt(courier_id, 10) : null
+      );
       res.json(order);
     } catch (error) {
       console.error('Update order status error:', error);
-      res.status(500).json({ error: 'Failed to update order status' });
+      res.status(error.status || 500).json({ error: error.message || 'Failed to update order status' });
     }
   }
 

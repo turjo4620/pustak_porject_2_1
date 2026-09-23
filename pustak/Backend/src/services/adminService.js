@@ -538,7 +538,42 @@ class AdminService {
     };
   }
 
-  async updateOrderStatus(orderId, status) {
+  async getCouriersForOrder(orderId) {
+    const addressResult = await pool.query(`
+      SELECT a.district, a.division
+      FROM orders o
+      LEFT JOIN addresses a ON o.address_id = a.address_id
+      WHERE o.order_id = $1
+    `, [orderId]);
+
+    if (!addressResult.rows.length) {
+      throw { status: 404, message: 'Order not found' };
+    }
+
+    const { district, division } = addressResult.rows[0];
+    const courierResult = await pool.query(
+      'SELECT courier_id, name FROM courier ORDER BY name ASC'
+    );
+
+    const normalizedDistrict = String(district || '').trim().toLowerCase();
+    const normalizedDivision = String(division || '').trim().toLowerCase();
+    const dhakaArea = normalizedDistrict === 'ঢাকা' || normalizedDistrict === 'dhaka'
+      || normalizedDivision === 'ঢাকা' || normalizedDivision === 'dhaka';
+
+    return courierResult.rows
+      .filter(courier => {
+        // Pathao and RedX are currently configured for Dhaka-area delivery.
+        // Sundarban remains available for every saved address.
+        const name = courier.name.toLowerCase();
+        return name === 'sundarban' || dhakaArea || !['pathao', 'redx'].includes(name);
+      })
+      .map(courier => ({
+        ...courier,
+        address: { district: district || null, division: division || null }
+      }));
+  }
+
+  async updateOrderStatus(orderId, status, courierId = null) {
     const tsColumn = {
       Confirmed:  'confirmed_at',
       Processing: 'packed_at',
@@ -568,20 +603,33 @@ class AdminService {
       }
 
       if (status === 'Delivered' || status === 'Shipped') {
+        if (status === 'Shipped' && !courierId) {
+          throw { status: 400, message: 'Please select a courier before shipping the order' };
+        }
+        if (courierId) {
+          const courierResult = await client.query(
+            'SELECT courier_id FROM courier WHERE courier_id = $1',
+            [courierId]
+          );
+          if (!courierResult.rows.length) {
+            throw { status: 400, message: 'Selected courier is not available' };
+          }
+        }
         const timestampColumn = status === 'Delivered' ? 'delivered_at' : 'dispatch_date';
         const deliveryUpdate = await client.query(
           `UPDATE deliveries
            SET status = $1,
+               courier_id = COALESCE($3, courier_id),
                ${timestampColumn} = COALESCE(${timestampColumn}, CURRENT_TIMESTAMP)
            WHERE order_id = $2`,
-          [status, orderId]
+          [status, orderId, courierId]
         );
 
         if (!deliveryUpdate.rowCount) {
           await client.query(
-            `INSERT INTO deliveries (order_id, status, ${timestampColumn})
-             VALUES ($1, $2, CURRENT_TIMESTAMP)`,
-            [orderId, status]
+            `INSERT INTO deliveries (order_id, courier_id, status, ${timestampColumn})
+             VALUES ($1, $2, $3, CURRENT_TIMESTAMP)`,
+            [orderId, courierId, status]
           );
         }
       } else if (status === 'Cancelled' || status === 'Returned') {

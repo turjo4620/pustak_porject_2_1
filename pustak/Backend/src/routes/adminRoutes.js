@@ -26,6 +26,7 @@ router.patch('/users/:id/status', adminController.updateUserStatus);
 // ============= ORDER MANAGEMENT =============
 router.get('/orders', adminController.getAllOrders);
 router.get('/orders/:id', adminController.getOrderDetails);
+router.get('/orders/:id/couriers', adminController.getOrderCouriers);
 router.patch('/orders/:id/status', adminController.updateOrderStatus);
 
 // ============= RETURN MANAGEMENT =============

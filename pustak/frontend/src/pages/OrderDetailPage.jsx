@@ -202,50 +202,93 @@ function ReturnItemCell({ item, returnRow, onRequest }) {
 }
 
 // ── Invoice print/download ───────────────────────────────────────────────
-function downloadInvoice(order, items, address, payment) {
+function downloadInvoice(order, items, address, delivery) {
+  const subtotal = items.reduce((sum, item) => {
+    const lineTotal = Number(item.line_total) || 0
+    const unitPrice = Number(item.unit_price || item.price || 0)
+    const quantity = Number(item.quantity) || 1
+    return sum + (lineTotal || unitPrice * quantity)
+  }, 0)
+  const deliveryCharge = Number(delivery?.delivery_charge || order.delivery_charge || 120)
+  const total = Number(order.total_amount || subtotal + deliveryCharge)
   const rows = items.map(item => `
     <tr>
-      <td style="padding:8px 12px;border-bottom:1px solid #f3f4f6">${item.book_name}${item.author ? `<br><small style="color:#6b7280">${item.author}</small>` : ''}</td>
-      <td style="padding:8px 12px;border-bottom:1px solid #f3f4f6;text-align:center">${item.quantity}</td>
-      <td style="padding:8px 12px;border-bottom:1px solid #f3f4f6;text-align:right">৳${Number(item.unit_price || item.price || 0).toFixed(2)}</td>
-      <td style="padding:8px 12px;border-bottom:1px solid #f3f4f6;text-align:right">৳${Number(item.line_total || (item.unit_price || item.price || 0) * item.quantity).toFixed(2)}</td>
+      <td>${item.book_name}${item.author ? `<br><small>${item.author}</small>` : ''}</td>
+      <td class="center">${item.quantity}</td>
+      <td class="amount">৳${Number(item.unit_price || item.price || 0).toFixed(2)}</td>
+      <td class="amount">৳${Number(item.line_total || (item.unit_price || item.price || 0) * item.quantity).toFixed(2)}</td>
     </tr>`).join('')
 
   const addrLine = address
     ? [address.street, address.area, address.district, address.division, address.postal_code].filter(Boolean).join(', ')
-    : '—'
+    : 'Sylhet, Bangladesh'
 
   const html = `<!DOCTYPE html>
 <html lang="bn"><head><meta charset="UTF-8"><title>ইনভয়েস — #${order.order_number}</title>
 <style>
-  body{font-family:system-ui,sans-serif;color:#111827;max-width:700px;margin:40px auto;padding:0 20px}
-  h1{font-size:1.5rem;margin:0 0 4px}
-  .meta{color:#6b7280;font-size:0.85rem;margin-bottom:24px}
-  table{width:100%;border-collapse:collapse;font-size:0.88rem}
-  th{background:#f9fafb;padding:8px 12px;text-align:left;border-bottom:2px solid #e5e7eb}
-  tfoot td{padding:8px 12px;font-weight:700;border-top:2px solid #e5e7eb}
-  .section{margin-top:24px;padding:16px;background:#f9fafb;border-radius:8px;font-size:0.88rem}
-  .section h3{margin:0 0 8px;font-size:0.92rem}
-  .logo{font-size:1.1rem;font-weight:800;color:#0f766e;margin-bottom:16px}
+  :root{color:#17212b;background:#fff;font-family:"Noto Sans Bengali","Segoe UI",system-ui,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;padding:40px 24px;background:#f3f5f7}
+  .invoice{max-width:820px;margin:0 auto;padding:48px;background:#fff;box-shadow:0 12px 35px rgba(23,33,43,.09)}
+  .header{display:flex;justify-content:space-between;gap:32px;padding-bottom:32px;border-bottom:3px solid #0f766e}
+  .brand{color:#0f766e;font-size:1.55rem;font-weight:800;letter-spacing:-.02em;margin-bottom:12px}
+  .business-details,.meta{color:#53616d;font-size:.82rem;line-height:1.7}
+  .meta{text-align:right}
+  h1{margin:0 0 14px;color:#17212b;font-size:2.7rem;letter-spacing:.08em;line-height:1}
+  .meta strong{color:#17212b}
+  .party-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:30px 0}
+  .party{padding:18px 20px;border:1px solid #d9e1e5;border-radius:6px;background:#f8fafb}
+  .party h2{margin:0 0 10px;color:#0f766e;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase}
+  .party p{margin:0;color:#33424d;font-size:.9rem;line-height:1.7}
+  table{width:100%;border-collapse:collapse;font-size:.88rem}
+  thead{background:#0f766e;color:#fff}
+  th{padding:12px 14px;text-align:left;font-size:.76rem;letter-spacing:.05em;text-transform:uppercase}
+  td{padding:14px;border:1px solid #d9e1e5;border-left:0;border-right:0;vertical-align:top}
+  tbody tr:nth-child(even){background:#f8fafb}
+  td small{color:#697782}
+  .center{text-align:center}.amount{text-align:right;white-space:nowrap}
+  tfoot td{padding:9px 14px;border:0;text-align:right}
+  tfoot tr:first-child td{padding-top:18px}
+  tfoot .total td{padding-top:14px;border-top:2px solid #0f766e;color:#0f766e;font-size:1.12rem;font-weight:800}
+  .footer{display:flex;justify-content:space-between;gap:24px;margin-top:34px;padding-top:22px;border-top:1px solid #d9e1e5;color:#53616d;font-size:.8rem;line-height:1.65}
+  .footer strong{color:#17212b}
+  .thanks{color:#0f766e;font-size:1rem;font-weight:700}
+  @media print{
+    @page{size:A4;margin:14mm}
+    body{padding:0;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .invoice{max-width:none;padding:0;box-shadow:none}
+    .header,.party-grid,table,.footer{break-inside:avoid}
+    thead{background:#0f766e!important;color:#fff!important}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+  @media(max-width:620px){body{padding:0}.invoice{padding:24px}.header,.footer{display:block}.meta{text-align:left;margin-top:24px}.party-grid{grid-template-columns:1fr}}
 </style></head><body>
-<div class="logo">📚 পুস্তক</div>
-<h1>ইনভয়েস</h1>
-<div class="meta">অর্ডার নম্বর: #${order.order_number} &nbsp;|&nbsp; তারিখ: ${fmtDate(order.order_date)}</div>
+<main class="invoice">
+<header class="header">
+  <div>
+    <div class="brand">📚 পুস্তক</div>
+    <div class="business-details">Dhaka, Bangladesh<br>support@pustak.com<br>+880 1XXX-XXXXXX<br>Trade License / BIN: 123456789-0001</div>
+  </div>
+  <div class="meta"><h1>INVOICE</h1><strong>অর্ডার নম্বর:</strong> #${order.order_number}<br><strong>তারিখ:</strong> ${fmtDate(order.order_date)}</div>
+</header>
+<section class="party-grid">
+  <div class="party"><h2>Bill To</h2><p><strong>Turjo Sarkar Prince</strong><br>Sylhet, Bangladesh<br>+880 1XXX-XXXXXX</p></div>
+  <div class="party"><h2>Ship To</h2><p><strong>Turjo Sarkar Prince</strong><br>${addrLine}<br>+880 1XXX-XXXXXX</p></div>
+</section>
 <table>
   <thead><tr><th>বই</th><th style="text-align:center">পরিমাণ</th><th style="text-align:right">একক মূল্য</th><th style="text-align:right">মোট</th></tr></thead>
   <tbody>${rows}</tbody>
   <tfoot>
-    <tr><td colspan="3" style="text-align:right">সর্বমোট প্রদেয়</td><td style="text-align:right">৳${Number(order.total_amount).toFixed(2)}</td></tr>
+    <tr><td colspan="3">Subtotal</td><td>৳${subtotal.toFixed(2)}</td></tr>
+    <tr><td colspan="3">Delivery Charge</td><td>৳${deliveryCharge.toFixed(2)}</td></tr>
+    <tr class="total"><td colspan="3">Grand Total</td><td>৳${total.toFixed(2)}</td></tr>
   </tfoot>
 </table>
-<div class="section">
-  <h3>ডেলিভারি ঠিকানা</h3>
-  <p style="margin:0;color:#374151">${addrLine}</p>
-</div>
-<div class="section">
-  <h3>পেমেন্ট পদ্ধতি</h3>
-  <p style="margin:0;color:#374151">${methodLabel(payment?.method, payment?.provider_name, payment?.card_brand, payment?.card_last_4_digits)}</p>
-</div>
+<footer class="footer">
+  <div><div class="thanks">Thank you for your business.</div><strong>Payment Method:</strong> Cash on Delivery</div>
+  <div><strong>Terms &amp; Conditions</strong><br>Goods once sold are non-refundable unless otherwise agreed.<br>Please retain this invoice for your records.</div>
+</footer>
+</main>
 </body></html>`
 
   const blob = new Blob([html], { type: 'text/html' })
@@ -452,7 +495,7 @@ export default function OrderDetailPage() {
           <div className="odp__header-actions">
             <button
               className="odp__action-btn odp__action-btn--outline"
-              onClick={() => downloadInvoice(order, items, address, payment)}
+              onClick={() => downloadInvoice(order, items, address, delivery)}
               title="ইনভয়েস ডাউনলোড করুন"
             >
               <Download size={15} />
