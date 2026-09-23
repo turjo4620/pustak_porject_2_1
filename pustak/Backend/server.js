@@ -69,12 +69,12 @@ app.get('/api/public/top-customers', async (req, res) => {
     const limit = Math.min(parseInt(req.query.limit) || 5, 10);
     const result = await pool.query(`
       SELECT
-        u.name,
+        MAX(u.name) AS name,
         COUNT(DISTINCT o.order_id) AS total_orders
       FROM users u
       JOIN orders o ON o.user_id = u.user_id
       WHERE o.status NOT IN ('Cancelled')
-      GROUP BY u.user_id, u.name
+      GROUP BY LOWER(TRIM(u.name))
       ORDER BY total_orders DESC
       LIMIT $1
     `, [limit]);

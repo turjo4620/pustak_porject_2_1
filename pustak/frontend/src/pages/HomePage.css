@@ -1,0 +1,107 @@
+.landing-highlights {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(280px, 5fr);
+  align-items: start;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  gap: var(--space-6);
+}
+
+.landing-highlights > * {
+  min-width: 0;
+  height: 100%;
+}
+
+.landing-highlights .ranked-bestsellers,
+.landing-highlights .top-customers {
+  margin: 0;
+  padding: var(--space-8) 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.landing-highlights .ranked-bestsellers .container,
+.landing-highlights .top-customers .container {
+  padding: 0 var(--space-5);
+}
+
+.landing-highlights .top-customers__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.landing-highlights .top-customers__card {
+  min-width: 0;
+  width: 100%;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-color: var(--border-color);
+  background: var(--bg-secondary);
+  box-shadow: none;
+  text-align: left;
+}
+
+.landing-highlights .top-customers__card:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.landing-highlights .top-customers__rank {
+  width: 2rem;
+  flex-shrink: 0;
+  font-size: 1.35rem;
+  text-align: center;
+}
+
+.landing-highlights .top-customers__avatar,
+.landing-highlights .rank-card--1 .top-customers__avatar {
+  width: 44px;
+  height: 44px;
+  font-size: 1.15rem;
+  box-shadow: none;
+}
+
+.landing-highlights .top-customers__info {
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .landing-highlights {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .landing-highlights .top-customers {
+    height: auto;
+    margin: 0;
+    border-width: 1px 0;
+    border-radius: 0;
+  }
+
+  .landing-highlights .top-customers__list {
+    flex-direction: column;
+    overflow-x: visible;
+    justify-content: initial;
+    padding-bottom: 0;
+  }
+
+  .landing-highlights .top-customers__card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .landing-highlights {
+    padding: 0 var(--space-4);
+  }
+}
+
+@media (max-width: 640px) {
+  .landing-highlights .top-customers__card {
+    width: 190px;
+  }
+}

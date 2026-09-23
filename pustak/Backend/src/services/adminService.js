@@ -613,27 +613,38 @@ class AdminService {
       queryParams.push(filters.book_id);
       paramIndex++;
     }
-    if (filters.is_hidden !== undefined) {
+    if (filters.is_hidden !== undefined && filters.is_hidden !== '') {
       whereConditions.push(`r.is_hidden = $${paramIndex}`);
-      queryParams.push(filters.is_hidden);
+      queryParams.push(filters.is_hidden === true || filters.is_hidden === 'true');
       paramIndex++;
     }
 
     const whereClause = whereConditions.join(' AND ');
     const query = `
-      SELECT r.*, u.name as user_name, b.book_name
+      SELECT
+        r.review_id,
+        r.user_id,
+        r.book_id,
+        r.rating,
+        r.comment,
+        r.is_hidden,
+        u.name  AS user_name,
+        b.book_name
       FROM reviews r
       JOIN users u ON r.user_id = u.user_id
       JOIN books b ON r.book_id = b.id
       WHERE ${whereClause}
-      ORDER BY r.review_date DESC
+      ORDER BY r.review_id DESC
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `;
     queryParams.push(limit, offset);
 
     const [reviewsResult, countResult] = await Promise.all([
       pool.query(query, queryParams),
-      pool.query(`SELECT COUNT(*) as total FROM reviews r WHERE ${whereClause}`, queryParams.slice(0, -2))
+      pool.query(
+        `SELECT COUNT(*) AS total FROM reviews r WHERE ${whereClause}`,
+        queryParams.slice(0, -2)
+      )
     ]);
 
     return {
@@ -646,9 +657,13 @@ class AdminService {
 
   async toggleReviewVisibility(reviewId) {
     const result = await pool.query(
-      `UPDATE reviews SET is_hidden = NOT is_hidden WHERE review_id = $1 RETURNING *`,
+      `UPDATE reviews
+       SET is_hidden = NOT COALESCE(is_hidden, FALSE)
+       WHERE review_id = $1
+       RETURNING review_id, is_hidden`,
       [reviewId]
     );
+    if (!result.rows.length) throw { status: 404, message: 'Review not found' };
     return result.rows[0];
   }
 

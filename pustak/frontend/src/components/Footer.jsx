@@ -11,12 +11,12 @@ const bookCategories = [
   { label: 'শিশুদের বই',   to: '/search?q=শিশুদের বই'   },
 ]
 
-// ── Help links — for now scroll/hash placeholders but with readable paths ──
+// ── Help links ───────────────────────────────────────────────────────────────
 const helpLinks = [
-  { label: 'অর্ডার ট্র্যাক',  to: '/account/orders'   },
-  { label: 'রিটার্ন নীতি',    to: '/account/returns'  },
-  { label: 'ডেলিভারি তথ্য',   to: '/search?q=ডেলিভারি' },
-  { label: 'প্রশ্ন উত্তর',    to: '/search?q=সাহায্য'  },
+  { label: 'অর্ডার ট্র্যাক',  to: '/help#tracking'  },
+  { label: 'রিটার্ন নীতি',    to: '/help#returns'   },
+  { label: 'ডেলিভারি তথ্য',   to: '/help#delivery'  },
+  { label: 'প্রশ্ন উত্তর',    to: '/help#faq'       },
 ]
 
 // ── Company — placeholder routes (404 → NotFound handles gracefully) ─────────

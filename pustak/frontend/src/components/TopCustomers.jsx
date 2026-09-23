@@ -23,7 +23,17 @@ export default function TopCustomers() {
   useEffect(() => {
     fetch('http://localhost:5000/api/public/top-customers?limit=5')
       .then(r => r.json())
-      .then(data => setCustomers(Array.isArray(data) ? data : []))
+      .then(data => {
+        const uniqueCustomers = new Map()
+        ;(Array.isArray(data) ? data : []).forEach(customer => {
+          const key = String(customer.name || '').trim().toLocaleLowerCase()
+          const existing = uniqueCustomers.get(key)
+          if (!existing || Number(customer.total_orders) > Number(existing.total_orders)) {
+            uniqueCustomers.set(key, customer)
+          }
+        })
+        setCustomers([...uniqueCustomers.values()].slice(0, 5))
+      })
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])

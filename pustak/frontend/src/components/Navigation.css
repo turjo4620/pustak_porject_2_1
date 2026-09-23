@@ -122,18 +122,19 @@
 }
 
 .nav__signin-btn {
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.1rem;
   border-radius: var(--radius-md);
   font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-primary);
-  background: var(--primary-color);
+  font-weight: 600;
+  color: #ffffff;
+  background: var(--accent);
+  border: none;
   transition: all var(--transition-fast);
   white-space: nowrap;
 }
 
 .nav__signin-btn:hover {
-  background: var(--primary-dark);
+  background: var(--accent-hover);
   transform: translateY(-1px);
 }
 

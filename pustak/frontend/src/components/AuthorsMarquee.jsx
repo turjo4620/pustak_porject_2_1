@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import BookCard from './BookCard'
 import SectionHeader from './SectionHeader'
 import './AuthorsMarquee.css'
 
@@ -31,7 +30,6 @@ function AuthorCard({ author }) {
 
 export default function AuthorsMarquee() {
   const [authors, setAuthors] = useState([])
-  const [topBook, setTopBook] = useState(null)
   const trackRef = useRef(null)
 
   useEffect(() => {
@@ -46,54 +44,31 @@ export default function AuthorsMarquee() {
       })
       .catch(() => {})
 
-    fetch(`${BASE}/books/bestsellers?limit=1`)
-      .then(r => r.json())
-      .then(json => setTopBook(json.data?.[0] || null))
-      .catch(() => {})
   }, [])
 
-  if (!authors.length && !topBook) return null
+  if (!authors.length) return null
 
   const doubled = [...authors, ...authors]
 
   return (
     <section className="authors-marquee section-sm" aria-label="জনপ্রিয় লেখক ও শীর্ষ বিক্রিত বই">
-      {topBook && (
-        <div className="am-top-book container">
-          <SectionHeader
-            label="সর্বাধিক কেনা"
-            title="সবচেয়ে বেশি কেনা বই"
-            subtitle="পাঠকদের পছন্দের শীর্ষ বইটি দেখুন"
-            linkText="সব বেস্টসেলার"
-            linkHref="/bestsellers"
-          />
-          <div className="am-top-book__card">
-            <BookCard book={topBook} />
-          </div>
+      <div className="container">
+        <SectionHeader
+          label="লেখক"
+          title="জনপ্রিয় লেখক"
+          subtitle="আপনার প্রিয় লেখকের বই খুঁজুন"
+          linkText="সব লেখক"
+          linkHref="/authors"
+        />
+      </div>
+
+      <div className="am-track-wrap">
+        <div className="am-track" ref={trackRef}>
+          {doubled.map((author, i) => (
+            <AuthorCard key={`${author.author_id}-${i}`} author={author} />
+          ))}
         </div>
-      )}
-
-      {authors.length > 0 && (
-        <>
-          <div className="container">
-            <SectionHeader
-              label="লেখক"
-              title="জনপ্রিয় লেখক"
-              subtitle="আপনার প্রিয় লেখকের বই খুঁজুন"
-              linkText="সব লেখক"
-              linkHref="/authors"
-            />
-          </div>
-
-          <div className="am-track-wrap">
-            <div className="am-track" ref={trackRef}>
-              {doubled.map((author, i) => (
-                <AuthorCard key={`${author.author_id}-${i}`} author={author} />
-              ))}
-            </div>
-          </div>
-        </>
-      )}
+      </div>
     </section>
   )
 }

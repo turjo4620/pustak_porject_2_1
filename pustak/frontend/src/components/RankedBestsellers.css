@@ -1,0 +1,77 @@
+.ranked-bestsellers {
+  min-width: 0;
+}
+
+.ranked-bestsellers__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.ranked-bestsellers__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.ranked-bestsellers__item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.ranked-bestsellers__rank {
+  width: 2rem;
+  flex-shrink: 0;
+  font-size: 1.35rem;
+  text-align: center;
+}
+
+.ranked-bestsellers__cover {
+  width: 44px;
+  height: 58px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.ranked-bestsellers__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ranked-bestsellers__title,
+.ranked-bestsellers__author {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranked-bestsellers__title {
+  color: var(--text-primary);
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+}
+
+.ranked-bestsellers__author {
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+}
+
+.ranked-bestsellers__price {
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 700;
+}

@@ -69,10 +69,12 @@ export default function AdminOrders() {
       if (!response.ok) throw new Error('Failed to update order status');
 
       // Update the local selectedOrder state so the modal reflects the new status immediately
-      setSelectedOrder(prev => ({
-        ...prev,
-        order: { ...prev.order, status: newStatus }
-      }));
+      if (selectedOrder) {
+        setSelectedOrder(prev => ({
+          ...prev,
+          order: { ...prev.order, status: newStatus }
+        }));
+      }
       fetchOrders();
     } catch (error) {
       console.error('Error updating order status:', error);
@@ -152,6 +154,36 @@ export default function AdminOrders() {
                     </td>
                     <td>{new Date(order.order_date).toLocaleDateString()}</td>
                     <td className="actions-cell">
+                      {/* Quick approve — only for Pending orders */}
+                      {order.status === 'Pending' && (
+                        <button
+                          className="btn-icon"
+                          title="Approve Order"
+                          style={{ color: '#16a34a', marginRight: '4px' }}
+                          onClick={() => {
+                            if (window.confirm(`Approve order ${order.order_number}?`)) {
+                              updateOrderStatus(order.order_id, 'Confirmed');
+                            }
+                          }}
+                        >
+                          ✅
+                        </button>
+                      )}
+                      {/* Quick ship — only for Confirmed orders */}
+                      {order.status === 'Confirmed' && (
+                        <button
+                          className="btn-icon"
+                          title="Mark as Shipped"
+                          style={{ color: '#0369a1', marginRight: '4px' }}
+                          onClick={() => {
+                            if (window.confirm(`Mark order ${order.order_number} as Shipped?`)) {
+                              updateOrderStatus(order.order_id, 'Shipped');
+                            }
+                          }}
+                        >
+                          🚚
+                        </button>
+                      )}
                       <button
                         className="btn-icon"
                         onClick={() => fetchOrderDetails(order.order_id)}
@@ -249,7 +281,35 @@ export default function AdminOrders() {
 
               {/* Update status */}
               <div className="details-section">
-                <h3>Actions</h3>
+                <h3>Order Actions</h3>
+
+                {/* Visual status flow */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px', flexWrap: 'wrap' }}>
+                  {['Pending','Confirmed','Processing','Shipped','Delivered'].map((s, i, arr) => {
+                    const statuses = ['Pending','Confirmed','Processing','Shipped','Delivered'];
+                    const currentIdx = statuses.indexOf(selectedOrder.order.status);
+                    const stepIdx = statuses.indexOf(s);
+                    const isDone = stepIdx <= currentIdx && currentIdx >= 0;
+                    const isActive = s === selectedOrder.order.status;
+                    return (
+                      <span key={s} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{
+                          padding: '4px 10px',
+                          borderRadius: '999px',
+                          fontSize: '0.75rem',
+                          fontWeight: isActive ? 700 : 500,
+                          background: isActive ? '#0f766e' : isDone ? '#d1fae5' : '#f3f4f6',
+                          color: isActive ? '#fff' : isDone ? '#065f46' : '#9ca3af',
+                          border: isActive ? '2px solid #0f766e' : '1.5px solid transparent',
+                        }}>
+                          {isActive ? '▶ ' : isDone ? '✓ ' : ''}{s}
+                        </span>
+                        {i < arr.length - 1 && <span style={{ color: '#d1d5db', fontSize: '10px' }}>→</span>}
+                      </span>
+                    );
+                  })}
+                </div>
+
                 <div className="order-actions">
                   {/* Approve — visible when Pending */}
                   {selectedOrder.order.status === 'Pending' && (
@@ -261,13 +321,23 @@ export default function AdminOrders() {
                     </button>
                   )}
 
-                  {/* Set Courier / Ship — visible when Confirmed or Processing */}
+                  {/* Mark Processing — visible when Confirmed */}
+                  {selectedOrder.order.status === 'Confirmed' && (
+                    <button
+                      className="order-action-btn courier"
+                      onClick={() => updateOrderStatus(selectedOrder.order.order_id, 'Processing')}
+                    >
+                      📦 Mark as Processing
+                    </button>
+                  )}
+
+                  {/* Ship — visible when Confirmed or Processing */}
                   {(selectedOrder.order.status === 'Confirmed' || selectedOrder.order.status === 'Processing') && (
                     <button
                       className="order-action-btn courier"
                       onClick={() => updateOrderStatus(selectedOrder.order.order_id, 'Shipped')}
                     >
-                      🚚 Set Courier &amp; Ship
+                      🚚 Ship Order
                     </button>
                   )}
 
@@ -277,7 +347,7 @@ export default function AdminOrders() {
                       className="order-action-btn deliver"
                       onClick={() => updateOrderStatus(selectedOrder.order.order_id, 'Delivered')}
                     >
-                      📦 Mark as Delivered
+                      🎉 Mark as Delivered
                     </button>
                   )}
 
