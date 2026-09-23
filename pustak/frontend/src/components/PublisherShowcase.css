@@ -1,3 +1,5 @@
+.publishers.section-sm { padding-top: 0; }
+
 .publishers__grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);

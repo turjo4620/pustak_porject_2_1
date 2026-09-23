@@ -216,10 +216,19 @@ async function listOrders(userId) {
          b.id         AS book_id,
          b.book_name,
          b.cover_image_url,
-         COUNT(*)::int AS quantity
+         COUNT(*)::int AS quantity,
+         COALESCE(
+           JSONB_AGG(DISTINCT JSONB_BUILD_OBJECT(
+             'category_id', c.category_id,
+             'category_name', c.category_name
+           )) FILTER (WHERE c.category_id IS NOT NULL),
+           '[]'::jsonb
+         ) AS categories
        FROM order_item oi
        JOIN book_copy bc ON bc.copy_id = oi.copy_id
        JOIN books     b  ON b.id       = bc.book_id
+       LEFT JOIN book_category bkcat ON b.id = bkcat.book_id
+       LEFT JOIN categories c ON bkcat.category_id = c.category_id
        WHERE oi.order_id = ANY($1::int[])
        GROUP BY oi.order_id, b.id, b.book_name, b.cover_image_url
        ORDER BY oi.order_id, b.book_name`,
@@ -234,6 +243,7 @@ async function listOrders(userId) {
         book_name: row.book_name,
         cover_image_url: row.cover_image_url,
         quantity: row.quantity,
+        categories: row.categories || [],
       });
     }
     for (const order of orders) {

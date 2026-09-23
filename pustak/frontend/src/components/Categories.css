@@ -3,9 +3,24 @@
   grid-template-columns: repeat(6, 1fr);
   gap: var(--space-4);
 }
+
+.categories__books {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-6);
+  margin-top: var(--space-10);
+}
+
+.categories.section { padding-bottom: 0; }
+.categories.section + .author.section,
+.categories.section + .reviews.section-sm { padding-top: 0; }
+
 @media (max-width: 1100px) { .categories__grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 1100px) { .categories__books { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 720px)  { .categories__grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 720px)  { .categories__books { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px)  { .categories__grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px)  { .categories__books { gap: var(--space-4); } }
 
 .cat-card {
   display: flex; flex-direction: column; align-items: center; gap: var(--space-3);

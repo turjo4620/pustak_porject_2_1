@@ -85,6 +85,15 @@
   font-family: var(--font-sans);
 }
 
+.newsletter__error {
+  margin: 0 0 var(--space-3);
+  color: #ffb4b4;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
 .newsletter__success {
   display: flex; align-items: center; justify-content: center; gap: var(--space-3);
   background: rgba(30,58,47,0.3);

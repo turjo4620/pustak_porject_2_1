@@ -1905,9 +1905,75 @@
 }
 
 /* Active nav item */
+[data-theme="dark"] .account-sidebar .sidebar-nav .nav-item {
+  color: var(--text-primary) !important;
+}
+[data-theme="dark"] .account-sidebar .sidebar-nav .nav-item:hover {
+  background-color: var(--bg-elevated) !important;
+  color: var(--text-primary) !important;
+}
 [data-theme="dark"] .account-sidebar .sidebar-nav .nav-item.active {
   background-color: var(--accent-subtle) !important;
   color: var(--accent) !important;
+}
+
+/* Review, return, and refund text must stay readable on dark cards. */
+[data-theme="dark"] .ar-header__icon,
+[data-theme="dark"] .ar-header__title,
+[data-theme="dark"] .ar-title,
+[data-theme="dark"] .ar-card__title,
+[data-theme="dark"] .ar-card__book-name,
+[data-theme="dark"] .ar-row__value,
+[data-theme="dark"] .ar-modal__header h3,
+[data-theme="dark"] .ar-modal__label {
+  color: var(--text-primary);
+}
+[data-theme="dark"] .ar-header__sub,
+[data-theme="dark"] .tab,
+[data-theme="dark"] .ar-card__author,
+[data-theme="dark"] .ar-card__rating-text,
+[data-theme="dark"] .ar-card__order-num,
+[data-theme="dark"] .ar-row__label,
+[data-theme="dark"] .ar-empty__sub {
+  color: var(--text-secondary);
+}
+[data-theme="dark"] .ar-card__title:hover,
+[data-theme="dark"] .tab:hover,
+[data-theme="dark"] .ar-modal__close:hover {
+  color: var(--accent);
+}
+[data-theme="dark"] .orders-tabs {
+  border-color: var(--border-color);
+}
+[data-theme="dark"] .tab:hover {
+  background: var(--bg-elevated);
+}
+[data-theme="dark"] .tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+[data-theme="dark"] .tab-badge {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+}
+[data-theme="dark"] .tab.active .tab-badge {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+[data-theme="dark"] .ar-card__cover,
+[data-theme="dark"] .ar-card__thumb {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+[data-theme="dark"] .ar-card__header,
+[data-theme="dark"] .ar-card__footer {
+  border-color: var(--border-color);
+}
+[data-theme="dark"] .ar-empty__title {
+  color: var(--text-primary);
+}
+[data-theme="dark"] .ar-modal__close {
+  color: var(--text-muted);
 }
 
 /* Search input */
@@ -1998,6 +2064,81 @@
 /* Wishlist card */
 [data-theme="dark"] .wishlist-card {
   background: var(--bg-card);
+  border-color: var(--border-color);
+}
+[data-theme="dark"] .wishlist-banner__count,
+[data-theme="dark"] .wishlist-banner__count strong,
+[data-theme="dark"] .wishlist-card__title,
+[data-theme="dark"] .wishlist-empty p {
+  color: var(--text-primary);
+}
+[data-theme="dark"] .wishlist-card__author,
+[data-theme="dark"] .wishlist-empty {
+  color: var(--text-secondary);
+}
+[data-theme="dark"] .wishlist-banner__shop,
+[data-theme="dark"] .wishlist-card__price,
+[data-theme="dark"] .wishlist-card__title:hover {
+  color: var(--accent);
+}
+[data-theme="dark"] .wishlist-card__cover {
+  background: var(--bg-secondary);
+}
+[data-theme="dark"] .wishlist-card__remove-btn {
+  border-color: var(--border-color);
+  color: var(--text-muted);
+}
+
+/* Other account pages: replace remaining light-mode-only text colors. */
+[data-theme="dark"] .order-card__number,
+[data-theme="dark"] .order-card__item-title,
+[data-theme="dark"] .order-card__price,
+[data-theme="dark"] .tracking-modal__header h3,
+[data-theme="dark"] .tracking-table td strong,
+[data-theme="dark"] .od-title,
+[data-theme="dark"] .od-book-title,
+[data-theme="dark"] .od-entity-name {
+  color: var(--text-primary);
+}
+[data-theme="dark"] .order-card__label,
+[data-theme="dark"] .order-card__date,
+[data-theme="dark"] .order-card__item-qty,
+[data-theme="dark"] .order-card__more,
+[data-theme="dark"] .order-card__price-label,
+[data-theme="dark"] .tracking-modal__info,
+[data-theme="dark"] .tracking-step__sub,
+[data-theme="dark"] .tracking-table td,
+[data-theme="dark"] .od-sub,
+[data-theme="dark"] .od-empty,
+[data-theme="dark"] .od-prompt,
+[data-theme="dark"] .od-book-author,
+[data-theme="dark"] .od-entity-count {
+  color: var(--text-secondary);
+}
+[data-theme="dark"] .tracking-step__label,
+[data-theme="dark"] .tracking-step--done .tracking-step__label {
+  color: var(--text-primary);
+}
+[data-theme="dark"] .tracking-step--active .tracking-step__label,
+[data-theme="dark"] .od-book-price,
+[data-theme="dark"] .od-entity-avatar {
+  color: var(--accent);
+}
+[data-theme="dark"] .order-card__item-qty,
+[data-theme="dark"] .od-tab-hint,
+[data-theme="dark"] .od-prompt-sub,
+[data-theme="dark"] .od-book-price s {
+  color: var(--text-muted);
+}
+[data-theme="dark"] .order-card__more,
+[data-theme="dark"] .od-book-cover,
+[data-theme="dark"] .od-entity-avatar {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+[data-theme="dark"] .order-card__price-row,
+[data-theme="dark"] .order-card__footer,
+[data-theme="dark"] .tracking-table td {
   border-color: var(--border-color);
 }
 

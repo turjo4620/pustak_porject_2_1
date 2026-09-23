@@ -1,101 +1,74 @@
-import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import BookCard from './BookCard'
 import SectionHeader from './SectionHeader'
+import { useApp } from '../context/AppContext'
+import { api } from '../api/http'
 import './Categories.css'
 
-// Emoji/icon map keyed by partial category name match (fallback to 📚)
-const ICON_MAP = [
-  { match: /উপন্যাস/,          icon: '📖' },
-  { match: /গল্প/,              icon: '📝' },
-  { match: /কবিত/,             icon: '🎭' },
-  { match: /বিজ্ঞান|প্রযুক্তি/, icon: '🔬' },
-  { match: /ইতিহাস/,            icon: '🏛️' },
-  { match: /মুক্তিযুদ্ধ/,       icon: '🇧🇩' },
-  { match: /শিশু|কিশোর/,        icon: '🧒' },
-  { match: /ধর্ম|ইসলাম/,        icon: '☪️' },
-  { match: /রান্না|রেসিপি/,     icon: '🍳' },
-  { match: /ভ্রমণ/,             icon: '✈️' },
-  { match: /রাজনীত/,            icon: '🏛️' },
-  { match: /স্বাস্থ্য/,         icon: '🏥' },
-  { match: /অনুবাদ/,            icon: '🌍' },
-  { match: /জীবনী/,             icon: '👤' },
-  { match: /অর্থনীত/,           icon: '💰' },
-  { match: /থ্রিলার|রহস্য/,     icon: '🔍' },
-  { match: /রোমান্স/,           icon: '❤️' },
-  { match: /দর্শন/,             icon: '🤔' },
-]
-
-const COLOR_POOL = [
-  '#e8a020','#0f766e','#6b2737','#1a2744',
-  '#2563eb','#7c3aed','#059669','#dc2626',
-  '#d97706','#0891b2','#65a30d','#c026d3',
-]
-
-function catIcon(name) {
-  const hit = ICON_MAP.find(({ match }) => match.test(name))
-  return hit ? hit.icon : '📚'
-}
-
-function catColor(idx) {
-  return COLOR_POOL[idx % COLOR_POOL.length]
-}
-
-const BASE = 'http://localhost:5000/api'
-
 export default function Categories() {
-  const [visible,    setVisible]    = useState(false)
-  const [categories, setCategories] = useState([])
-  const ref = useRef(null)
+  const [orderedItems, setOrderedItems] = useState([])
+  const [interestBooks, setInterestBooks] = useState([])
+  const { authUser, wishItems } = useApp()
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setVisible(true) },
-      { threshold: 0.1 }
-    )
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
+    if (!authUser) {
+      setOrderedItems([])
+      return
+    }
+
+    api.get('/orders')
+      .then(orders => setOrderedItems(orders.flatMap(order => order.items || [])))
+      .catch(() => setOrderedItems([]))
+  }, [authUser])
+
+  const categories = [...wishItems, ...orderedItems].reduce((unique, item) => {
+    ;(item.categories || []).forEach((category) => {
+      if (category.category_name && category.category_id && !unique.some(item => item.category_id === category.category_id)) {
+        unique.push(category)
+      }
+    })
+    return unique
   }, [])
 
+  const categoryIds = categories.map(category => category.category_id).join(',')
+
   useEffect(() => {
-    fetch(`${BASE}/categories`)
-      .then(r => r.json())
-      .then(json => setCategories(json.data || (Array.isArray(json) ? json : [])))
-      .catch(() => {})
-  }, [])
+    if (!categoryIds) {
+      setInterestBooks([])
+      return
+    }
+
+    Promise.all(
+      categories.map(category =>
+        fetch(`http://localhost:5000/api/books/category/${category.category_id}?limit=4`)
+          .then(response => response.json())
+          .then(json => json.data || [])
+          .catch(() => [])
+      )
+    ).then(results => {
+      const uniqueBooks = results.flat().filter((book, index, books) =>
+        books.findIndex(item => item.id === book.id) === index
+      )
+      setInterestBooks(uniqueBooks.slice(0, 8))
+    })
+  }, [categoryIds])
 
   if (!categories.length) return null
 
   return (
-    <section className="categories section" ref={ref} aria-label="সব বিভাগ">
+    <section className="categories section" aria-label="আপনার আগ্রহের বিষয়">
       <div className="container">
         <SectionHeader
-          label="বিভাগসমূহ"
           title="আপনার আগ্রহের বিষয়"
-          subtitle="বিষয়ভিত্তিক বইয়ের বিশাল সংগ্রহ"
           align="center"
         />
-        <div className={`categories__grid ${visible ? 'categories__grid--visible' : ''}`}>
-          {categories.map((cat, i) => {
-            const color = catColor(i)
-            return (
-              <Link
-                key={cat.category_id}
-                to={`/category/${cat.category_id}`}
-                className="cat-card"
-                style={{ transitionDelay: `${i * 45}ms` }}
-                aria-label={cat.category_name}
-              >
-                <div
-                  className="cat-card__icon"
-                  style={{ background: `${color}18`, color }}
-                >
-                  {catIcon(cat.category_name)}
-                </div>
-                <strong className="cat-card__name">{cat.category_name}</strong>
-              </Link>
-            )
-          })}
-        </div>
+        {interestBooks.length > 0 && (
+          <div className="categories__books">
+            {interestBooks.map(book => (
+              <BookCard key={book.id} book={book} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

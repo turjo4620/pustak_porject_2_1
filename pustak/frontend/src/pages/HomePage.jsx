@@ -27,9 +27,9 @@ export default function HomePage() {
         <BestSellers />
         <NewlyReleased />
         <Recommendations />
-        <AuthorSpotlight />
-        <Categories />
         <PublisherShowcase />
+          <Categories />
+          <AuthorSpotlight />
         <Reviews />
         <Newsletter />
       </div>

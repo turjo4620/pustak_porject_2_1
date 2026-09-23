@@ -44,6 +44,7 @@ const couponRoutes = require("./src/routes/couponRoutes");
 const addressRoutes = require("./src/routes/addressRoutes");
 const returnRoutes = require("./src/routes/returnRoutes");
 const reviewRoutes = require("./src/routes/reviewRoutes");
+const newsletterRoutes = require('./src/routes/newsletterRoutes');
 
 // Admin routes
 const adminRoutes = require('./src/routes/adminRoutes');
@@ -56,6 +57,7 @@ app.use("/api/coupons", couponRoutes);
 app.use("/api/addresses", addressRoutes);
 app.use("/api/returns", returnRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use('/api/newsletter', newsletterRoutes);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/authors', authorRoutes);

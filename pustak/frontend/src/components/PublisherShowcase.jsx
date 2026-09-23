@@ -25,7 +25,6 @@ export default function PublisherShowcase() {
     <section className="publishers section-sm" aria-label="প্রকাশক পরিচিতি">
       <div className="container">
         <SectionHeader
-          label="প্রকাশক"
           title="বিশ্বস্ত প্রকাশনী"
           align="center"
         />

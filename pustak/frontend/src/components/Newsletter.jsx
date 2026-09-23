@@ -1,16 +1,28 @@
 import { useState } from 'react'
 import { Send, Check } from 'lucide-react'
+import { api } from '../api/http'
 import './Newsletter.css'
 
 export default function Newsletter() {
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (email) {
-      setSubmitted(true)
-      setEmail('')
+    if (email && !loading) {
+      setLoading(true)
+      setError('')
+      try {
+        await api.post('/newsletter/subscribe', { email })
+        setSubmitted(true)
+        setEmail('')
+      } catch (err) {
+        setError(err.message || 'সাবস্ক্রাইব করা যায়নি')
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
@@ -49,9 +61,10 @@ export default function Newsletter() {
                   />
                   <button type="submit" className="newsletter__btn" aria-label="সাবস্ক্রাইব করুন">
                     <Send size={16} />
-                    সাবস্ক্রাইব
+                    {loading ? 'যাচাই হচ্ছে...' : 'সাবস্ক্রাইব'}
                   </button>
                 </div>
+                {error && <p className="newsletter__error" role="alert">{error}</p>}
                 <p className="newsletter__note">কোনো স্প্যাম নয়। যেকোনো সময় আনসাবস্ক্রাইব করুন।</p>
               </form>
             )}

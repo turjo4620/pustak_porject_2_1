@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, NavLink } from 'react-router-dom'
 import { Search, Heart, ShoppingBag, User, Menu, X, Sun, Moon, Trash2, ArrowRight,
-         Package, Star, LogOut } from 'lucide-react'
+         Package, Star, LogOut, RotateCcw } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import './Navigation.css'
 
@@ -138,7 +138,12 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
                 className={`nav__icon-btn nav__icon-btn--user ${userOpen ? 'nav__icon-btn--open' : ''}`}
                 aria-label="আমার অ্যাকাউন্ট"
                 aria-expanded={userOpen}
-                onClick={() => { navigate('/account'); setCartOpen(false); setWishOpen(false) }}
+                onClick={() => {
+                  if (userOpen) navigate('/account')
+                  else setUserOpen(true)
+                  setCartOpen(false)
+                  setWishOpen(false)
+                }}
               >
                 <User size={20} />
               </button>
@@ -308,15 +313,26 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
                     </p>
                   )}
                 </div>
+                <button
+                  type="button"
+                  className="user-drawer__account-btn"
+                  aria-label="অ্যাকাউন্টে যান"
+                  title="অ্যাকাউন্টে যান"
+                  onClick={() => { setUserOpen(false); navigate('/account') }}
+                >
+                  <User size={18} />
+                </button>
               </div>
 
               {/* ── Nav links ── */}
               <div className="user-drawer__links">
                 {[
-                  { label: 'আমার প্রোফাইল',      to: '/account/info',     icon: User    },
-                  { label: 'অর্ডার ও ট্র্যাকিং', to: '/account/orders',   icon: Package },
-                  { label: 'পছন্দের তালিকা',      to: '/account/wishlist', icon: Heart   },
-                  { label: 'রিভিউ ও রেটিং',       to: '/account/reviews',  icon: Star    },
+                  { label: 'আমার তথ্য',          to: '/account/profile', icon: User      },
+                  { label: 'অর্ডার দিন',         to: '/account/order',   icon: ShoppingBag },
+                  { label: 'অর্ডার ট্র্যাকিং',    to: '/account/orders',  icon: Package   },
+                  { label: 'পছন্দের তালিকা',     to: '/account/wishlist', icon: Heart     },
+                  { label: 'রিটার্ন ও রিফান্ড',   to: '/account/returns', icon: RotateCcw },
+                  { label: 'রিভিউ ও রেটিং',       to: '/account/reviews', icon: Star      },
                 ].map(({ label, to, icon: Icon }) => (
                   <Link
                     key={to}
@@ -387,7 +403,7 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
               <div className="nav__drawer-user-avatar">{(authUser.name || authUser.email || 'U').slice(0,1).toUpperCase()}</div>
               <div className="nav__drawer-user-info">
                 <p className="nav__drawer-user-name">{authUser.name || authUser.email}</p>
-                <Link to="/account/info" className="nav__drawer-user-link" onClick={() => setMobileOpen(false)}>
+                <Link to="/account/profile" className="nav__drawer-user-link" onClick={() => setMobileOpen(false)}>
                   প্রোফাইল দেখুন
                 </Link>
               </div>
@@ -421,11 +437,23 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
           
           {authUser && (
             <div className="nav__drawer-account-links">
+              <Link to="/account/profile" className="nav__drawer-link" onClick={() => setMobileOpen(false)}>
+                আমার তথ্য
+              </Link>
+              <Link to="/account/order" className="nav__drawer-link" onClick={() => setMobileOpen(false)}>
+                অর্ডার দিন
+              </Link>
               <Link to="/account/orders" className="nav__drawer-link" onClick={() => setMobileOpen(false)}>
-                অর্ডার ও ট্র্যাকিং
+                অর্ডার ট্র্যাকিং
               </Link>
               <Link to="/account/wishlist" className="nav__drawer-link" onClick={() => setMobileOpen(false)}>
                 পছন্দের তালিকা
+              </Link>
+              <Link to="/account/returns" className="nav__drawer-link" onClick={() => setMobileOpen(false)}>
+                রিটার্ন ও রিফান্ড
+              </Link>
+              <Link to="/account/reviews" className="nav__drawer-link" onClick={() => setMobileOpen(false)}>
+                রিভিউ ও রেটিং
               </Link>
             </div>
           )}
