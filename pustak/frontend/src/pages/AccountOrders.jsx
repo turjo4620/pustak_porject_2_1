@@ -19,8 +19,8 @@ const STATUS_BN = {
   Paid:       'পরিশোধিত',
   processing: 'প্রসেসিং',
   Processing: 'প্রসেসিং',
-  shipped:    'পাঠানো হয়েছে',
-  Shipped:    'পাঠানো হয়েছে',
+  shipped:    'পথে আছে',
+  Shipped:    'পথে আছে',
   delivered:  'ডেলিভার্ড',
   Delivered:  'ডেলিভার্ড',
   cancelled:  'বাতিল',
@@ -201,7 +201,7 @@ export default function AccountOrders() {
     { key: 'all',        label: 'সব অর্ডার' },
     { key: 'topay',      label: 'পেমেন্ট বাকি' },
     { key: 'processing', label: 'প্রসেসিং' },
-    { key: 'shipped',    label: 'পাঠানো হয়েছে' },
+    { key: 'shipped',    label: 'পথে আছে' },
     { key: 'delivered',  label: 'ডেলিভার্ড' },
   ]
 

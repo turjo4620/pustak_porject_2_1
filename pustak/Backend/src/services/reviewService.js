@@ -6,7 +6,7 @@ async function refreshBookRating(client, bookId) {
        COALESCE(ROUND(AVG(rating), 1), 0) AS average_rating,
        COUNT(*)::int AS review_count
      FROM reviews
-     WHERE book_id = $1 AND COALESCE(is_hidden, FALSE) = FALSE`,
+     WHERE book_id = $1`,
     [bookId]
   );
   const { average_rating, review_count } = aggregate.rows[0];
@@ -69,7 +69,7 @@ async function getBookReviews(bookId) {
             u.name AS reviewer_name
      FROM reviews r
      JOIN users u ON u.user_id = r.user_id
-     WHERE r.book_id = $1 AND COALESCE(r.is_hidden, FALSE) = FALSE
+     WHERE r.book_id = $1
      ORDER BY r.review_id DESC`,
     [bookId]
   );

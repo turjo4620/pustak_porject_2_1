@@ -3,7 +3,7 @@
   color: rgba(250,247,242,0.75);
   padding: var(--space-20) 0 var(--space-8);
 }
-[data-theme="dark"] .footer { background: #0d0d0c; border-top: 1px solid var(--border-color); }
+[data-theme="dark"] .footer { background: var(--bg-primary); border-top: 1px solid var(--border-color); }
 
 .footer__top {
   display: grid;

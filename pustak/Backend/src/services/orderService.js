@@ -364,4 +364,57 @@ async function placeBuyNowOrder(userId, bookId, quantity = 1, addressId = null, 
   }
 }
 
-module.exports = { placeOrderFromCart, placeBuyNowOrder, getOrderById, listOrders, getTrackingInfo };
+async function cancelOrder(userId, orderId) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Verify ownership and cancellable status
+    const orderRes = await client.query(
+      `SELECT order_id, status FROM orders
+       WHERE order_id = $1 AND user_id = $2
+       FOR UPDATE`,
+      [orderId, userId]
+    );
+    if (!orderRes.rows.length) {
+      throw { status: 404, message: 'অর্ডার খুঁজে পাওয়া যায়নি' };
+    }
+
+    const { status } = orderRes.rows[0];
+    const cancellable = ['Pending', 'Confirmed', 'Paid', 'Processing'];
+    if (!cancellable.includes(status)) {
+      throw {
+        status: 400,
+        message: `"${status}" অবস্থায় থাকা অর্ডার বাতিল করা যাবে না`,
+      };
+    }
+
+    // Restore every book_copy reserved for this order back to in_stock
+    await client.query(
+      `UPDATE book_copy
+       SET status = 'in_stock'
+       WHERE copy_id IN (
+         SELECT copy_id FROM order_item WHERE order_id = $1
+       )`,
+      [orderId]
+    );
+
+    // Mark the order cancelled
+    const updated = await client.query(
+      `UPDATE orders SET status = 'Cancelled'
+       WHERE order_id = $1
+       RETURNING *`,
+      [orderId]
+    );
+
+    await client.query('COMMIT');
+    return updated.rows[0];
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+module.exports = { placeOrderFromCart, placeBuyNowOrder, getOrderById, listOrders, getTrackingInfo, cancelOrder };

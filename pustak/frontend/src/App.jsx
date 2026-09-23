@@ -23,6 +23,7 @@ import CartPage        from './pages/CartPage'
 import LoginPage       from './pages/LoginPage'
 import RegisterPage    from './pages/RegisterPage'
 import NotFoundPage    from './pages/NotFoundPage'
+import HelpPage        from './pages/HelpPage'
 
 // Import the Account Dashboard components
 import AccountDashboardLayout from './pages/AccountDashboardLayout.jsx'
@@ -88,11 +89,32 @@ function Layout({ children, isDarkMode, toggleDarkMode }) {
 }
 
 export default function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // 1. Respect stored preference
+    const stored = localStorage.getItem('pustak-theme')
+    if (stored === 'dark') return true
+    if (stored === 'light') return false
+    // 2. Fall back to OS preference
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+  })
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : '')
+    localStorage.setItem('pustak-theme', isDarkMode ? 'dark' : 'light')
   }, [isDarkMode])
+
+  // Keep in sync if the user changes OS preference while the tab is open
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const handler = (e) => {
+      // Only update if the user hasn't made an explicit choice yet
+      if (!localStorage.getItem('pustak-theme')) {
+        setIsDarkMode(e.matches)
+      }
+    }
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   return (
     <BrowserRouter>
@@ -123,6 +145,7 @@ export default function App() {
             <Route path="/order-success/:orderId" element={<OrderSuccessPage />} />
             <Route path="/login"             element={<LoginPage />} />
             <Route path="/register"          element={<RegisterPage />} />
+            <Route path="/help"              element={<HelpPage />} />
             
             {/* --- NEW NESTED ACCOUNT ROUTES --- */}
             <Route path="/account" element={<AccountDashboardLayout />}>

@@ -134,11 +134,17 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
             </button>
 
             <button
-              className="nav__icon-btn"
-              aria-label={isDarkMode ? 'লাইট মোড' : 'ডার্ক মোড'}
+              className={`nav__theme-toggle ${isDarkMode ? 'nav__theme-toggle--dark' : ''}`}
+              aria-label={isDarkMode ? 'লাইট মোড চালু করুন' : 'ডার্ক মোড চালু করুন'}
               onClick={toggleDarkMode}
+              title={isDarkMode ? 'Light mode' : 'Dark mode'}
             >
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+              <span className="nav__theme-toggle__track">
+                <span className="nav__theme-toggle__thumb">
+                  <Sun  size={11} className="nav__theme-toggle__sun"  aria-hidden="true" />
+                  <Moon size={11} className="nav__theme-toggle__moon" aria-hidden="true" />
+                </span>
+              </span>
             </button>
 
             {authUser ? (

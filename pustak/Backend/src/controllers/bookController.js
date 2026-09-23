@@ -617,10 +617,20 @@ const getNewArrivals = async (req, res) => {
 
     // edition column may contain Bengali digits (২০২৫) or ASCII (2025).
     // Translate Bengali digits → ASCII, then extract 4-digit year.
+    // Use DISTINCT ON (b.id) to guarantee one row per book regardless of
+    // how many authors or book_copy rows are joined.
     const query = `
       WITH translated AS (
         SELECT
-          b.*,
+          b.id,
+          b.book_name,
+          b.cover_image_url,
+          b.price,
+          b.discount_percentage,
+          b.availability,
+          b.rating,
+          b.num_reviews,
+          b.edition,
           TRANSLATE(
             b.edition,
             '০১২৩৪৫৬৭৮৯',
@@ -635,6 +645,12 @@ const getNewArrivals = async (req, res) => {
           (regexp_match(t.edition_ascii, '(\\d{4})'))[1]::INTEGER AS pub_year
         FROM translated t
         WHERE t.edition_ascii ~ '\\d{4}'
+      ),
+      authors_agg AS (
+        SELECT ba.book_id, MIN(a.name) AS author
+        FROM book_author ba
+        JOIN authors a ON a.author_id = ba.author_id
+        GROUP BY ba.book_id
       )
       SELECT
         w.id,
@@ -643,16 +659,15 @@ const getNewArrivals = async (req, res) => {
         w.price,
         w.discount_percentage,
         ROUND(w.price * (1 - w.discount_percentage / 100.0), 2) AS discount_price,
-        w.edition,
         w.availability,
+        w.rating,
+        w.num_reviews,
+        w.edition,
         w.pub_year,
-        MIN(a.name) AS author
+        aa.author
       FROM with_year w
-      LEFT JOIN book_author ba ON w.id = ba.book_id
-      LEFT JOIN authors a ON ba.author_id = a.author_id
+      LEFT JOIN authors_agg aa ON aa.book_id = w.id
       WHERE w.pub_year BETWEEN 1900 AND 2030
-      GROUP BY w.id, w.book_name, w.cover_image_url, w.price,
-               w.discount_percentage, w.edition, w.availability, w.pub_year
       ORDER BY w.pub_year DESC, w.id DESC
       LIMIT $1
     `;

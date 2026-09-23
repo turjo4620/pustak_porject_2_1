@@ -148,5 +148,5 @@
   font-size: 0.9rem; text-align: center;
   font-family: var(--font-sans);
 }
-.auth-message.success { background: rgba(34, 197, 94, 0.12); color: #166534; }
-.auth-message.error { background: rgba(239, 68, 68, 0.12); color: #991b1b; }
+.auth-message.success { background: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-border); }
+.auth-message.error { background: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-border); }

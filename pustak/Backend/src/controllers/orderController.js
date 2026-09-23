@@ -58,4 +58,13 @@ async function buyNow(req, res, next) {
   }
 }
 
-module.exports = { placeOrder, buyNow, getOrder, getOrders, getTracking };
+async function cancelOrder(req, res, next) {
+  try {
+    const order = await orderService.cancelOrder(req.userId, req.params.orderId);
+    res.json({ success: true, order });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { placeOrder, buyNow, getOrder, getOrders, getTracking, cancelOrder };

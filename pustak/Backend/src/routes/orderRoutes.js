@@ -18,6 +18,9 @@ router.get('/', orderController.getOrders);
 // GET  /api/orders/:orderId           -> { order, items } | used by PaymentPage
 router.get('/:orderId', orderController.getOrder);
 
+// PATCH /api/orders/:orderId/cancel  -> cancel an order (customer)
+router.patch('/:orderId/cancel', orderController.cancelOrder);
+
 // GET  /api/orders/:orderId/tracking  -> { order, delivery } | used by AccountOrders
 router.get('/:orderId/tracking', orderController.getTracking);
 

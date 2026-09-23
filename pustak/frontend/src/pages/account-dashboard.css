@@ -1859,3 +1859,167 @@
   .ar-card__actions { flex-direction: row; }
   .ar-modal { padding: 1.25rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   DARK MODE OVERRIDES — account-dashboard
+   All hardcoded #fff / white / light greens replaced with tokens
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* --- Core card/sidebar/modal surfaces --- */
+[data-theme="dark"] .card,
+[data-theme="dark"] .account-sidebar,
+[data-theme="dark"] .order-card,
+[data-theme="dark"] .tracking-modal,
+[data-theme="dark"] .ar-modal,
+[data-theme="dark"] .ar-empty,
+[data-theme="dark"] .od-book-row,
+[data-theme="dark"] .od-entity-btn,
+[data-theme="dark"] .ar-action-btn,
+[data-theme="dark"] .ar-btn--ghost {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Sign-out button */
+[data-theme="dark"] .sign-out-btn {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+[data-theme="dark"] .sign-out-btn:hover {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border-color: var(--error-border);
+}
+
+/* Avatar edit overlay */
+[data-theme="dark"] .sidebar-avatar-edit {
+  background: var(--bg-elevated);
+  border-color: var(--border-color);
+}
+[data-theme="dark"] .sidebar-avatar-edit:hover {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Active nav item */
+[data-theme="dark"] .account-sidebar .sidebar-nav .nav-item.active {
+  background-color: var(--accent-subtle) !important;
+  color: var(--accent) !important;
+}
+
+/* Search input */
+[data-theme="dark"] .orders-search-input {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+[data-theme="dark"] .orders-search-input:focus {
+  background: var(--bg-card);
+  border-color: var(--accent);
+}
+
+/* Order card header */
+[data-theme="dark"] .order-card__header {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+/* Ghost/return buttons */
+[data-theme="dark"] .order-btn--ghost:hover,
+[data-theme="dark"] .order-btn--return:hover,
+[data-theme="dark"] .od-entity-btn:hover {
+  background: var(--accent-subtle);
+  border-color: var(--accent);
+}
+
+/* Tracking timeline dots */
+[data-theme="dark"] .tracking-step__dot {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+/* Order Din entity avatar */
+[data-theme="dark"] .od-entity-avatar {
+  background: var(--accent-subtle);
+  color: var(--accent);
+}
+
+/* Review action buttons */
+[data-theme="dark"] .ar-action-btn--edit:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-subtle);
+}
+[data-theme="dark"] .ar-action-btn--del:hover {
+  border-color: var(--error-text);
+  color: var(--error-text);
+  background: var(--error-bg);
+}
+
+/* Review comment quote bar */
+[data-theme="dark"] .ar-card__comment {
+  background: var(--bg-secondary);
+  border-left-color: var(--accent);
+  color: var(--text-secondary);
+}
+
+/* Status badge colors in returns/orders */
+[data-theme="dark"] .ar-badge--pending {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border-color: var(--warning-border);
+}
+[data-theme="dark"] .ar-badge--rejected,
+[data-theme="dark"] .ar-badge--refund-failed {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border-color: var(--error-border);
+}
+[data-theme="dark"] .ar-badge--refund-done {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border-color: var(--success-border);
+}
+
+/* Modal textarea */
+[data-theme="dark"] .ar-modal__textarea {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+[data-theme="dark"] .ar-modal__textarea:focus {
+  background: var(--bg-card);
+  border-color: var(--accent);
+}
+
+/* Wishlist card */
+[data-theme="dark"] .wishlist-card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+/* OrderDin book row */
+[data-theme="dark"] .od-book-row:hover {
+  border-color: var(--accent);
+  box-shadow: 0 2px 10px rgba(111, 175, 145, 0.10);
+}
+
+/* od-* search inputs already use .orders-search-input — covered above */
+
+/* Profile card in account */
+[data-theme="dark"] .account-profile-card .prof-fields-card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+}
+[data-theme="dark"] .prof-field__input {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+[data-theme="dark"] .prof-field__input:focus {
+  background: var(--bg-card);
+  border-color: var(--accent);
+}

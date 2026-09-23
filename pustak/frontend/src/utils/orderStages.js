@@ -26,7 +26,7 @@ export const ORDER_STAGES = [
   },
   {
     key:   'shipped',
-    label: 'কুরিয়ারে হস্তান্তর / পথে আছে',
+    label: 'পথে আছে',
     reachedBy: ['shipped', 'delivered'],
   },
   {

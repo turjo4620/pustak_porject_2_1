@@ -855,9 +855,9 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  background: #d1fae5;
-  color: #065f46;
-  border: 1px solid #6ee7b7;
+  background: var(--success-bg);
+  color: var(--success-text);
+  border: 1px solid var(--success-border);
   border-radius: var(--radius-lg);
   padding: var(--space-3) var(--space-5);
   font-size: 0.9rem;
