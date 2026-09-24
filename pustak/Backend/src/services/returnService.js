@@ -165,64 +165,14 @@ async function approveReturn(returnId) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-
-    const retRes = await client.query(
-      `SELECT r.return_id, r.status, r.order_item_id,
-              oi.price_sold, o.order_id,
-              p.payment_id
-       FROM "return" r
-       JOIN order_item oi ON oi.order_item_id = r.order_item_id
-       JOIN orders      o  ON o.order_id       = oi.order_id
-       LEFT JOIN payments p ON p.order_id      = o.order_id
-                            AND p.payment_status = 'Completed'
-       WHERE r.return_id = $1
-       ORDER BY p.payment_id DESC
-       LIMIT 1`,
+    await client.query('CALL sp_approve_return($1)', [returnId]);
+    const refundRes = await client.query(
+      'SELECT * FROM refund WHERE return_id = $1',
       [returnId]
     );
-
-    if (!retRes.rows.length) {
-      throw { status: 404, message: 'রিটার্ন রিকোয়েস্ট খুঁজে পাওয়া যায়নি' };
-    }
-
-    const ret = retRes.rows[0];
-
-    if (ret.status !== 'initiated') {
-      throw {
-        status: 409,
-        message: `রিটার্নটি ইতিমধ্যে '${ret.status}' অবস্থায় আছে`,
-      };
-    }
-
-    // Approve
-    await client.query(
-      `UPDATE "return"
-       SET status = 'approved', approved_at = NOW()
-       WHERE return_id = $1`,
-      [returnId]
-    );
-
-    // Create refund row (idempotent)
-    const existingRefund = await client.query(
-      'SELECT refund_id FROM refund WHERE return_id = $1',
-      [returnId]
-    );
-
-    let refundRow = null;
-    if (!existingRefund.rows.length) {
-      const refundRes = await client.query(
-        `INSERT INTO refund (return_id, refund_amount, refund_status)
-         VALUES ($1, $2, 'Pending')
-         RETURNING *`,
-        [returnId, ret.price_sold]
-      );
-      refundRow = refundRes.rows[0];
-    } else {
-      refundRow = existingRefund.rows[0];
-    }
 
     await client.query('COMMIT');
-    return { returnId, refund: refundRow };
+    return { returnId, refund: refundRes.rows[0] || null };
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;

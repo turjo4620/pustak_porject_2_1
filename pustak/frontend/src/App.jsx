@@ -53,6 +53,7 @@ import AdminReviews     from './pages/admin/AdminReviews.jsx'
 import AdminAnalytics   from './pages/admin/AdminAnalytics.jsx'
 import AdminCoupons     from './pages/admin/AdminCoupons.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import CustomerAuthRoute from './components/CustomerAuthRoute.jsx'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -148,16 +149,18 @@ export default function App() {
             <Route path="/help"              element={<HelpPage />} />
             
             {/* --- NEW NESTED ACCOUNT ROUTES --- */}
-            <Route path="/account" element={<AccountDashboardLayout />}>
-              <Route index element={<AccountHomePage />} />
-              <Route path="profile" element={<AccountProfileCard />} />
-              <Route path="info" element={<AccountProfileCard />} />
-              <Route path="order" element={<AccountHomePage />} />
-              <Route path="orders" element={<AccountOrders />} />
-              <Route path="orders/:orderId" element={<OrderDetailPage />} />
-              <Route path="wishlist" element={<AccountWishlist />} />
-              <Route path="returns" element={<AccountReturns />} />
-              <Route path="reviews" element={<AccountReviews />} />
+            <Route element={<CustomerAuthRoute />}>
+              <Route path="/account" element={<AccountDashboardLayout />}>
+                <Route index element={<AccountHomePage />} />
+                <Route path="profile" element={<AccountProfileCard />} />
+                <Route path="info" element={<AccountProfileCard />} />
+                <Route path="order" element={<AccountHomePage />} />
+                <Route path="orders" element={<AccountOrders />} />
+                <Route path="orders/:orderId" element={<OrderDetailPage />} />
+                <Route path="wishlist" element={<AccountWishlist />} />
+                <Route path="returns" element={<AccountReturns />} />
+                <Route path="reviews" element={<AccountReviews />} />
+              </Route>
             </Route>
 
             {/* --- ADMIN ROUTES --- */}

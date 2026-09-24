@@ -735,6 +735,14 @@ class AdminService {
     return result.rows;
   }
 
+  async getSalesSummary(startDate, endDate) {
+    const result = await pool.query(
+      'SELECT * FROM fn_sales_summary($1::timestamp, $2::timestamp)',
+      [startDate, endDate]
+    );
+    return result.rows[0];
+  }
+
   async getBestSellingBooks(limit = 10) {
     const result = await pool.query(`
       SELECT 

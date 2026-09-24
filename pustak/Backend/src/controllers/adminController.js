@@ -227,8 +227,9 @@ class AdminController {
       const startDate = start_date || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
       const endDate = end_date || new Date().toISOString();
 
-      const [salesData, bestSellers, popularCategories, lowStock, outOfStock, bestCustomers] = await Promise.all([
+      const [salesData, salesSummary, bestSellers, popularCategories, lowStock, outOfStock, bestCustomers] = await Promise.all([
         adminService.getSalesAnalytics(startDate, endDate),
+        adminService.getSalesSummary(startDate, endDate),
         adminService.getBestSellingBooks(10),
         adminService.getPopularCategories(),
         adminService.getLowStockBooks(),
@@ -238,6 +239,7 @@ class AdminController {
 
       res.json({
         sales: salesData,
+        salesSummary,
         bestSellers,
         popularCategories,
         lowStock,
