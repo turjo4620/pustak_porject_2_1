@@ -78,14 +78,16 @@
 
 /* ── Dropdown ── */
 .search-dropdown {
-  position: absolute;
-  top: calc(100% + 8px); left: 0; right: 0;
+  position: relative;
+  margin: 8px 0 0;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
   z-index: 500;
+  max-height: min(28rem, 60vh);
+  overflow-y: auto;
   animation: scale-in 150ms ease;
 }
 

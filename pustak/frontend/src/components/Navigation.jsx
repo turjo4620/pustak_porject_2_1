@@ -15,6 +15,7 @@ const navLinks = [
 ]
 
 const trendingSearches = ['হিমু', 'হুমায়ূন আহমেদ', 'রবীন্দ্রনাথ', 'মুক্তিযুদ্ধ', 'বিজ্ঞান']
+const BASE = 'http://localhost:5000/api'
 
 export default function Navigation({ isDarkMode, toggleDarkMode }) {
   const navigate = useNavigate()
@@ -26,7 +27,11 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
   const [searchOpen, setSearchOpen] = useState(false)
   const [userOpen, setUserOpen]   = useState(false)
   const [query, setQuery]         = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const [searchLoading, setSearchLoading] = useState(false)
   const searchRef = useRef(null)
+  const searchDebounce = useRef(null)
+  const searchRequestSeq = useRef(0)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -37,6 +42,32 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
   useEffect(() => {
     if (searchOpen && searchRef.current) searchRef.current.focus()
   }, [searchOpen])
+
+  useEffect(() => {
+    clearTimeout(searchDebounce.current)
+    const term = query.trim()
+    if (term.length < 2) {
+      setSearchResults([])
+      setSearchLoading(false)
+      return
+    }
+
+    const seq = ++searchRequestSeq.current
+    setSearchLoading(true)
+    searchDebounce.current = setTimeout(async () => {
+      try {
+        const response = await fetch(`${BASE}/books/search?q=${encodeURIComponent(term)}&limit=6`)
+        const json = await response.json()
+        if (seq === searchRequestSeq.current) setSearchResults(json.data || [])
+      } catch {
+        if (seq === searchRequestSeq.current) setSearchResults([])
+      } finally {
+        if (seq === searchRequestSeq.current) setSearchLoading(false)
+      }
+    }, 280)
+
+    return () => clearTimeout(searchDebounce.current)
+  }, [query])
 
   
   // Close drawers on route change
@@ -59,6 +90,13 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
   const handleSearchChip = (term) => {
     navigate(`/search?q=${encodeURIComponent(term)}`)
     setSearchOpen(false)
+    setQuery('')
+  }
+
+  const handleSearchResult = (bookId) => {
+    navigate(`/book/${bookId}`)
+    setSearchOpen(false)
+    setQuery('')
   }
 
   const anyDrawerOpen = cartOpen || wishOpen || userOpen || mobileOpen
@@ -516,20 +554,53 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
                 <X size={20} />
               </button>
             </form>
-            <div className="search-modal__trending">
-              <p className="search-modal__label">ট্রেন্ডিং অনুসন্ধান</p>
-              <div className="search-modal__chips">
-                {trendingSearches.map((t) => (
+            {query.trim().length >= 2 ? (
+              <div className="search-modal__results" role="listbox" aria-label="অনুসন্ধান ফলাফল">
+                {searchLoading && <p className="search-modal__status">খুঁজছি...</p>}
+                {!searchLoading && searchResults.length === 0 && (
+                  <p className="search-modal__status">কোনো ফলাফল পাওয়া যায়নি।</p>
+                )}
+                {!searchLoading && searchResults.map((book) => (
                   <button
-                    key={t}
-                    className="search-modal__chip"
-                    onClick={() => handleSearchChip(t)}
+                    key={book.id}
+                    type="button"
+                    className="search-modal__result"
+                    role="option"
+                    onClick={() => handleSearchResult(book.id)}
                   >
-                    {t}
+                    {book.cover_image_url
+                      ? <img src={book.cover_image_url} alt="" className="search-modal__result-cover" />
+                      : <span className="search-modal__result-cover search-modal__result-cover--fallback">বই</span>
+                    }
+                    <span className="search-modal__result-info">
+                      <strong>{book.book_name}</strong>
+                      <span>{book.author || book.authors?.[0]?.name || ''}</span>
+                    </span>
+                    <span className="search-modal__result-type">বই</span>
                   </button>
                 ))}
+                {!searchLoading && searchResults.length > 0 && (
+                  <button type="submit" className="search-modal__all">
+                    "{query.trim()}" — সব ফলাফল দেখুন →
+                  </button>
+                )}
               </div>
-            </div>
+            ) : (
+              <div className="search-modal__trending">
+                <p className="search-modal__label">ট্রেন্ডিং অনুসন্ধান</p>
+                <div className="search-modal__chips">
+                  {trendingSearches.map((t) => (
+                    <button
+                      key={t}
+                      className="search-modal__chip"
+                      onClick={() => handleSearchChip(t)}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

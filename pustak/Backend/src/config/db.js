@@ -1,31 +1,27 @@
-// pool class import
-
 const { Pool } = require('pg');
 
-// dotenv import
+// 1. SAFETY GUARD: Catch missing variables immediately
+if (!process.env.DATABASE_URL) {
+    console.error("FATAL ERROR: DATABASE_URL is missing!");
+    console.error("Make sure require('dotenv').config() is on line 1 of server.js.");
+    process.exit(1);
+}
 
-require('dotenv').config();
-
-
-// creating new connection
-
+// 2. Initialize using the Neon connection string and mandatory SSL
 const pool = new Pool({
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
-
-// test
-
-pool.connect()
-    .then(()=> console.log('OK!'))
-    .catch((err)=> console.error('Error :', err.stack));
-
-// export
+// 3. Safely test the connection
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    console.error('Database connection error:', err.stack);
+  } else {
+    console.log('Connected to Neon Database successfully!');
+  }
+});
 
 module.exports = pool;
-
-

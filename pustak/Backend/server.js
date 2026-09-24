@@ -1,7 +1,14 @@
-const express = require('express');
-const cors = require('cors');
+// 1. MUST BE LINE 1: Load environment variables before ANYTHING else
 require('dotenv').config();
 
+// 2. DEBUG CHECK: Prove the URL is loaded before we connect to the database
+console.log("--- STARTING SERVER ---");
+console.log("Database URL loaded:", process.env.DATABASE_URL ? "✅ YES" : "❌ NO! Check your .env file");
+
+const express = require('express');
+const cors = require('cors');
+
+// 3. Load DB AFTER dotenv is confirmed working
 const pool = require('./src/config/db');
 
 const app = express();
