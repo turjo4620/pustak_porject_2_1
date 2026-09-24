@@ -196,7 +196,7 @@ class AdminController {
       res.json(result);
     } catch (error) {
       console.error('Get all reviews error:', error);
-      res.status(500).json({ error: 'Failed to fetch reviews' });
+      res.status(error.status || 500).json({ error: error.message || 'Failed to fetch reviews' });
     }
   }
 
@@ -206,7 +206,7 @@ class AdminController {
       res.json(review);
     } catch (error) {
       console.error('Toggle review visibility error:', error);
-      res.status(500).json({ error: 'Failed to toggle review visibility' });
+      res.status(error.status || 500).json({ error: error.message || 'Failed to toggle review visibility' });
     }
   }
 
@@ -216,7 +216,7 @@ class AdminController {
       res.json({ message: 'Review deleted successfully' });
     } catch (error) {
       console.error('Delete review error:', error);
-      res.status(500).json({ error: 'Failed to delete review' });
+      res.status(error.status || 500).json({ error: error.message || 'Failed to delete review' });
     }
   }
 

@@ -656,13 +656,28 @@ class AdminService {
     let queryParams = [];
     let paramIndex = 1;
 
+    const columnResult = await pool.query(
+      `SELECT column_name
+       FROM information_schema.columns
+       WHERE table_schema = 'public'
+         AND table_name = 'reviews'
+         AND column_name IN ('is_hidden', 'review_date')`
+    );
+    const reviewColumns = new Set(columnResult.rows.map((row) => row.column_name));
+    const hiddenExpression = reviewColumns.has('is_hidden')
+      ? 'COALESCE(r.is_hidden, FALSE)'
+      : 'FALSE';
+    const dateExpression = reviewColumns.has('review_date')
+      ? 'r.review_date'
+      : 'NULL::timestamp';
+
     if (filters.book_id) {
       whereConditions.push(`r.book_id = $${paramIndex}`);
       queryParams.push(filters.book_id);
       paramIndex++;
     }
     if (filters.is_hidden !== undefined && filters.is_hidden !== '') {
-      whereConditions.push(`r.is_hidden = $${paramIndex}`);
+      whereConditions.push(`${hiddenExpression} = $${paramIndex}`);
       queryParams.push(filters.is_hidden === true || filters.is_hidden === 'true');
       paramIndex++;
     }
@@ -674,8 +689,9 @@ class AdminService {
         r.user_id,
         r.book_id,
         r.rating,
-        r.comment,
-        r.is_hidden,
+        r.comment AS review_text,
+        ${dateExpression} AS review_date,
+        ${hiddenExpression} AS is_hidden,
         u.name  AS user_name,
         b.book_name
       FROM reviews r
@@ -716,7 +732,45 @@ class AdminService {
   }
 
   async deleteReview(reviewId) {
-    await pool.query('DELETE FROM reviews WHERE review_id = $1', [reviewId]);
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      const reviewResult = await client.query(
+        'SELECT book_id FROM reviews WHERE review_id = $1 FOR UPDATE',
+        [reviewId]
+      );
+      if (!reviewResult.rows.length) {
+        throw { status: 404, message: 'Review not found' };
+      }
+
+      const bookId = reviewResult.rows[0].book_id;
+      await client.query('DELETE FROM reviews WHERE review_id = $1', [reviewId]);
+
+      const aggregate = await client.query(
+        `SELECT
+           COALESCE(ROUND(AVG(rating), 1), 0) AS average_rating,
+           COUNT(*)::int AS review_count
+         FROM reviews
+         WHERE book_id = $1`,
+        [bookId]
+      );
+      await client.query(
+        'UPDATE books SET rating = $1, num_reviews = $2 WHERE id = $3',
+        [
+          aggregate.rows[0].average_rating,
+          aggregate.rows[0].review_count,
+          bookId,
+        ]
+      );
+
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   // ============= ANALYTICS =============

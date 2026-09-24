@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Eye, EyeOff, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Trash2, FileText, X } from 'lucide-react';
 import '../../styles/admin.css';
 
 export default function AdminReviews() {
@@ -7,6 +7,7 @@ export default function AdminReviews() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedReview, setSelectedReview] = useState(null);
 
   useEffect(() => {
     fetchReviews();
@@ -23,8 +24,8 @@ export default function AdminReviews() {
       if (!response.ok) throw new Error('Failed to fetch reviews');
 
       const data = await response.json();
-      setReviews(data.reviews);
-      setTotalPages(data.totalPages);
+      setReviews(Array.isArray(data.reviews) ? data.reviews : []);
+      setTotalPages(Math.max(1, Number(data.totalPages) || 1));
     } catch (error) {
       console.error('Error fetching reviews:', error);
     } finally {
@@ -98,7 +99,11 @@ export default function AdminReviews() {
                 </tr>
               </thead>
               <tbody>
-                {reviews.map(review => (
+                {reviews.length === 0 ? (
+                  <tr>
+                    <td colSpan="8" className="no-data">No reviews found</td>
+                  </tr>
+                ) : reviews.map(review => (
                   <tr key={review.review_id} className={review.is_hidden ? 'hidden-row' : ''}>
                     <td>{review.review_id}</td>
                     <td>{review.book_name}</td>
@@ -107,13 +112,22 @@ export default function AdminReviews() {
                       <span className="rating-stars">{renderStars(review.rating)}</span>
                     </td>
                     <td className="review-text">{review.review_text || 'No text'}</td>
-                    <td>{new Date(review.review_date).toLocaleDateString()}</td>
+                    <td>{review.review_date
+                      ? new Date(review.review_date).toLocaleDateString()
+                      : '—'}</td>
                     <td>
                       <span className={`status-badge ${review.is_hidden ? 'danger' : 'success'}`}>
                         {review.is_hidden ? 'Hidden' : 'Visible'}
                       </span>
                     </td>
                     <td className="actions-cell">
+                      <button
+                        className="btn-icon"
+                        onClick={() => setSelectedReview(review)}
+                        title="View Details"
+                      >
+                        <FileText size={18} />
+                      </button>
                       <button 
                         className="btn-icon" 
                         onClick={() => toggleVisibility(review.review_id)}
@@ -145,6 +159,46 @@ export default function AdminReviews() {
             </button>
           </div>
         </>
+      )}
+
+      {selectedReview && (
+        <div className="modal-overlay" onClick={() => setSelectedReview(null)}>
+          <div className="modal-content" onClick={(event) => event.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Review Details</h2>
+              <button
+                className="modal-close"
+                onClick={() => setSelectedReview(null)}
+                title="Close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-form">
+              <p><strong>Review ID:</strong> {selectedReview.review_id}</p>
+              <p><strong>Book:</strong> {selectedReview.book_name || '—'}</p>
+              <p><strong>User:</strong> {selectedReview.user_name || '—'}</p>
+              <p>
+                <strong>Rating:</strong>{' '}
+                <span className="rating-stars">{renderStars(Number(selectedReview.rating) || 0)}</span>
+              </p>
+              <p>
+                <strong>Date:</strong>{' '}
+                {selectedReview.review_date
+                  ? new Date(selectedReview.review_date).toLocaleString()
+                  : '—'}
+              </p>
+              <p>
+                <strong>Visibility:</strong>{' '}
+                {selectedReview.is_hidden ? 'Hidden' : 'Visible'}
+              </p>
+              <div>
+                <strong>Review:</strong>
+                <p className="review-details-text">{selectedReview.review_text || 'No text'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

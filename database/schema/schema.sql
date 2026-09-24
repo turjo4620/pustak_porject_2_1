@@ -17,10 +17,13 @@ CREATE TABLE IF NOT EXISTS users
 CREATE TABLE IF NOT EXISTS wishlist
 (
 wishlist_id serial NOT NULL,
-user_id integer NOT NULL,
+user_id bigint NOT NULL,
 created_at timestamp NOT NULL DEFAULT now(),
 CONSTRAINT wishlist_pkey PRIMARY KEY (wishlist_id),
-CONSTRAINT wishlist_user_id_key UNIQUE (user_id)
+CONSTRAINT wishlist_user_id_key UNIQUE (user_id),
+CONSTRAINT wishlist_user_id_fkey FOREIGN KEY (user_id)
+REFERENCES users (user_id)
+ON DELETE CASCADE
 );
 
 
@@ -48,7 +51,7 @@ CREATE TABLE IF NOT EXISTS wishlist_item
 CREATE TABLE IF NOT EXISTS reviews
 (
 review_id serial NOT NULL,
-user_id integer NOT NULL,
+user_id bigint NOT NULL,
 book_id integer NOT NULL,
 rating integer,
 comment text,
@@ -57,6 +60,9 @@ review_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 CONSTRAINT reviews_pkey PRIMARY KEY (review_id),
 CONSTRAINT reviews_book_id_fkey FOREIGN KEY (book_id)
 REFERENCES books (id)
+ON DELETE CASCADE,
+CONSTRAINT reviews_user_id_fkey FOREIGN KEY (user_id)
+REFERENCES users (user_id)
 ON DELETE CASCADE,
 CONSTRAINT reviews_rating_check CHECK (rating >= 1 AND rating <= 5)
 );
@@ -67,16 +73,11 @@ CREATE TABLE IF NOT EXISTS "return"
 (
 return_id bigserial NOT NULL,
 order_item_id bigint NOT NULL,
-copy_id bigint NOT NULL,
-user_id bigint NOT NULL,
 reason varchar(255),
 return_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 status varchar(50) NOT NULL DEFAULT 'initiated',
-refund_status varchar(50),
 approved_at timestamp,
 CONSTRAINT return_pkey PRIMARY KEY (return_id),
-CONSTRAINT return_copy_id_fkey FOREIGN KEY (copy_id)
-REFERENCES book_copy (copy_id),
 CONSTRAINT return_order_item_id_fkey FOREIGN KEY (order_item_id)
 REFERENCES order_item (order_item_id)
 );
@@ -128,7 +129,7 @@ ON DELETE CASCADE
 CREATE TABLE IF NOT EXISTS orders
 (
 order_id serial NOT NULL,
-user_id integer NOT NULL,
+user_id bigint NOT NULL,
 address_id integer,
 coupon_id integer,
 order_number varchar(50) NOT NULL,
@@ -137,6 +138,9 @@ order_date timestamp DEFAULT CURRENT_TIMESTAMP,
 status varchar(50) DEFAULT 'Pending',
 CONSTRAINT orders_pkey PRIMARY KEY (order_id),
 CONSTRAINT orders_order_number_key UNIQUE (order_number),
+CONSTRAINT orders_user_id_fkey FOREIGN KEY (user_id)
+REFERENCES users (user_id)
+ON DELETE RESTRICT,
 CONSTRAINT orders_address_id_fkey FOREIGN KEY (address_id)
 REFERENCES addresses (address_id),
 CONSTRAINT orders_coupon_id_fkey FOREIGN KEY (coupon_id)
@@ -148,7 +152,7 @@ REFERENCES coupons (coupon_id)
 CREATE TABLE IF NOT EXISTS order_item
 (
 order_item_id bigserial NOT NULL,
-order_id bigint NOT NULL,
+order_id integer NOT NULL,
 copy_id bigint NOT NULL,
 price_sold numeric(10,2) NOT NULL,
 CONSTRAINT order_item_pkey PRIMARY KEY (order_item_id),
@@ -290,12 +294,15 @@ CREATE INDEX IF NOT EXISTS idx_cart_item_cart_id
 CREATE TABLE IF NOT EXISTS cart
 (
 cart_id bigserial NOT NULL,
-user_id integer NOT NULL,
+user_id bigint NOT NULL,
 status varchar(50) NOT NULL DEFAULT 'active',
 created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 CONSTRAINT cart_pkey PRIMARY KEY (cart_id),
-CONSTRAINT cart_user_id_key UNIQUE (user_id)
+CONSTRAINT cart_user_id_key UNIQUE (user_id),
+CONSTRAINT cart_user_id_fkey FOREIGN KEY (user_id)
+REFERENCES users (user_id)
+ON DELETE CASCADE
 );
 
 
@@ -333,7 +340,7 @@ CREATE TABLE IF NOT EXISTS books
     initial_stock integer DEFAULT 0,
     publication_id integer,
     discount_percentage integer DEFAULT 0,
-    admin_id integer DEFAULT 1786484073,
+    admin_id bigint DEFAULT 1786484073,
     CONSTRAINT books_pkey PRIMARY KEY (id),
     CONSTRAINT books_publication_id_fkey FOREIGN KEY (publication_id)
         REFERENCES publications (publication_id),
@@ -351,7 +358,7 @@ CREATE TABLE IF NOT EXISTS books
 CREATE TABLE IF NOT EXISTS book_copy
 (
     copy_id bigserial NOT NULL,
-    book_id bigint NOT NULL,
+    book_id integer NOT NULL,
     status varchar(50) NOT NULL DEFAULT 'in_stock',
     condition varchar(50) NOT NULL DEFAULT 'new',
     barcode varchar(100),
@@ -427,12 +434,15 @@ CREATE TABLE IF NOT EXISTS admin
 CREATE TABLE IF NOT EXISTS addresses
 (
     address_id serial NOT NULL,
-    user_id integer NOT NULL,
+    user_id bigint NOT NULL,
     street varchar(255),
     area varchar(100),
     district varchar(100),
     division varchar(100),
     postal_code varchar(20),
     is_default boolean DEFAULT false,
-    CONSTRAINT addresses_pkey PRIMARY KEY (address_id)
+    CONSTRAINT addresses_pkey PRIMARY KEY (address_id),
+    CONSTRAINT addresses_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES users (user_id)
+        ON DELETE CASCADE
 );

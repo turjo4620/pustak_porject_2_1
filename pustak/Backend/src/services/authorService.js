@@ -1,32 +1,64 @@
 const pool = require('../config/db');
 
-const getAuthorIdentityKey = (author) => {
-    if (author.photo_url) return `photo:${author.photo_url}`;
-    if (author.bio) return `bio:${author.bio.trim()}`;
-    return `id:${author.author_id}`;
-};
-
 const mergeAuthorRows = (rows) => {
-    const groups = new Map();
+    const parent = new Map(rows.map((author) => [author.author_id, author.author_id]));
+    const identityOwners = new Map();
+
+    const find = (id) => {
+        let root = parent.get(id);
+        while (root !== parent.get(root)) {
+            parent.set(root, parent.get(parent.get(root)));
+            root = parent.get(root);
+        }
+        return root;
+    };
+
+    const union = (firstId, secondId) => {
+        const firstRoot = find(firstId);
+        const secondRoot = find(secondId);
+        if (firstRoot !== secondRoot) parent.set(secondRoot, firstRoot);
+    };
 
     rows.forEach((author) => {
-        const key = getAuthorIdentityKey(author);
-        const group = groups.get(key);
+        const identities = [
+            author.photo_url && `photo:${author.photo_url.trim()}`,
+            author.bio && `bio:${author.bio.trim()}`,
+        ].filter(Boolean);
+
+        identities.forEach((identity) => {
+            const ownerId = identityOwners.get(identity);
+            if (ownerId !== undefined) union(author.author_id, ownerId);
+            else identityOwners.set(identity, author.author_id);
+        });
+    });
+
+    const groups = new Map();
+    rows.forEach((author) => {
+        const root = find(author.author_id);
+        const group = groups.get(root);
 
         if (group) {
             group.author_ids.push(author.author_id);
             group.count += Number(author.count || 0);
+            if (Number(author.count || 0) > Number(group._canonicalCount || 0)) {
+                group.name = author.name;
+                group.bio = author.bio || group.bio;
+                group.photo_url = author.photo_url || group.photo_url;
+                group._canonicalCount = Number(author.count || 0);
+            }
             return;
         }
 
-        groups.set(key, {
+        groups.set(root, {
             ...author,
             author_ids: [author.author_id],
             count: Number(author.count || 0),
+            _canonicalCount: Number(author.count || 0),
         });
     });
 
     return Array.from(groups.values())
+        .map(({ _canonicalCount, ...author }) => author)
         .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 };
 
