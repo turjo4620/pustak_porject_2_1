@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { getAuthorGroupIds } = require('../services/authorService');
 
 // Helper: computed discount_price expression
 const DISCOUNT_PRICE_EXPR = `ROUND(books.price * (1 - books.discount_percentage / 100.0), 2)`;
@@ -102,6 +103,7 @@ const getBooksByAuthor = async (req, res) => {
       return res.status(404).json({ error: "Author not found" });
     }
     const authorName = authorResult.rows[0].name;
+    const authorGroupIds = await getAuthorGroupIds(authorId);
 
     const bookQuery = `
       SELECT 
@@ -115,7 +117,7 @@ const getBooksByAuthor = async (req, res) => {
       FROM books
       JOIN book_author ON books.id = book_author.book_id
       JOIN authors ON book_author.author_id = authors.author_id
-      WHERE authors.author_id = $1
+      WHERE authors.author_id = ANY($1)
       ORDER BY 
         CASE 
           WHEN books.book_name LIKE '%কালেকশন%' THEN 1
@@ -129,9 +131,12 @@ const getBooksByAuthor = async (req, res) => {
         books.id ASC
       LIMIT $2 OFFSET $3
     `;
-    const { rows } = await pool.query(bookQuery, [authorId, limit, offset]);
+    const { rows } = await pool.query(bookQuery, [authorGroupIds, limit, offset]);
 
-    const countResult = await pool.query(`SELECT COUNT(*) FROM book_author WHERE author_id = $1`, [authorId]);
+    const countResult = await pool.query(
+      `SELECT COUNT(DISTINCT book_id) FROM book_author WHERE author_id = ANY($1)`,
+      [authorGroupIds]
+    );
     const totalBooks  = parseInt(countResult.rows[0].count);
 
     res.status(200).json({
@@ -365,7 +370,7 @@ function buildCatalogWhere(opts, skipDimension) {
     );
   }
   if (opts.authorId) {
-    push(`EXISTS (SELECT 1 FROM book_author ba WHERE ba.book_id = books.id AND ba.author_id = ?)`, opts.authorId);
+    push(`EXISTS (SELECT 1 FROM book_author ba WHERE ba.book_id = books.id AND ba.author_id = ANY(?))`, opts.authorGroupIds);
   } else if (opts.authorIds.length && skipDimension !== 'authors') {
     push(`EXISTS (SELECT 1 FROM book_author ba WHERE ba.book_id = books.id AND ba.author_id = ANY(?))`, opts.authorIds);
   }
@@ -420,7 +425,8 @@ const getCatalog = async (req, res) => {
     }
 
     const opts = { q, authorId, categoryId, publisherId, authorIds, categoryIds, publisherIds,
-                   priceMin, priceMax, inStock, scope, minPct };
+                   priceMin, priceMax, inStock, scope, minPct,
+                   authorGroupIds: authorId ? await getAuthorGroupIds(authorId) : [] };
 
     const where = buildCatalogWhere(opts);
     const whereSql = where.conds.length ? `WHERE ${where.conds.join('\n        AND ')}` : '';

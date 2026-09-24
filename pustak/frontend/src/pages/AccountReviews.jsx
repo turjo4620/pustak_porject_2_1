@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Star, Trash2, BookOpen, PenLine } from 'lucide-react'
 import { useApp } from '../context/AppContext'
@@ -44,7 +44,7 @@ function ReviewCard({ review, onDelete, onEdit }) {
     setDeleting(true)
     try {
       await api.del(`/reviews/${review.review_id}`)
-      onDelete(review.review_id)
+      onDelete(review)
     } catch (e) {
       alert(e.message || 'মুছে ফেলা যায়নি')
     } finally {
@@ -208,6 +208,10 @@ export default function AccountReviews() {
   const [loading,  setLoading]  = useState(true)
   const [error,    setError]    = useState('')
   const [editing,  setEditing]  = useState(null)   // review being edited
+  const [deletedReview, setDeletedReview] = useState(null)
+  const [undoSeconds, setUndoSeconds] = useState(0)
+  const undoTimer = useRef(null)
+  const undoInterval = useRef(null)
 
   useEffect(() => {
     if (!authUser) { navigate('/login'); return }
@@ -217,8 +221,51 @@ export default function AccountReviews() {
       .finally(()  => setLoading(false))
   }, [authUser, navigate])
 
-  const handleDelete = (reviewId) => {
-    setReviews(prev => prev.filter(r => r.review_id !== reviewId))
+  useEffect(() => () => {
+    clearTimeout(undoTimer.current)
+    clearInterval(undoInterval.current)
+  }, [])
+
+  const handleDelete = (review) => {
+    clearTimeout(undoTimer.current)
+    clearInterval(undoInterval.current)
+    setReviews(prev => prev.filter(r => r.review_id !== review.review_id))
+    setDeletedReview(review)
+    setUndoSeconds(5)
+    undoInterval.current = setInterval(() => {
+      setUndoSeconds(prev => {
+        if (prev <= 1) {
+          clearInterval(undoInterval.current)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+    undoTimer.current = setTimeout(() => {
+      setDeletedReview(null)
+      setUndoSeconds(0)
+    }, 5000)
+  }
+
+  const handleUndo = async () => {
+    if (!deletedReview) return
+    clearTimeout(undoTimer.current)
+    clearInterval(undoInterval.current)
+    try {
+      await api.post('/reviews', {
+        bookId: deletedReview.book_id,
+        rating: deletedReview.rating,
+        comment: deletedReview.comment || '',
+      })
+      const data = await api.get('/reviews/mine')
+      setReviews(data.data || [])
+      setDeletedReview(null)
+      setUndoSeconds(0)
+    } catch (e) {
+      setError(e.message || 'রিভিউ ফিরিয়ে আনা যায়নি')
+      setDeletedReview(null)
+      setUndoSeconds(0)
+    }
   }
 
   const handleSaved = (updated) => {
@@ -278,6 +325,15 @@ export default function AccountReviews() {
           onClose={() => setEditing(null)}
           onSaved={handleSaved}
         />
+      )}
+
+      {deletedReview && undoSeconds > 0 && (
+        <div className="ar-undo-toast" role="status">
+          <span>রিভিউ মুছে ফেলা হয়েছে</span>
+          <button type="button" onClick={handleUndo}>
+            ফিরিয়ে আনুন ({toBn(undoSeconds)})
+          </button>
+        </div>
       )}
     </div>
   )

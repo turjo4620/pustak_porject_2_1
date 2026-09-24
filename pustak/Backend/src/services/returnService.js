@@ -19,7 +19,7 @@ function withinReturnWindow(deliveredAt) {
 }
 
 // ── requestReturn ──────────────────────────────────────────────────────────
-async function requestReturn(userId, orderItemId, reason) {
+async function requestReturn(userId, orderItemId, reason, copyId = null) {
   // 1. Verify the item belongs to this user's order and the order is Delivered
   const ownershipRes = await pool.query(
     `SELECT
@@ -28,7 +28,8 @@ async function requestReturn(userId, orderItemId, reason) {
        oi.price_sold,
        o.order_id,
        o.status      AS order_status,
-       d.delivered_at
+       d.delivered_at,
+       d.status      AS delivery_status
      FROM order_item oi
      JOIN orders      o  ON  o.order_id   = oi.order_id
      LEFT JOIN deliveries d ON d.order_id = o.order_id
@@ -43,7 +44,11 @@ async function requestReturn(userId, orderItemId, reason) {
 
   const row = ownershipRes.rows[0];
 
-  if (row.order_status !== 'Delivered') {
+  if (copyId != null && String(row.copy_id) !== String(copyId)) {
+    throw { status: 400, message: 'বইয়ের কপি তথ্য সঠিক নয়' };
+  }
+
+  if (row.order_status !== 'Delivered' && row.delivery_status !== 'Delivered') {
     throw {
       status: 400,
       message: 'শুধুমাত্র ডেলিভার্ড অর্ডারের জন্য রিটার্ন রিকোয়েস্ট করা যাবে',
@@ -71,10 +76,10 @@ async function requestReturn(userId, orderItemId, reason) {
 
   // 3. Insert
   const insertRes = await pool.query(
-    `INSERT INTO "return" (order_item_id, copy_id, user_id, reason, status)
-     VALUES ($1, $2, $3, $4, 'initiated')
+    `INSERT INTO "return" (order_item_id, reason, status)
+     VALUES ($1, $2, 'initiated')
      RETURNING *`,
-    [orderItemId, row.copy_id, userId, reason || null]
+    [orderItemId, reason || null]
   );
 
   return insertRes.rows[0];
@@ -95,6 +100,7 @@ async function getReturnsForOrder(userId, orderId) {
     `SELECT
        r.return_id,
        r.order_item_id,
+       oi.copy_id,
        r.reason,
        r.return_date   AS request_date,
        r.status        AS return_status,
@@ -118,7 +124,8 @@ async function getUserReturns(userId) {
   const res = await pool.query(
     `SELECT
        r.return_id,
-       r.order_item_id,
+       oi.order_item_id,
+       oi.copy_id,
        r.reason,
        r.return_date   AS request_date,
        r.status        AS return_status,
@@ -126,20 +133,27 @@ async function getUserReturns(userId) {
        b.book_name,
        b.cover_image_url,
        oi.price_sold,
+       oi.price_sold AS line_total,
        o.order_id,
        o.order_number,
+       d.delivered_at,
+       (d.delivered_at >= NOW() - INTERVAL '7 days') AS return_allowed,
+       GREATEST(0, 7 - FLOOR(EXTRACT(EPOCH FROM (NOW() - d.delivered_at)) / 86400))::int
+         AS return_days_remaining,
        rf.refund_id,
        rf.refund_amount,
        rf.refund_status,
        rf.refund_date  AS refunded_at
-     FROM "return" r
-     JOIN order_item  oi  ON  oi.order_item_id = r.order_item_id
+     FROM order_item oi
      JOIN orders       o  ON  o.order_id        = oi.order_id
+     LEFT JOIN deliveries d ON d.order_id        = o.order_id
      JOIN book_copy   bc  ON  bc.copy_id         = oi.copy_id
      JOIN books        b  ON  b.id               = bc.book_id
+     LEFT JOIN "return" r ON r.order_item_id = oi.order_item_id
      LEFT JOIN refund rf  ON  rf.return_id        = r.return_id
      WHERE o.user_id = $1
-     ORDER BY r.return_date DESC`,
+       AND (o.status = 'Delivered' OR d.status = 'Delivered')
+     ORDER BY d.delivered_at DESC, oi.order_item_id`,
     [userId]
   );
 

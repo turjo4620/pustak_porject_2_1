@@ -140,23 +140,25 @@ async function getOrderById(userId, orderId) {
 
   const itemsRes = await pool.query(
     `SELECT
-       oi.order_item_id,
-       oi.price_sold,
-       oi.price_sold                            AS unit_price,
-       oi.price_sold                            AS line_total,
-       1                                        AS quantity,
        b.id                                     AS book_id,
        b.book_name,
        b.cover_image_url,
-       MIN(a.name)                              AS author
+       author_names.author,
+       COUNT(*)::int                            AS quantity,
+       MIN(oi.price_sold)                       AS unit_price,
+       SUM(oi.price_sold)                       AS line_total
      FROM order_item oi
      JOIN book_copy   bc ON bc.copy_id  = oi.copy_id
      JOIN books        b ON b.id        = bc.book_id
-     LEFT JOIN book_author ba ON ba.book_id   = b.id
-     LEFT JOIN authors     a  ON a.author_id  = ba.author_id
+     LEFT JOIN LATERAL (
+       SELECT MIN(a.name) AS author
+       FROM book_author ba
+       JOIN authors a ON a.author_id = ba.author_id
+       WHERE ba.book_id = b.id
+     ) author_names ON TRUE
      WHERE oi.order_id = $1
-     GROUP BY oi.order_item_id, oi.price_sold, b.id, b.book_name, b.cover_image_url
-     ORDER BY oi.order_item_id`,
+     GROUP BY b.id, b.book_name, b.cover_image_url, author_names.author
+     ORDER BY b.book_name`,
     [orderId]
   );
 

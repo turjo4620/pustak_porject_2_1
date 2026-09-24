@@ -17,6 +17,7 @@ export default function SearchBar() {
   const inputRef   = useRef(null)
   const wrapRef    = useRef(null)
   const debounce   = useRef(null)
+  const requestSeq = useRef(0)
 
   // Intersection observer for entry animation
   useEffect(() => {
@@ -31,17 +32,23 @@ export default function SearchBar() {
   // Debounced live search
   useEffect(() => {
     clearTimeout(debounce.current)
-    if (query.trim().length < 2) { setResults([]); return }
+    const term = query.trim()
+    if (term.length < 2) {
+      setResults([])
+      setLoading(false)
+      return
+    }
+    const seq = ++requestSeq.current
     setLoading(true)
     debounce.current = setTimeout(async () => {
       try {
-        const res  = await fetch(`${BASE}/books/search?q=${encodeURIComponent(query.trim())}&limit=6`)
+        const res  = await fetch(`${BASE}/books/search?q=${encodeURIComponent(term)}&limit=6`)
         const json = await res.json()
-        setResults(json.data || [])
+        if (seq === requestSeq.current) setResults(json.data || [])
       } catch {
-        setResults([])
+        if (seq === requestSeq.current) setResults([])
       } finally {
-        setLoading(false)
+        if (seq === requestSeq.current) setLoading(false)
       }
     }, 280)
     return () => clearTimeout(debounce.current)

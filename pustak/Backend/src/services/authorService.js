@@ -1,5 +1,35 @@
 const pool = require('../config/db');
 
+const getAuthorIdentityKey = (author) => {
+    if (author.photo_url) return `photo:${author.photo_url}`;
+    if (author.bio) return `bio:${author.bio.trim()}`;
+    return `id:${author.author_id}`;
+};
+
+const mergeAuthorRows = (rows) => {
+    const groups = new Map();
+
+    rows.forEach((author) => {
+        const key = getAuthorIdentityKey(author);
+        const group = groups.get(key);
+
+        if (group) {
+            group.author_ids.push(author.author_id);
+            group.count += Number(author.count || 0);
+            return;
+        }
+
+        groups.set(key, {
+            ...author,
+            author_ids: [author.author_id],
+            count: Number(author.count || 0),
+        });
+    });
+
+    return Array.from(groups.values())
+        .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+};
+
 const getAllAuthors = async (searchTerm = '') => {
     let query = `
         SELECT 
@@ -21,14 +51,30 @@ const getAllAuthors = async (searchTerm = '') => {
     query += ` GROUP BY authors.author_id ORDER BY count DESC`;
     
     const result = await pool.query(query, params);
-    return result.rows;
+    return mergeAuthorRows(result.rows);
 };
 
 const getAuthorByID = async (id) => {
-    const result = await pool.query(
+    const authorResult = await pool.query(
         'SELECT * FROM authors WHERE author_id = $1', [id]
     );
-    return result.rows[0];
+    const author = authorResult.rows[0];
+    if (!author) return null;
+
+    const identityColumn = author.photo_url ? 'photo_url' : author.bio ? 'bio' : null;
+    const groupResult = identityColumn
+        ? await pool.query(
+            `SELECT author_id FROM authors WHERE ${identityColumn} IS NOT DISTINCT FROM $1`,
+            [author[identityColumn]]
+        )
+        : { rows: [author] };
+    const groupIds = groupResult.rows.map((row) => row.author_id);
+    const canonicalId = Math.min(...groupIds);
+    const canonical = groupIds.includes(author.author_id)
+        ? (await pool.query('SELECT * FROM authors WHERE author_id = $1', [canonicalId])).rows[0]
+        : author;
+
+    return { ...canonical, author_ids: groupIds };
 };
 
 const getAuthorByName = async (name) => {
@@ -82,6 +128,10 @@ const deleteAuthor = async (id) => {
 module.exports = { 
     getAllAuthors,
     getAuthorByID,
+    getAuthorGroupIds: async (id) => {
+        const author = await getAuthorByID(id);
+        return author ? author.author_ids : [];
+    },
     getAuthorByName,
     createAuthor,
     updateAuthor,

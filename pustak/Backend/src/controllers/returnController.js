@@ -5,14 +5,15 @@ const returnService = require('../services/returnService');
 // Body: { orderItemId, reason }
 async function requestReturn(req, res, next) {
   try {
-    const { orderItemId, reason } = req.body;
+    const { orderItemId, copyId, reason } = req.body;
     if (!orderItemId) {
       return res.status(400).json({ message: 'orderItemId প্রয়োজন' });
     }
     const ret = await returnService.requestReturn(
       req.userId,
       Number(orderItemId),
-      reason || ''
+      reason || '',
+      copyId ? Number(copyId) : null
     );
     res.status(201).json({ success: true, data: ret });
   } catch (err) {

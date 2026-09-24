@@ -72,6 +72,7 @@ export default function ReturnModal({ item, onClose, onSuccess }) {
     try {
       const res = await api.post('/returns', {
         orderItemId: item.order_item_id,
+        copyId:      item.copy_id,
         reason:      finalReason,
       })
       setSubmitted(true)
