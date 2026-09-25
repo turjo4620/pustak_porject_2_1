@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/admin.css';
 import { 
@@ -21,7 +21,7 @@ export default function AdminDashboard() {
       const token = localStorage.getItem('adminToken');
       console.log('Fetching dashboard with token:', token ? 'exists' : 'missing');
       
-      const response = await fetch('http://localhost:5000/api/admin/dashboard', {
+      const response = await fetch('https://putak-porject-2-1.onrender.com/api/admin/dashboard', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -102,7 +102,7 @@ export default function AdminDashboard() {
     },
     {
       title: 'Total Revenue',
-      value: `৳${(stats?.totalRevenue || 0).toFixed(2)}`,
+      value: `à§³${(stats?.totalRevenue || 0).toFixed(2)}`,
       icon: <DollarSign size={32} />,
       color: '#059669',
       link: '/admin/analytics'
@@ -194,3 +194,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+

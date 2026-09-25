@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Search, Eye, Ban, CheckCircle } from 'lucide-react';
 import '../../styles/admin.css';
 
@@ -26,7 +26,7 @@ export default function AdminUsers() {
         ...(statusFilter && { status: statusFilter })
       });
 
-      const response = await fetch(`http://localhost:5000/api/admin/users?${queryParams}`, {
+      const response = await fetch(`https://putak-porject-2-1.onrender.com/api/admin/users?${queryParams}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -45,7 +45,7 @@ export default function AdminUsers() {
   const fetchUserDetails = async (userId) => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+      const response = await fetch(`https://putak-porject-2-1.onrender.com/api/admin/users/${userId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -61,7 +61,7 @@ export default function AdminUsers() {
   const updateUserStatus = async (userId, newStatus) => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}/status`, {
+      const response = await fetch(`https://putak-porject-2-1.onrender.com/api/admin/users/${userId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -208,7 +208,7 @@ export default function AdminUsers() {
                 <h3>Activity Statistics</h3>
                 <p><strong>Total Orders:</strong> {selectedUser.total_orders}</p>
                 <p><strong>Total Reviews:</strong> {selectedUser.total_reviews}</p>
-                <p><strong>Total Spent:</strong> ৳{parseFloat(selectedUser.total_spent || 0).toFixed(2)}</p>
+                <p><strong>Total Spent:</strong> à§³{parseFloat(selectedUser.total_spent || 0).toFixed(2)}</p>
                 <p><strong>Last Login:</strong> {selectedUser.last_login ? new Date(selectedUser.last_login).toLocaleString() : 'Never'}</p>
               </div>
 
@@ -228,3 +228,4 @@ export default function AdminUsers() {
     </div>
   );
 }
+

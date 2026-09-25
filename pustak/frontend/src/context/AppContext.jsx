@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+﻿import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { api } from '../api/http'
 
 // Context
@@ -14,7 +14,7 @@ export function AppProvider({ children }) {
   const [wishOpen, setWishOpen]     = useState(false)
   const [previewBook, setPreviewBook] = useState(null)
 
-  // Auth (persisted to localStorage — customer only, never admin)
+  // Auth (persisted to localStorage â€” customer only, never admin)
   const [authUser, setAuthUserState] = useState(() => {
     try {
       const userType = localStorage.getItem('pustak-user-type')
@@ -59,7 +59,7 @@ export function AppProvider({ children }) {
   const fetchBooks = async (page = 1, limit = 20) => {
     try {
       setLoading(true)
-      const res = await fetch(`http://localhost:5000/api/books?page=${page}&limit=${limit}`)
+      const res = await fetch(`https://putak-porject-2-1.onrender.com/api/books?page=${page}&limit=${limit}`)
       const json = await res.json()
 
       setBooks(json.data)
@@ -106,7 +106,7 @@ export function AppProvider({ children }) {
   // Accepts an optional `qty` property on the book object (from BookDetailPage).
   const addToCart = async (book) => {
     if (!authUser) {
-      throw new Error('কার্টে যোগ করতে লগইন করুন')
+      throw new Error('à¦•à¦¾à¦°à§à¦Ÿà§‡ à¦¯à§‹à¦— à¦•à¦°à¦¤à§‡ à¦²à¦—à¦‡à¦¨ à¦•à¦°à§à¦¨')
     }
     const quantity = (Number.isInteger(book.qty) && book.qty > 0) ? book.qty : 1
     const item = await api.post('/cart/items', { bookId: book.id, quantity })
@@ -228,3 +228,4 @@ export const useApp = () => {
   if (!ctx) throw new Error('Error')
   return ctx
 }
+

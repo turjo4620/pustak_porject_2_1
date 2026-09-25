@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+﻿import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, TrendingUp, X } from 'lucide-react'
 import './SearchBar.css'
 
-const trending = ['হিমু', 'হুমায়ূন আহমেদ', 'রবীন্দ্রনাথ', 'মুক্তিযুদ্ধ', 'নতুন বই', 'বিজ্ঞান']
+const trending = ['à¦¹à¦¿à¦®à§', 'à¦¹à§à¦®à¦¾à¦¯à¦¼à§‚à¦¨ à¦†à¦¹à¦®à§‡à¦¦', 'à¦°à¦¬à§€à¦¨à§à¦¦à§à¦°à¦¨à¦¾à¦¥', 'à¦®à§à¦•à§à¦¤à¦¿à¦¯à§à¦¦à§à¦§', 'à¦¨à¦¤à§à¦¨ à¦¬à¦‡', 'à¦¬à¦¿à¦œà§à¦žà¦¾à¦¨']
 
-const BASE = 'http://localhost:5000/api'
+const BASE = 'https://putak-porject-2-1.onrender.com/api'
 
 export default function SearchBar() {
   const navigate   = useNavigate()
@@ -78,11 +78,11 @@ export default function SearchBar() {
     <section
       className={`search-section section-sm ${visible ? 'search-section--visible' : ''}`}
       ref={wrapRef}
-      aria-label="বই অনুসন্ধান"
+      aria-label="à¦¬à¦‡ à¦…à¦¨à§à¦¸à¦¨à§à¦§à¦¾à¦¨"
     >
       <div className="container">
         <div className="search-section__inner">
-          <p className="search-section__label">আপনার পছন্দের বই খুঁজুন</p>
+          <p className="search-section__label">à¦†à¦ªà¦¨à¦¾à¦° à¦ªà¦›à¦¨à§à¦¦à§‡à¦° à¦¬à¦‡ à¦–à§à¦à¦œà§à¦¨</p>
 
           <form
             className={`search-wrap ${focused ? 'search-wrap--focused' : ''}`}
@@ -95,12 +95,12 @@ export default function SearchBar() {
                 ref={inputRef}
                 type="search"
                 className="search-input"
-                placeholder="বই, লেখক, প্রকাশক বা বিভাগ লিখুন..."
+                placeholder="à¦¬à¦‡, à¦²à§‡à¦–à¦•, à¦ªà§à¦°à¦•à¦¾à¦¶à¦• à¦¬à¦¾ à¦¬à¦¿à¦­à¦¾à¦— à¦²à¦¿à¦–à§à¦¨..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onFocus={() => setFocused(true)}
                 onBlur={() => setTimeout(() => setFocused(false), 200)}
-                aria-label="বই খুঁজুন"
+                aria-label="à¦¬à¦‡ à¦–à§à¦à¦œà§à¦¨"
                 aria-expanded={showDropdown}
                 aria-haspopup="listbox"
                 autoComplete="off"
@@ -110,25 +110,25 @@ export default function SearchBar() {
                   type="button"
                   className="search-clear"
                   onClick={() => { setQuery(''); setResults([]); inputRef.current?.focus() }}
-                  aria-label="মুছুন"
+                  aria-label="à¦®à§à¦›à§à¦¨"
                 >
                   <X size={16} />
                 </button>
               )}
-              <button type="submit" className="search-btn" aria-label="অনুসন্ধান করুন">
-                অনুসন্ধান
+              <button type="submit" className="search-btn" aria-label="à¦…à¦¨à§à¦¸à¦¨à§à¦§à¦¾à¦¨ à¦•à¦°à§à¦¨">
+                à¦…à¦¨à§à¦¸à¦¨à§à¦§à¦¾à¦¨
               </button>
             </div>
 
             {/* Dropdown */}
             {showDropdown && (
-              <div className="search-dropdown" role="listbox" aria-label="অনুসন্ধান ফলাফল">
+              <div className="search-dropdown" role="listbox" aria-label="à¦…à¦¨à§à¦¸à¦¨à§à¦§à¦¾à¦¨ à¦«à¦²à¦¾à¦«à¦²">
 
                 {/* Trending (empty query) */}
                 {query.length === 0 && (
                   <div className="search-dropdown__section">
                     <div className="search-dropdown__header">
-                      <TrendingUp size={14} /> ট্রেন্ডিং অনুসন্ধান
+                      <TrendingUp size={14} /> à¦Ÿà§à¦°à§‡à¦¨à§à¦¡à¦¿à¦‚ à¦…à¦¨à§à¦¸à¦¨à§à¦§à¦¾à¦¨
                     </div>
                     <div className="search-dropdown__chips">
                       {trending.map((t) => (
@@ -149,10 +149,10 @@ export default function SearchBar() {
                 {query.length >= 2 && (
                   <div className="search-dropdown__section">
                     {loading && (
-                      <p className="search-dropdown__loading">খুঁজছি...</p>
+                      <p className="search-dropdown__loading">à¦–à§à¦à¦œà¦›à¦¿...</p>
                     )}
                     {!loading && results.length === 0 && (
-                      <p className="search-dropdown__empty">কোনো ফলাফল পাওয়া যায়নি।</p>
+                      <p className="search-dropdown__empty">à¦•à§‹à¦¨à§‹ à¦«à¦²à¦¾à¦«à¦² à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿à¥¤</p>
                     )}
                     {!loading && results.map((book) => (
                       <div
@@ -165,13 +165,13 @@ export default function SearchBar() {
                       >
                         {book.cover_image_url
                           ? <img src={book.cover_image_url} alt={book.book_name} className="search-suggestion__cover" />
-                          : <div className="search-suggestion__cover search-suggestion__cover--fallback">📖</div>
+                          : <div className="search-suggestion__cover search-suggestion__cover--fallback">ðŸ“–</div>
                         }
                         <div className="search-suggestion__info">
                           <strong>{book.book_name}</strong>
                           <span>{book.author || book.authors?.[0]?.name || ''}</span>
                         </div>
-                        <span className="search-suggestion__type">বই</span>
+                        <span className="search-suggestion__type">à¦¬à¦‡</span>
                       </div>
                     ))}
                   </div>
@@ -183,7 +183,7 @@ export default function SearchBar() {
                       type="submit"
                       className="search-dropdown__all"
                     >
-                      "{query}" — সব ফলাফল দেখুন →
+                      "{query}" â€” à¦¸à¦¬ à¦«à¦²à¦¾à¦«à¦² à¦¦à§‡à¦–à§à¦¨ â†’
                     </button>
                   </div>
                 )}
@@ -192,8 +192,8 @@ export default function SearchBar() {
           </form>
 
           {/* Trending chips below bar */}
-          <div className="search-section__trending" aria-label="ট্রেন্ডিং">
-            <span className="search-section__trending-label">ট্রেন্ডিং:</span>
+          <div className="search-section__trending" aria-label="à¦Ÿà§à¦°à§‡à¦¨à§à¦¡à¦¿à¦‚">
+            <span className="search-section__trending-label">à¦Ÿà§à¦°à§‡à¦¨à§à¦¡à¦¿à¦‚:</span>
             {trending.slice(0, 5).map((t) => (
               <button
                 key={t}
@@ -210,3 +210,4 @@ export default function SearchBar() {
     </section>
   )
 }
+

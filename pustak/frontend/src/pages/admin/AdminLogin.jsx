@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Lock, Mail } from 'lucide-react';
 import '../../styles/admin.css';
@@ -17,7 +17,7 @@ export default function AdminLogin() {
     try {
       console.log('Attempting login with:', credentials.email);
       
-      const response = await fetch('http://localhost:5000/api/auth/admin/login', {
+      const response = await fetch('https://putak-porject-2-1.onrender.com/api/auth/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials)
@@ -63,8 +63,8 @@ export default function AdminLogin() {
       <div className="login-container">
         <div className="login-header">
           <BookOpen size={40} className="login-icon" />
-          <h1>পুস্তক</h1>
-          <p>Admin Panel — Sign in to manage your bookstore</p>
+          <h1>à¦ªà§à¦¸à§à¦¤à¦•</h1>
+          <p>Admin Panel â€” Sign in to manage your bookstore</p>
         </div>
 
         {error && (
@@ -118,3 +118,4 @@ export default function AdminLogin() {
     </div>
   );
 }
+

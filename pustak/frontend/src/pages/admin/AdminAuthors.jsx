@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Trash2 } from 'lucide-react';
 import '../../styles/admin.css';
 
@@ -18,8 +18,8 @@ export default function AdminAuthors() {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
       const url = searchTerm 
-        ? `http://localhost:5000/api/authors?search=${searchTerm}`
-        : 'http://localhost:5000/api/authors';
+        ? `https://putak-porject-2-1.onrender.com/api/authors?search=${searchTerm}`
+        : 'https://putak-porject-2-1.onrender.com/api/authors';
       
       const response = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -42,7 +42,7 @@ export default function AdminAuthors() {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/authors/${authorId}`, {
+      const response = await fetch(`https://putak-porject-2-1.onrender.com/api/authors/${authorId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -174,8 +174,8 @@ function AuthorModal({ author, onClose, onSuccess }) {
     try {
       const token = localStorage.getItem('adminToken');
       const url = author 
-        ? `http://localhost:5000/api/authors/${author.author_id}`
-        : 'http://localhost:5000/api/authors';
+        ? `https://putak-porject-2-1.onrender.com/api/authors/${author.author_id}`
+        : 'https://putak-porject-2-1.onrender.com/api/authors';
       
       const response = await fetch(url, {
         method: author ? 'PUT' : 'POST',
@@ -248,3 +248,4 @@ function AuthorModal({ author, onClose, onSuccess }) {
     </div>
   );
 }
+

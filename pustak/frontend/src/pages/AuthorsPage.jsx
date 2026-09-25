@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+﻿import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import './ListPage.css'
 import './AuthorsPage.css'
@@ -8,7 +8,7 @@ export default function AuthorsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/authors')
+    fetch('https://putak-porject-2-1.onrender.com/api/authors')
       .then(res => res.json())
       .then(json => {
         if (json.success) {
@@ -28,18 +28,18 @@ export default function AuthorsPage() {
 
         <div className="list-page__header">
           <p className="list-page__breadcrumb">
-            <Link to="/">হোম</Link> › লেখক
+            <Link to="/">à¦¹à§‹à¦®</Link> â€º à¦²à§‡à¦–à¦•
           </p>
-          <h1>সকল লেখক</h1>
+          <h1>à¦¸à¦•à¦² à¦²à§‡à¦–à¦•</h1>
           <p className="list-page__subtitle">
-            {loading ? 'লোড হচ্ছে...' : `${authors.length} জন লেখক`}
+            {loading ? 'à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...' : `${authors.length} à¦œà¦¨ à¦²à§‡à¦–à¦•`}
           </p>
         </div>
 
         <div className="authors-grid">
           {loading ? (
             <p style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '2rem' }}>
-              লেখকদের তথ্য লোড হচ্ছে...
+              à¦²à§‡à¦–à¦•à¦¦à§‡à¦° à¦¤à¦¥à§à¦¯ à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...
             </p>
           ) : (
             authors.map((author) => (
@@ -74,3 +74,4 @@ export default function AuthorsPage() {
     </div>
   )
 }
+

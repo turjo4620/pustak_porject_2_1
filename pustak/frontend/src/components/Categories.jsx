@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import BookCard from './BookCard'
 import SectionHeader from './SectionHeader'
 import { useApp } from '../context/AppContext'
@@ -40,7 +40,7 @@ export default function Categories() {
 
     Promise.all(
       categories.map(category =>
-        fetch(`http://localhost:5000/api/books/category/${category.category_id}?limit=4`)
+        fetch(`https://putak-porject-2-1.onrender.com/api/books/category/${category.category_id}?limit=4`)
           .then(response => response.json())
           .then(json => json.data || [])
           .catch(() => [])
@@ -56,10 +56,10 @@ export default function Categories() {
   if (!categories.length) return null
 
   return (
-    <section className="categories section" aria-label="আপনার আগ্রহের বিষয়">
+    <section className="categories section" aria-label="à¦†à¦ªà¦¨à¦¾à¦° à¦†à¦—à§à¦°à¦¹à§‡à¦° à¦¬à¦¿à¦·à¦¯à¦¼">
       <div className="container">
         <SectionHeader
-          title="আপনার আগ্রহের বিষয়"
+          title="à¦†à¦ªà¦¨à¦¾à¦° à¦†à¦—à§à¦°à¦¹à§‡à¦° à¦¬à¦¿à¦·à¦¯à¦¼"
           align="center"
         />
         {interestBooks.length > 0 && (
@@ -73,3 +73,4 @@ export default function Categories() {
     </section>
   )
 }
+

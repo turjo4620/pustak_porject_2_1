@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+﻿import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
@@ -8,10 +8,13 @@ export default defineConfig({
     historyApiFallback: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'https://putak-porject-2-1.onrender.com',
         changeOrigin: true,
         secure: false
       }
     }
   }
 })
+
+
+

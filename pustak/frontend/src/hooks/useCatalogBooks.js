@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+﻿import { useEffect, useMemo, useRef, useState } from 'react'
 
-const BASE = 'http://localhost:5000/api'
+const BASE = 'https://putak-porject-2-1.onrender.com/api'
 
 const EMPTY_FACETS = { categories: [], authors: [], publishers: [] }
 
@@ -34,7 +34,7 @@ export default function useCatalogBooks(params) {
       authorIds.join(','), categoryIds.join(','), publisherIds.join(','),
       priceMin, priceMax, inStock, sort, minPct, page, limit])
 
-  // Filter signature without page — used to decide debounce vs immediate fetch
+  // Filter signature without page â€” used to decide debounce vs immediate fetch
   const filterSig = useMemo(
     () => query.replace(/(^|&)page=\d+/, ''),
     [query]
@@ -73,7 +73,7 @@ export default function useCatalogBooks(params) {
         })
         .catch((err) => {
           if (err.name === 'AbortError' || seq !== seqRef.current) return
-          setState((s) => ({ ...s, loading: false, error: 'বই লোড করা যায়নি' }))
+          setState((s) => ({ ...s, loading: false, error: 'à¦¬à¦‡ à¦²à§‹à¦¡ à¦•à¦°à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿' }))
         })
     }
 
@@ -89,3 +89,4 @@ export default function useCatalogBooks(params) {
 
   return state
 }
+

@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import SectionHeader from './SectionHeader'
 import './TopCustomers.css'
 
-const MEDALS = ['🥇', '🥈', '🥉']
-const toBn = (n) => String(n).replace(/[0-9]/g, (d) => '০১২৩৪৫৬৭৮৯'[d])
+const MEDALS = ['ðŸ¥‡', 'ðŸ¥ˆ', 'ðŸ¥‰']
+const toBn = (n) => String(n).replace(/[0-9]/g, (d) => 'à§¦à§§à§¨à§©à§ªà§«à§¬à§­à§®à§¯'[d])
 const formatCustomerName = (name = '') =>
   /^turjo sarker$/i.test(name.trim()) ? 'Turjo Sarkar Prince' : name
 
@@ -23,7 +23,7 @@ export default function TopCustomers() {
   const [loading, setLoading]     = useState(true)
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/public/top-customers?limit=5')
+    fetch('https://putak-porject-2-1.onrender.com/api/public/top-customers?limit=5')
       .then(r => r.json())
       .then(data => {
         const uniqueCustomers = new Map()
@@ -43,12 +43,12 @@ export default function TopCustomers() {
   if (loading || customers.length === 0) return null
 
   return (
-    <section className="top-customers section-sm" aria-label="সেরা ক্রেতা">
+    <section className="top-customers section-sm" aria-label="à¦¸à§‡à¦°à¦¾ à¦•à§à¦°à§‡à¦¤à¦¾">
       <div className="container">
         <SectionHeader
-          label="আমাদের সেরা"
-          title="শীর্ষ ক্রেতা"
-          subtitle="সবচেয়ে বেশি বই কিনেছেন যারা"
+          label="à¦†à¦®à¦¾à¦¦à§‡à¦° à¦¸à§‡à¦°à¦¾"
+          title="à¦¶à§€à¦°à§à¦· à¦•à§à¦°à§‡à¦¤à¦¾"
+          subtitle="à¦¸à¦¬à¦šà§‡à¦¯à¦¼à§‡ à¦¬à§‡à¦¶à¦¿ à¦¬à¦‡ à¦•à¦¿à¦¨à§‡à¦›à§‡à¦¨ à¦¯à¦¾à¦°à¦¾"
           align="center"
         />
 
@@ -57,7 +57,7 @@ export default function TopCustomers() {
             <div
               key={idx}
               className={`top-customers__card rank-card--${idx + 1}`}
-              aria-label={`${idx + 1} নম্বর: ${formatCustomerName(c.name)}`}
+              aria-label={`${idx + 1} à¦¨à¦®à§à¦¬à¦°: ${formatCustomerName(c.name)}`}
             >
               {/* Rank badge */}
               <div className="top-customers__rank">
@@ -82,7 +82,7 @@ export default function TopCustomers() {
                   {formatCustomerName(c.name)}
                 </p>
                 <p className="top-customers__orders">
-                  {toBn(c.total_orders)} টি অর্ডার
+                  {toBn(c.total_orders)} à¦Ÿà¦¿ à¦…à¦°à§à¦¡à¦¾à¦°
                 </p>
               </div>
             </div>
@@ -92,3 +92,4 @@ export default function TopCustomers() {
     </section>
   )
 }
+

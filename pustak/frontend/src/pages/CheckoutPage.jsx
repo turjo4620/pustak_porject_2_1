@@ -1,19 +1,19 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import './CheckoutPage.css'
 
-// ── Bengali numeral helper ──────────────────────────────────────
+// â”€â”€ Bengali numeral helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const toBn = (n) =>
-  String(n).replace(/[0-9]/g, (d) => '০১২৩৪৫৬৭৮৯'[d])
+  String(n).replace(/[0-9]/g, (d) => 'à§¦à§§à§¨à§©à§ªà§«à§¬à§­à§®à§¯'[d])
 
 const formatBnAmount = (num) =>
   toBn(Number(num).toFixed(2))
 
-// ── Delivery charge ─────────────────────────────────────────────
+// â”€â”€ Delivery charge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const DELIVERY_DHAKA   =  70
 const DELIVERY_OUTSIDE = 120
-const DHAKA_VARIANTS   = ['ঢাকা', 'dhaka', 'dhaka division', 'dhaka vibhag']
+const DHAKA_VARIANTS   = ['à¦¢à¦¾à¦•à¦¾', 'dhaka', 'dhaka division', 'dhaka vibhag']
 
 function isDhaka(value) {
   if (!value) return false
@@ -35,7 +35,7 @@ export default function CheckoutPage() {
 
   const buyNow = location.state?.buyNow || null
 
-  // ── Address state ──────────────────────────────────────────────
+  // â”€â”€ Address state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [addresses, setAddresses]         = useState([])
   const [selectedAddressId, setSelectedAddressId] = useState(null)
   const [showAddForm, setShowAddForm]     = useState(false)
@@ -45,7 +45,7 @@ export default function CheckoutPage() {
   const [addrSaving, setAddrSaving]       = useState(false)
   const [addrError, setAddrError]         = useState('')
 
-  // ── Order state ────────────────────────────────────────────────
+  // â”€â”€ Order state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const [placing, setPlacing]             = useState(false)
   const [error, setError]                 = useState('')
   const [couponInput, setCouponInput]     = useState('')
@@ -57,16 +57,16 @@ export default function CheckoutPage() {
   const displayItems = buyNow ? [buyNow] : cartItems
   const subtotal     = buyNow ? Number(buyNow.price_sold) * buyNow.quantity : totalCartPrice
 
-  // Delivery charge — recalculates when selected address changes
+  // Delivery charge â€” recalculates when selected address changes
   const selectedAddr   = addresses.find(x => x.address_id === selectedAddressId) || null
   const deliveryCharge = selectedAddr ? calcDeliveryCharge(selectedAddr) : 0
   const finalTotal     = Math.max(0, subtotal - discountAmount) + deliveryCharge
 
-  // ── Fetch user's saved addresses ───────────────────────────────
+  // â”€â”€ Fetch user's saved addresses â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     if (!authUser) return
     const token = localStorage.getItem('pustak-auth-token')
-    fetch('http://localhost:5000/api/addresses', {
+    fetch('https://putak-porject-2-1.onrender.com/api/addresses', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(r => r.json())
@@ -79,21 +79,21 @@ export default function CheckoutPage() {
       .catch(() => {})
   }, [authUser])
 
-  // ── Save new address ───────────────────────────────────────────
+  // â”€â”€ Save new address â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleSaveAddress = async (e) => {
     e.preventDefault()
-    if (!addrForm.street.trim()) { setAddrError('রাস্তার ঠিকানা দিন'); return }
+    if (!addrForm.street.trim()) { setAddrError('à¦°à¦¾à¦¸à§à¦¤à¦¾à¦° à¦ à¦¿à¦•à¦¾à¦¨à¦¾ à¦¦à¦¿à¦¨'); return }
     setAddrError('')
     setAddrSaving(true)
     try {
       const token = localStorage.getItem('pustak-auth-token')
-      const res = await fetch('http://localhost:5000/api/addresses', {
+      const res = await fetch('https://putak-porject-2-1.onrender.com/api/addresses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(addrForm)
       })
       const saved = await res.json()
-      if (!res.ok) throw new Error(saved.message || 'ঠিকানা সংরক্ষণ করা যায়নি')
+      if (!res.ok) throw new Error(saved.message || 'à¦ à¦¿à¦•à¦¾à¦¨à¦¾ à¦¸à¦‚à¦°à¦•à§à¦·à¦£ à¦•à¦°à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿')
       setAddresses(prev => {
         const updated = addrForm.is_default
           ? prev.map(a => ({ ...a, is_default: false }))
@@ -110,13 +110,13 @@ export default function CheckoutPage() {
     }
   }
 
-  // ── Coupon ─────────────────────────────────────────────────────
+  // â”€â”€ Coupon â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handleApplyCoupon = async () => {
     if (!couponInput.trim()) return
     setCouponError('')
     setCouponLoading(true)
     try {
-      const res = await fetch('http://localhost:5000/api/coupons/validate', {
+      const res = await fetch('https://putak-porject-2-1.onrender.com/api/coupons/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: couponInput.trim(), orderSubtotal: subtotal }),
@@ -127,7 +127,7 @@ export default function CheckoutPage() {
       } else {
         setCouponApplied(data.coupon); setDiscountAmount(data.discount_amount); setCouponError('')
       }
-    } catch { setCouponError('কুপন যাচাই করতে সমস্যা হয়েছে') }
+    } catch { setCouponError('à¦•à§à¦ªà¦¨ à¦¯à¦¾à¦šà¦¾à¦‡ à¦•à¦°à¦¤à§‡ à¦¸à¦®à¦¸à§à¦¯à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡') }
     finally { setCouponLoading(false) }
   }
 
@@ -135,17 +135,17 @@ export default function CheckoutPage() {
     setCouponApplied(null); setDiscountAmount(0); setCouponInput(''); setCouponError('')
   }
 
-  // ── Place order ────────────────────────────────────────────────
+  // â”€â”€ Place order â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const handlePlaceOrder = async () => {
     if (!authUser) { navigate('/login'); return }
-    if (!selectedAddressId) { setError('অনুগ্রহ করে একটি ঠিকানা নির্বাচন করুন'); return }
+    if (!selectedAddressId) { setError('à¦…à¦¨à§à¦—à§à¦°à¦¹ à¦•à¦°à§‡ à¦à¦•à¦Ÿà¦¿ à¦ à¦¿à¦•à¦¾à¦¨à¦¾ à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¨ à¦•à¦°à§à¦¨'); return }
     setError('')
     try {
       setPlacing(true)
       let order
       if (buyNow) {
         const token = localStorage.getItem('pustak-auth-token')
-        const res = await fetch('http://localhost:5000/api/orders/buy-now', {
+        const res = await fetch('https://putak-porject-2-1.onrender.com/api/orders/buy-now', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({
@@ -157,14 +157,14 @@ export default function CheckoutPage() {
           })
         })
         const data = await res.json()
-        if (!res.ok) throw new Error(data.message || 'অর্ডার দিতে সমস্যা হয়েছে')
+        if (!res.ok) throw new Error(data.message || 'à¦…à¦°à§à¦¡à¦¾à¦° à¦¦à¦¿à¦¤à§‡ à¦¸à¦®à¦¸à§à¦¯à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡')
         order = data
       } else {
         order = await placeOrder(selectedAddressId, couponApplied?.code || null, deliveryCharge)
       }
       navigate(`/payment/${order.order_id}`)
     } catch (err) {
-      setError(err.message || 'অর্ডার দিতে সমস্যা হয়েছে')
+      setError(err.message || 'à¦…à¦°à§à¦¡à¦¾à¦° à¦¦à¦¿à¦¤à§‡ à¦¸à¦®à¦¸à§à¦¯à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡')
     } finally {
       setPlacing(false)
     }
@@ -176,33 +176,33 @@ export default function CheckoutPage() {
     <div className="checkout-page">
       <div className="container">
         <p className="list-page__breadcrumb" style={{ marginBottom: 'var(--space-6)', display: 'flex', gap: 'var(--space-2)' }}>
-          <Link to="/">হোম</Link> › চেকআউট
+          <Link to="/">à¦¹à§‹à¦®</Link> â€º à¦šà§‡à¦•à¦†à¦‰à¦Ÿ
         </p>
-        <h1 className="checkout-page__title">অর্ডার নিশ্চিত করুন</h1>
+        <h1 className="checkout-page__title">à¦…à¦°à§à¦¡à¦¾à¦° à¦¨à¦¿à¦¶à§à¦šà¦¿à¦¤ à¦•à¦°à§à¦¨</h1>
 
         {error && <p className="checkout-page__error">{error}</p>}
 
         {isEmpty ? (
           <div className="checkout-page__empty">
-            <p>কার্ট খালি। বই কিনতে হোমে ফিরুন।</p>
-            <Link to="/" className="list-page__back-btn">হোমে ফিরুন</Link>
+            <p>à¦•à¦¾à¦°à§à¦Ÿ à¦–à¦¾à¦²à¦¿à¥¤ à¦¬à¦‡ à¦•à¦¿à¦¨à¦¤à§‡ à¦¹à§‹à¦®à§‡ à¦«à¦¿à¦°à§à¦¨à¥¤</p>
+            <Link to="/" className="list-page__back-btn">à¦¹à§‹à¦®à§‡ à¦«à¦¿à¦°à§à¦¨</Link>
           </div>
         ) : (
           <div className="checkout-page__layout">
 
-            {/* ── Left column ── */}
+            {/* â”€â”€ Left column â”€â”€ */}
             <div className="checkout-page__left">
 
               {/* Items */}
               <div className="checkout-page__items">
-                <h2>অর্ডার তালিকা ({toBn(displayItems.length)})</h2>
+                <h2>à¦…à¦°à§à¦¡à¦¾à¦° à¦¤à¦¾à¦²à¦¿à¦•à¦¾ ({toBn(displayItems.length)})</h2>
                 {displayItems.map((b, idx) => (
                   <div key={b.cart_item_id || b.book_id || idx} className="checkout-item">
                     <img src={b.cover_image_url} alt={b.book_name} className="checkout-item__cover" />
                     <div className="checkout-item__info">
                       <strong><Link to={`/book/${b.book_id}`}>{b.book_name}</Link></strong>
                       {b.authors && <span>{b.authors}</span>}
-                      <span className="checkout-item__price">৳{formatBnAmount(b.price_sold || b.locked_price)}</span>
+                      <span className="checkout-item__price">à§³{formatBnAmount(b.price_sold || b.locked_price)}</span>
                     </div>
 
                     {/* Quantity stepper */}
@@ -211,27 +211,27 @@ export default function CheckoutPage() {
                         <button
                           className="checkout-item__stepper-btn"
                           onClick={() => decrementItem(b)}
-                          aria-label="কমান"
-                        >−</button>
+                          aria-label="à¦•à¦®à¦¾à¦¨"
+                        >âˆ’</button>
                         <span className="checkout-item__stepper-qty">{toBn(b.quantity)}</span>
                         <button
                           className="checkout-item__stepper-btn"
                           onClick={() => incrementItem(b)}
-                          aria-label="বাড়ান"
+                          aria-label="à¦¬à¦¾à¦¡à¦¼à¦¾à¦¨"
                         >+</button>
                       </div>
                     )}
 
                     {!buyNow && (
-                      <button className="checkout-item__remove" onClick={() => removeFromCart(b.cart_item_id)} aria-label="সরান">✕</button>
+                      <button className="checkout-item__remove" onClick={() => removeFromCart(b.cart_item_id)} aria-label="à¦¸à¦°à¦¾à¦¨">âœ•</button>
                     )}
                   </div>
                 ))}
               </div>
 
-              {/* ── Address section ── */}
+              {/* â”€â”€ Address section â”€â”€ */}
               <div className="checkout-address">
-                <h2>ডেলিভারি ঠিকানা</h2>
+                <h2>à¦¡à§‡à¦²à¦¿à¦­à¦¾à¦°à¦¿ à¦ à¦¿à¦•à¦¾à¦¨à¦¾</h2>
 
                 {addresses.length > 0 && (
                   <div className="checkout-address__list">
@@ -252,7 +252,7 @@ export default function CheckoutPage() {
                           {authUser?.name && (
                             <div className="checkout-address__name">
                               {authUser.name}
-                              {authUser.phone && <span className="checkout-address__phone"> · {authUser.phone}</span>}
+                              {authUser.phone && <span className="checkout-address__phone"> Â· {authUser.phone}</span>}
                             </div>
                           )}
                           <div className="checkout-address__lines">
@@ -260,15 +260,15 @@ export default function CheckoutPage() {
                             {addr.area && <span>, {addr.area}</span>}
                             {addr.district && <span>, {addr.district}</span>}
                             {addr.division && <span>, {addr.division}</span>}
-                            {addr.postal_code && <span> – {addr.postal_code}</span>}
+                            {addr.postal_code && <span> â€“ {addr.postal_code}</span>}
                           </div>
-                          {addr.is_default && <span className="checkout-address__default-badge">ডিফল্ট</span>}
+                          {addr.is_default && <span className="checkout-address__default-badge">à¦¡à¦¿à¦«à¦²à§à¦Ÿ</span>}
                         </div>
                         <button
                           type="button"
                           className="checkout-address__edit-btn"
                           onClick={e => { e.preventDefault(); setShowAddForm(true) }}
-                        >পরিবর্তন</button>
+                        >à¦ªà¦°à¦¿à¦¬à¦°à§à¦¤à¦¨</button>
                       </label>
                     ))}
                   </div>
@@ -276,18 +276,18 @@ export default function CheckoutPage() {
 
                 {!showAddForm ? (
                   <button className="checkout-address__add-btn" onClick={() => setShowAddForm(true)}>
-                    + নতুন ঠিকানা যোগ করুন
+                    + à¦¨à¦¤à§à¦¨ à¦ à¦¿à¦•à¦¾à¦¨à¦¾ à¦¯à§‹à¦— à¦•à¦°à§à¦¨
                   </button>
                 ) : (
                   <form className="checkout-address__form" onSubmit={handleSaveAddress}>
-                    <h3>নতুন ঠিকানা</h3>
+                    <h3>à¦¨à¦¤à§à¦¨ à¦ à¦¿à¦•à¦¾à¦¨à¦¾</h3>
                     {addrError && <p className="checkout-address__error">{addrError}</p>}
 
                     <div className="addr-field">
-                      <label>রাস্তা / বাড়ি নম্বর *</label>
+                      <label>à¦°à¦¾à¦¸à§à¦¤à¦¾ / à¦¬à¦¾à¦¡à¦¼à¦¿ à¦¨à¦®à§à¦¬à¦° *</label>
                       <input
                         type="text"
-                        placeholder="যেমন: বাড়ি ৫, রাস্তা ১২, ধানমন্ডি"
+                        placeholder="à¦¯à§‡à¦®à¦¨: à¦¬à¦¾à¦¡à¦¼à¦¿ à§«, à¦°à¦¾à¦¸à§à¦¤à¦¾ à§§à§¨, à¦§à¦¾à¦¨à¦®à¦¨à§à¦¡à¦¿"
                         value={addrForm.street}
                         onChange={e => setAddrForm(p => ({ ...p, street: e.target.value }))}
                         required
@@ -295,19 +295,19 @@ export default function CheckoutPage() {
                     </div>
                     <div className="addr-row">
                       <div className="addr-field">
-                        <label>এলাকা</label>
+                        <label>à¦à¦²à¦¾à¦•à¦¾</label>
                         <input
                           type="text"
-                          placeholder="এলাকা"
+                          placeholder="à¦à¦²à¦¾à¦•à¦¾"
                           value={addrForm.area}
                           onChange={e => setAddrForm(p => ({ ...p, area: e.target.value }))}
                         />
                       </div>
                       <div className="addr-field">
-                        <label>জেলা</label>
+                        <label>à¦œà§‡à¦²à¦¾</label>
                         <input
                           type="text"
-                          placeholder="জেলা"
+                          placeholder="à¦œà§‡à¦²à¦¾"
                           value={addrForm.district}
                           onChange={e => setAddrForm(p => ({ ...p, district: e.target.value }))}
                         />
@@ -315,19 +315,19 @@ export default function CheckoutPage() {
                     </div>
                     <div className="addr-row">
                       <div className="addr-field">
-                        <label>বিভাগ</label>
+                        <label>à¦¬à¦¿à¦­à¦¾à¦—</label>
                         <input
                           type="text"
-                          placeholder="বিভাগ"
+                          placeholder="à¦¬à¦¿à¦­à¦¾à¦—"
                           value={addrForm.division}
                           onChange={e => setAddrForm(p => ({ ...p, division: e.target.value }))}
                         />
                       </div>
                       <div className="addr-field">
-                        <label>পোস্টাল কোড</label>
+                        <label>à¦ªà§‹à¦¸à§à¦Ÿà¦¾à¦² à¦•à§‹à¦¡</label>
                         <input
                           type="text"
-                          placeholder="পোস্টাল কোড"
+                          placeholder="à¦ªà§‹à¦¸à§à¦Ÿà¦¾à¦² à¦•à§‹à¦¡"
                           value={addrForm.postal_code}
                           onChange={e => setAddrForm(p => ({ ...p, postal_code: e.target.value }))}
                         />
@@ -339,14 +339,14 @@ export default function CheckoutPage() {
                         checked={addrForm.is_default}
                         onChange={e => setAddrForm(p => ({ ...p, is_default: e.target.checked }))}
                       />
-                      ডিফল্ট ঠিকানা হিসেবে সংরক্ষণ করুন
+                      à¦¡à¦¿à¦«à¦²à§à¦Ÿ à¦ à¦¿à¦•à¦¾à¦¨à¦¾ à¦¹à¦¿à¦¸à§‡à¦¬à§‡ à¦¸à¦‚à¦°à¦•à§à¦·à¦£ à¦•à¦°à§à¦¨
                     </label>
                     <div className="addr-form-actions">
                       <button type="button" className="btn-secondary" onClick={() => { setShowAddForm(false); setAddrError('') }}>
-                        বাতিল
+                        à¦¬à¦¾à¦¤à¦¿à¦²
                       </button>
                       <button type="submit" className="btn-primary" disabled={addrSaving}>
-                        {addrSaving ? 'সংরক্ষণ হচ্ছে...' : 'সংরক্ষণ করুন'}
+                        {addrSaving ? 'à¦¸à¦‚à¦°à¦•à§à¦·à¦£ à¦¹à¦šà§à¦›à§‡...' : 'à¦¸à¦‚à¦°à¦•à§à¦·à¦£ à¦•à¦°à§à¦¨'}
                       </button>
                     </div>
                   </form>
@@ -354,17 +354,17 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* ── Summary ── */}
+            {/* â”€â”€ Summary â”€â”€ */}
             <div className="checkout-page__summary">
-              <h2>অর্ডার সারসংক্ষেপ</h2>
+              <h2>à¦…à¦°à§à¦¡à¦¾à¦° à¦¸à¦¾à¦°à¦¸à¦‚à¦•à§à¦·à§‡à¦ª</h2>
 
               <div className="checkout-page__summary-row">
-                <span>মোট বই</span>
-                <span>{toBn(displayItems.length)}টি</span>
+                <span>à¦®à§‹à¦Ÿ à¦¬à¦‡</span>
+                <span>{toBn(displayItems.length)}à¦Ÿà¦¿</span>
               </div>
               <div className="checkout-page__summary-row">
-                <span>উপমোট</span>
-                <span>৳{formatBnAmount(subtotal)}</span>
+                <span>à¦‰à¦ªà¦®à§‹à¦Ÿ</span>
+                <span>à§³{formatBnAmount(subtotal)}</span>
               </div>
 
               {!couponApplied ? (
@@ -373,48 +373,48 @@ export default function CheckoutPage() {
                     <input
                       type="text"
                       className="checkout-coupon__input"
-                      placeholder="প্রোমো কোড লিখুন"
+                      placeholder="à¦ªà§à¦°à§‹à¦®à§‹ à¦•à§‹à¦¡ à¦²à¦¿à¦–à§à¦¨"
                       value={couponInput}
                       onChange={e => setCouponInput(e.target.value.toUpperCase())}
                       onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
                     />
                     <button className="checkout-coupon__btn" onClick={handleApplyCoupon} disabled={couponLoading || !couponInput.trim()}>
-                      {couponLoading ? '...' : 'প্রয়োগ'}
+                      {couponLoading ? '...' : 'à¦ªà§à¦°à¦¯à¦¼à§‹à¦—'}
                     </button>
                   </div>
                   {couponError && <p className="checkout-coupon__error">{couponError}</p>}
                 </div>
               ) : (
                 <div className="checkout-coupon__applied">
-                  <span>🎉 <strong>{couponApplied.code}</strong> — {couponApplied.description || `৳${formatBnAmount(couponApplied.discount_value)} ছাড়`}</span>
-                  <button className="checkout-coupon__remove" onClick={handleRemoveCoupon}>সরান</button>
+                  <span>ðŸŽ‰ <strong>{couponApplied.code}</strong> â€” {couponApplied.description || `à§³${formatBnAmount(couponApplied.discount_value)} à¦›à¦¾à¦¡à¦¼`}</span>
+                  <button className="checkout-coupon__remove" onClick={handleRemoveCoupon}>à¦¸à¦°à¦¾à¦¨</button>
                 </div>
               )}
 
               {discountAmount > 0 && (
                 <div className="checkout-page__summary-row checkout-page__summary-discount">
-                  <span>ছাড়</span>
-                  <span>− ৳{formatBnAmount(discountAmount)}</span>
+                  <span>à¦›à¦¾à¦¡à¦¼</span>
+                  <span>âˆ’ à§³{formatBnAmount(discountAmount)}</span>
                 </div>
               )}
 
               <div className="checkout-page__summary-row">
-                <span>ডেলিভারি চার্জ</span>
+                <span>à¦¡à§‡à¦²à¦¿à¦­à¦¾à¦°à¦¿ à¦šà¦¾à¦°à§à¦œ</span>
                 <span className={deliveryCharge === DELIVERY_DHAKA ? '' : 'checkout-delivery__outside'}>
                   {!selectedAddr
-                    ? <em style={{ color: '#9ca3af', fontSize: '0.85rem' }}>ঠিকানা বাছুন</em>
-                    : `৳${deliveryCharge} (${deliveryCharge === DELIVERY_DHAKA ? 'ঢাকা বিভাগ' : 'ঢাকার বাইরে'})`
+                    ? <em style={{ color: '#9ca3af', fontSize: '0.85rem' }}>à¦ à¦¿à¦•à¦¾à¦¨à¦¾ à¦¬à¦¾à¦›à§à¦¨</em>
+                    : `à§³${deliveryCharge} (${deliveryCharge === DELIVERY_DHAKA ? 'à¦¢à¦¾à¦•à¦¾ à¦¬à¦¿à¦­à¦¾à¦—' : 'à¦¢à¦¾à¦•à¦¾à¦° à¦¬à¦¾à¦‡à¦°à§‡'})`
                   }
                 </span>
               </div>
 
               <div className="checkout-page__summary-total">
-                <strong>মোট</strong>
-                <strong>৳{formatBnAmount(finalTotal)}</strong>
+                <strong>à¦®à§‹à¦Ÿ</strong>
+                <strong>à§³{formatBnAmount(finalTotal)}</strong>
               </div>
 
               {!selectedAddressId && (
-                <p className="checkout-page__addr-warn">⚠️ ঠিকানা নির্বাচন করুন</p>
+                <p className="checkout-page__addr-warn">âš ï¸ à¦ à¦¿à¦•à¦¾à¦¨à¦¾ à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¨ à¦•à¦°à§à¦¨</p>
               )}
 
               <button
@@ -422,10 +422,10 @@ export default function CheckoutPage() {
                 onClick={handlePlaceOrder}
                 disabled={placing || !selectedAddressId}
               >
-                {placing ? 'অর্ডার দেওয়া হচ্ছে...' : 'পেমেন্টে এগিয়ে যান'}
+                {placing ? 'à¦…à¦°à§à¦¡à¦¾à¦° à¦¦à§‡à¦“à¦¯à¦¼à¦¾ à¦¹à¦šà§à¦›à§‡...' : 'à¦ªà§‡à¦®à§‡à¦¨à§à¦Ÿà§‡ à¦à¦—à¦¿à¦¯à¦¼à§‡ à¦¯à¦¾à¦¨'}
               </button>
               <p className="checkout-page__note">
-                বাংলাদেশের যেকোনো ঠিকানায় ৩-৫ কার্যদিবসে ডেলিভারি
+                à¦¬à¦¾à¦‚à¦²à¦¾à¦¦à§‡à¦¶à§‡à¦° à¦¯à§‡à¦•à§‹à¦¨à§‹ à¦ à¦¿à¦•à¦¾à¦¨à¦¾à¦¯à¦¼ à§©-à§« à¦•à¦¾à¦°à§à¦¯à¦¦à¦¿à¦¬à¦¸à§‡ à¦¡à§‡à¦²à¦¿à¦­à¦¾à¦°à¦¿
               </p>
             </div>
 
@@ -435,3 +435,4 @@ export default function CheckoutPage() {
     </div>
   )
 }
+

@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { Check, CircleCheck, CircleX, Search, X } from 'lucide-react';
 import '../../styles/admin.css';
 
-const API_BASE = 'http://localhost:5000/api/admin';
+const API_BASE = 'https://putak-porject-2-1.onrender.com/api/admin';
 
 function statusColor(status) {
   if (['approved', 'Processed'].includes(status)) return 'success';
@@ -12,11 +12,11 @@ function statusColor(status) {
 }
 
 function formatDate(value) {
-  return value ? new Date(value).toLocaleString() : '—';
+  return value ? new Date(value).toLocaleString() : 'â€”';
 }
 
 function formatAmount(value) {
-  return value == null ? '—' : `৳${Number(value).toFixed(2)}`;
+  return value == null ? 'â€”' : `à§³${Number(value).toFixed(2)}`;
 }
 
 export default function AdminReturns() {
@@ -188,7 +188,7 @@ export default function AdminReturns() {
                       </td>
                       <td>
                         <span className={`status-badge ${statusColor(item.return_status)}`}>{item.return_status}</span>
-                        <div className="admin-table-note" title={item.reason}>{item.reason || '—'}</div>
+                        <div className="admin-table-note" title={item.reason}>{item.reason || 'â€”'}</div>
                       </td>
                       <td>
                         {item.refund_id ? (
@@ -196,7 +196,7 @@ export default function AdminReturns() {
                             <strong>{formatAmount(item.refund_amount)}</strong>
                             <div><span className={`status-badge ${statusColor(item.refund_status)}`}>{item.refund_status}</span></div>
                           </>
-                        ) : '—'}
+                        ) : 'â€”'}
                       </td>
                       <td>{formatDate(item.request_date)}</td>
                       <td className="actions-cell">
@@ -240,7 +240,7 @@ export default function AdminReturns() {
                             </button>
                           </>
                         )}
-                        {item.return_status !== 'initiated' && item.refund_status !== 'Pending' && '—'}
+                        {item.return_status !== 'initiated' && item.refund_status !== 'Pending' && 'â€”'}
                       </td>
                     </tr>
                   );
@@ -259,3 +259,4 @@ export default function AdminReturns() {
     </div>
   );
 }
+

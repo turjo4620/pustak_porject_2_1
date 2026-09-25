@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Trash2 } from 'lucide-react';
 import '../../styles/admin.css';
 
@@ -18,8 +18,8 @@ export default function AdminCategories() {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
       const url = searchTerm 
-        ? `http://localhost:5000/api/categories?search=${searchTerm}`
-        : 'http://localhost:5000/api/categories';
+        ? `https://putak-porject-2-1.onrender.com/api/categories?search=${searchTerm}`
+        : 'https://putak-porject-2-1.onrender.com/api/categories';
       
       const response = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -42,7 +42,7 @@ export default function AdminCategories() {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+      const response = await fetch(`https://putak-porject-2-1.onrender.com/api/categories/${categoryId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -159,8 +159,8 @@ function CategoryModal({ category, onClose, onSuccess }) {
     try {
       const token = localStorage.getItem('adminToken');
       const url = category 
-        ? `http://localhost:5000/api/categories/${category.category_id}`
-        : 'http://localhost:5000/api/categories';
+        ? `https://putak-porject-2-1.onrender.com/api/categories/${category.category_id}`
+        : 'https://putak-porject-2-1.onrender.com/api/categories';
       
       const response = await fetch(url, {
         method: category ? 'PUT' : 'POST',
@@ -214,3 +214,4 @@ function CategoryModal({ category, onClose, onSuccess }) {
     </div>
   );
 }
+

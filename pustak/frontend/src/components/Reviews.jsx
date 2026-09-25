@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { Star, MessageSquare } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import SectionHeader from './SectionHeader'
 import './Reviews.css'
 
-const BASE = 'http://localhost:5000/api'
+const BASE = 'https://putak-porject-2-1.onrender.com/api'
 const formatReviewerName = (name = '') =>
   /^turjo sarker$/i.test(name.trim()) ? 'Turjo Sarkar Prince' : name
 
 function StarRow({ rating }) {
   return (
-    <div className="review-card__stars" aria-label={`রেটিং: ${rating} এর মধ্যে ৫`}>
+    <div className="review-card__stars" aria-label={`à¦°à§‡à¦Ÿà¦¿à¦‚: ${rating} à¦à¦° à¦®à¦§à§à¦¯à§‡ à§«`}>
       {[1,2,3,4,5].map((n) => (
         <Star
           key={n} size={13}
@@ -69,11 +69,11 @@ export default function Reviews() {
   if (!reviews.length) return null
 
   return (
-    <section className="reviews section-sm" aria-label="পাঠক রিভিউ">
+    <section className="reviews section-sm" aria-label="à¦ªà¦¾à¦ à¦• à¦°à¦¿à¦­à¦¿à¦‰">
       <div className="container">
         <SectionHeader
-          label="পাঠক মতামত"
-          title="পাঠকরা কী বলছেন"
+          label="à¦ªà¦¾à¦ à¦• à¦®à¦¤à¦¾à¦®à¦¤"
+          title="à¦ªà¦¾à¦ à¦•à¦°à¦¾ à¦•à§€ à¦¬à¦²à¦›à§‡à¦¨"
           align="center"
         />
         <div className="reviews__grid">
@@ -81,7 +81,7 @@ export default function Reviews() {
             <article
               key={r.review_id}
               className="review-card"
-              aria-label={`${formatReviewerName(r.reviewer_name)} এর রিভিউ`}
+              aria-label={`${formatReviewerName(r.reviewer_name)} à¦à¦° à¦°à¦¿à¦­à¦¿à¦‰`}
             >
               <div className="review-card__header">
                 <div className="review-card__avatar" aria-hidden="true">
@@ -89,7 +89,7 @@ export default function Reviews() {
                 </div>
                 <div className="review-card__info">
                   <strong className="review-card__name">
-                    {formatReviewerName(r.reviewer_name || 'পাঠক')}
+                    {formatReviewerName(r.reviewer_name || 'à¦ªà¦¾à¦ à¦•')}
                   </strong>
                 </div>
                 <StarRow rating={r.rating} />
@@ -113,3 +113,4 @@ export default function Reviews() {
     </section>
   )
 }
+

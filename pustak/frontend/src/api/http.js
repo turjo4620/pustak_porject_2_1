@@ -1,5 +1,5 @@
-// src/api/http.js
-const API_BASE = 'http://localhost:5000/api'
+﻿// src/api/http.js
+const API_BASE = 'https://putak-porject-2-1.onrender.com/api'
 
 function authHeaders() {
   const token = localStorage.getItem('pustak-auth-token')
@@ -17,7 +17,7 @@ async function request(path, options = {}) {
   })
 
   if (!res.ok) {
-    let message = 'কিছু একটা সমস্যা হয়েছে'
+    let message = 'à¦•à¦¿à¦›à§ à¦à¦•à¦Ÿà¦¾ à¦¸à¦®à¦¸à§à¦¯à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡'
     try {
       const body = await res.json()
       message = body.message || message
@@ -38,3 +38,4 @@ export const api = {
   put:    (path, body)  => request(path, { method: 'PUT',    body: JSON.stringify(body) }),
   del:    (path, body)  => request(path, { method: 'DELETE', body: body ? JSON.stringify(body) : undefined }),
 }
+

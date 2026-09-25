@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+﻿import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import './ListPage.css'
 import './CategoriesPage.css'
@@ -10,7 +10,7 @@ export default function CategoriesPage() {
 
   // fetch
   useEffect(() => {
-    fetch('http://localhost:5000/api/categories')
+    fetch('https://putak-porject-2-1.onrender.com/api/categories')
       .then(res => res.json())
       .then(json => {
         if (json.success) {
@@ -29,14 +29,14 @@ export default function CategoriesPage() {
       <div className="container">
         <div className="list-page__header">
           <p className="list-page__breadcrumb">
-            <Link to="/">হোম</Link> › বিভাগ
+            <Link to="/">à¦¹à§‹à¦®</Link> â€º à¦¬à¦¿à¦­à¦¾à¦—
           </p>
-          <h1>বিভাগসমূহ</h1>
-          <p className="list-page__subtitle">নীচে {categories.length}টি প্রধান বিভাগ দেখুন</p>
+          <h1>à¦¬à¦¿à¦­à¦¾à¦—à¦¸à¦®à§‚à¦¹</h1>
+          <p className="list-page__subtitle">à¦¨à§€à¦šà§‡ {categories.length}à¦Ÿà¦¿ à¦ªà§à¦°à¦§à¦¾à¦¨ à¦¬à¦¿à¦­à¦¾à¦— à¦¦à§‡à¦–à§à¦¨</p>
         </div>
 
         {loading ? (
-          <p style={{ textAlign: 'center', padding: '2rem' }}>লোড হচ্ছে...</p>
+          <p style={{ textAlign: 'center', padding: '2rem' }}>à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...</p>
         ) : (
           <div className="categories-list-grid">
             {categories.map((category) => (
@@ -54,3 +54,4 @@ export default function CategoriesPage() {
     </div>
   )
 }
+

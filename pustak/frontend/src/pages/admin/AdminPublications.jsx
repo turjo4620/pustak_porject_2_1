@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Trash2 } from 'lucide-react';
 import '../../styles/admin.css';
 
@@ -18,8 +18,8 @@ export default function AdminPublications() {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
       const url = searchTerm 
-        ? `http://localhost:5000/api/publications?search=${searchTerm}`
-        : 'http://localhost:5000/api/publications';
+        ? `https://putak-porject-2-1.onrender.com/api/publications?search=${searchTerm}`
+        : 'https://putak-porject-2-1.onrender.com/api/publications';
       
       const response = await fetch(url, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -42,7 +42,7 @@ export default function AdminPublications() {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/publications/${publicationId}`, {
+      const response = await fetch(`https://putak-porject-2-1.onrender.com/api/publications/${publicationId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -173,8 +173,8 @@ function PublicationModal({ publication, onClose, onSuccess }) {
     try {
       const token = localStorage.getItem('adminToken');
       const url = publication 
-        ? `http://localhost:5000/api/publications/${publication.publication_id}`
-        : 'http://localhost:5000/api/publications';
+        ? `https://putak-porject-2-1.onrender.com/api/publications/${publication.publication_id}`
+        : 'https://putak-porject-2-1.onrender.com/api/publications';
       
       const response = await fetch(url, {
         method: publication ? 'PUT' : 'POST',
@@ -247,3 +247,4 @@ function PublicationModal({ publication, onClose, onSuccess }) {
     </div>
   );
 }
+

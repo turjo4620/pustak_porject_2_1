@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SectionHeader from './SectionHeader'
 import './PublisherShowcase.css'
 
-const BASE = 'http://localhost:5000/api'
+const BASE = 'https://putak-porject-2-1.onrender.com/api'
 
 function initials(title = '') {
   return title.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?'
@@ -22,10 +22,10 @@ export default function PublisherShowcase() {
   if (!publications.length) return null
 
   return (
-    <section className="publishers section-sm" aria-label="প্রকাশক পরিচিতি">
+    <section className="publishers section-sm" aria-label="à¦ªà§à¦°à¦•à¦¾à¦¶à¦• à¦ªà¦°à¦¿à¦šà¦¿à¦¤à¦¿">
       <div className="container">
         <SectionHeader
-          title="বিশ্বস্ত প্রকাশনী"
+          title="à¦¬à¦¿à¦¶à§à¦¬à¦¸à§à¦¤ à¦ªà§à¦°à¦•à¦¾à¦¶à¦¨à§€"
           align="center"
         />
         <div className="publishers__grid">
@@ -52,7 +52,7 @@ export default function PublisherShowcase() {
                 <strong>{pub.title}</strong>
                 {pub.bio && (
                   <span className="publisher-card__bio">
-                    {pub.bio.slice(0, 60)}{pub.bio.length > 60 ? '…' : ''}
+                    {pub.bio.slice(0, 60)}{pub.bio.length > 60 ? 'â€¦' : ''}
                   </span>
                 )}
               </div>
@@ -63,3 +63,4 @@ export default function PublisherShowcase() {
     </section>
   )
 }
+

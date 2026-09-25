@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+﻿import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Plus, Edit, Trash2, Package } from 'lucide-react';
 import '../../styles/admin.css';
 
@@ -34,7 +34,7 @@ export default function AdminBooks() {
         ...filters
       });
 
-      const response = await fetch(`http://localhost:5000/api/admin/books?${queryParams}`, {
+      const response = await fetch(`https://putak-porject-2-1.onrender.com/api/admin/books?${queryParams}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -54,13 +54,13 @@ export default function AdminBooks() {
     try {
       const token = localStorage.getItem('adminToken');
       const [categoriesRes, authorsRes, publicationsRes] = await Promise.all([
-        fetch('http://localhost:5000/api/categories', {
+        fetch('https://putak-porject-2-1.onrender.com/api/categories', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('http://localhost:5000/api/authors', {
+        fetch('https://putak-porject-2-1.onrender.com/api/authors', {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch('http://localhost:5000/api/publications', {
+        fetch('https://putak-porject-2-1.onrender.com/api/publications', {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
@@ -94,7 +94,7 @@ export default function AdminBooks() {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:5000/api/admin/books/${bookId}`, {
+      const response = await fetch(`https://putak-porject-2-1.onrender.com/api/admin/books/${bookId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -204,16 +204,16 @@ export default function AdminBooks() {
                     <td>
                       {book.discount_percentage > 0 ? (
                         <>
-                          <span className="price-original">৳{book.price}</span>
+                          <span className="price-original">à§³{book.price}</span>
                           <span className="price-discount">
-                            ৳{Math.round(book.price * (1 - book.discount_percentage / 100))}
+                            à§³{Math.round(book.price * (1 - book.discount_percentage / 100))}
                           </span>
                           <span style={{ fontSize: '11px', color: '#16a34a', marginLeft: 4 }}>
-                            ({book.discount_percentage}% ছাড়)
+                            ({book.discount_percentage}% à¦›à¦¾à¦¡à¦¼)
                           </span>
                         </>
                       ) : (
-                        `৳${book.price}`
+                        `à§³${book.price}`
                       )}
                     </td>
                     <td>
@@ -283,7 +283,7 @@ export default function AdminBooks() {
   );
 }
 
-// ── Floating tooltip portal rendered at document.body level ────────────────
+// â”€â”€ Floating tooltip portal rendered at document.body level â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function FloatingTooltip({ text, anchorRect }) {
   if (!text || !anchorRect) return null;
 
@@ -330,7 +330,7 @@ function FloatingTooltip({ text, anchorRect }) {
   );
 }
 
-// ── Generic picker (works for both authors and publications) ────────────────
+// â”€â”€ Generic picker (works for both authors and publications) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function EntityPicker({
   items,          // array of objects
   selectedIds,    // number[]
@@ -354,7 +354,7 @@ function EntityPicker({
     if (!bio) return;
     clearTimeout(leaveTimer.current);
     const rect = e.currentTarget.getBoundingClientRect();
-    setTooltip({ text: bio.slice(0, 160) + (bio.length > 160 ? '…' : ''), rect });
+    setTooltip({ text: bio.slice(0, 160) + (bio.length > 160 ? 'â€¦' : ''), rect });
   }, [bioKey]);
 
   const handleMouseLeave = useCallback(() => {
@@ -401,7 +401,7 @@ function EntityPicker({
                       </div>
                   }
                   {selected && (
-                    <span className="author-card__check" aria-hidden="true">✓</span>
+                    <span className="author-card__check" aria-hidden="true">âœ“</span>
                   )}
                 </div>
                 <span className="author-card__name">{name}</span>
@@ -410,7 +410,7 @@ function EntityPicker({
           })}
 
           {filtered.length === 0 && (
-            <p className="author-picker__empty">কিছু পাওয়া যায়নি।</p>
+            <p className="author-picker__empty">à¦•à¦¿à¦›à§ à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿à¥¤</p>
           )}
         </div>
       </div>
@@ -429,7 +429,7 @@ function AuthorPicker({ authors, selectedIds, onToggle }) {
       nameKey="name"
       photoKey="photo_url"
       bioKey="bio"
-      searchPlaceholder="লেখক খুঁজুন..."
+      searchPlaceholder="à¦²à§‡à¦–à¦• à¦–à§à¦à¦œà§à¦¨..."
     />
   );
 }
@@ -445,7 +445,7 @@ function PublicationPicker({ publications, selectedIds, onToggle }) {
       nameKey="title"
       photoKey="cover_image_url"
       bioKey="bio"
-      searchPlaceholder="প্রকাশনী খুঁজুন..."
+      searchPlaceholder="à¦ªà§à¦°à¦•à¦¾à¦¶à¦¨à§€ à¦–à§à¦à¦œà§à¦¨..."
     />
   );
 }
@@ -479,8 +479,8 @@ function BookModal({ book, categories, authors, publications, onClose, onSuccess
     try {
       const token = localStorage.getItem('adminToken');
       const url = book 
-        ? `http://localhost:5000/api/admin/books/${book.id}`
-        : 'http://localhost:5000/api/admin/books';
+        ? `https://putak-porject-2-1.onrender.com/api/admin/books/${book.id}`
+        : 'https://putak-porject-2-1.onrender.com/api/admin/books';
       
       const response = await fetch(url, {
         method: book ? 'PUT' : 'POST',
@@ -605,7 +605,7 @@ function BookModal({ book, categories, authors, publications, onClose, onSuccess
             </div>
 
             <div className="form-group">
-              <label>Discount % <small style={{color:'#888'}}>(0–100, e.g. 18 for 18% off)</small></label>
+              <label>Discount % <small style={{color:'#888'}}>(0â€“100, e.g. 18 for 18% off)</small></label>
               <input
                 type="number"
                 min="0"
@@ -617,7 +617,7 @@ function BookModal({ book, categories, authors, publications, onClose, onSuccess
               />
               {formData.price && formData.discount_percentage > 0 && (
                 <small style={{ color: '#16a34a' }}>
-                  Discounted price: ৳{Math.round(formData.price * (1 - formData.discount_percentage / 100))}
+                  Discounted price: à§³{Math.round(formData.price * (1 - formData.discount_percentage / 100))}
                 </small>
               )}
             </div>
@@ -716,3 +716,4 @@ function BookModal({ book, categories, authors, publications, onClose, onSuccess
     </div>
   );
 }
+
