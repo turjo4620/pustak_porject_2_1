@@ -331,6 +331,95 @@
   background: #f9fafb;
 }
 
+/* The success page has its own white card palette, so it needs explicit
+   dark-theme values instead of relying only on the global tokens. */
+[data-theme="dark"] .ospage {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .ospage__card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .ospage__hero {
+  background: linear-gradient(160deg, #172b20 0%, var(--bg-card) 100%);
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .ospage__check-ring {
+  background: rgba(22, 163, 74, 0.2);
+}
+
+[data-theme="dark"] .ospage__check-icon {
+  color: #86efac;
+}
+
+[data-theme="dark"] .ospage__heading,
+[data-theme="dark"] .ospage__id-value,
+[data-theme="dark"] .ospage__meta-value,
+[data-theme="dark"] .ospage__total-value,
+[data-theme="dark"] .ospage__item-title {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .ospage__subheading,
+[data-theme="dark"] .ospage__id-label,
+[data-theme="dark"] .ospage__item-author,
+[data-theme="dark"] .ospage__item-meta,
+[data-theme="dark"] .ospage__meta-label,
+[data-theme="dark"] .ospage__total-label,
+[data-theme="dark"] .ospage__err {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .ospage__id-block {
+  background: var(--bg-secondary);
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .ospage__copy-btn,
+[data-theme="dark"] .ospage__btn--outline {
+  background: var(--bg-elevated);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .ospage__copy-btn:hover,
+[data-theme="dark"] .ospage__btn--outline:hover {
+  background: var(--accent-subtle);
+  border-color: var(--accent);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .ospage__divider,
+[data-theme="dark"] .ospage__actions {
+  border-color: var(--border-color);
+  background: transparent;
+}
+
+[data-theme="dark"] .ospage__item-thumb-wrap,
+[data-theme="dark"] .ospage__item-thumb-placeholder {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .ospage__item-price {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .ospage__btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
+}
+
+[data-theme="dark"] .ospage__btn--primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
 /* ── Responsive ────────────────────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .ospage__card {
