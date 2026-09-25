@@ -10,7 +10,8 @@ export default function AdminBooks() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     availability: '',
-    category_id: ''
+    category_id: '',
+    admin_id: ''
   });
   const [showModal, setShowModal] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
@@ -161,6 +162,15 @@ export default function AdminBooks() {
               {cat.category_name}
             </option>
           ))}
+        </select>
+
+        <select
+          value={filters.admin_id}
+          onChange={(e) => handleFilterChange('admin_id', e.target.value)}
+          aria-label="Filter books by admin"
+        >
+          <option value="">All Admins</option>
+          <option value="me">Added/updated by me</option>
         </select>
       </div>
 

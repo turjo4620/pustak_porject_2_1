@@ -149,6 +149,31 @@
   margin-left: 72px;
 }
 
+.admin-topbar {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 36px;
+  margin-bottom: var(--space-3);
+}
+
+.admin-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.admin-theme-toggle:hover {
+  color: var(--color-forest);
+  border-color: var(--color-forest);
+}
+
 /* ============= Admin Page Shell ============= */
 .admin-page {
   max-width: 1400px;
@@ -178,6 +203,64 @@
   margin-top: var(--space-1);
   font-family: var(--font-sans);
 }
+
+.admin-account-page {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.admin-account-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-account-avatar {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
+  color: var(--color-cream);
+  background: var(--color-forest);
+  border-radius: 50%;
+  font: 700 1.75rem var(--font-serif);
+}
+
+.admin-account-name {
+  margin: 0 0 var(--space-1);
+  color: var(--text-primary);
+  font: 700 1.4rem var(--font-serif);
+}
+
+.admin-account-email,
+.admin-account-role { margin: 0; color: var(--text-muted); }
+
+.admin-account-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--space-4);
+}
+
+.admin-account-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+}
+
+.admin-account-link:hover { border-color: var(--color-forest); }
 
 /* ============= Dashboard ============= */
 .admin-dashboard {

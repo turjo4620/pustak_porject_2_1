@@ -3,13 +3,14 @@ import { Outlet, NavLink, useNavigate, Navigate } from 'react-router-dom';
 import { 
   LayoutDashboard, BookOpen, Users, Package, ShoppingCart, 
   MessageSquare, BarChart3, LogOut, Menu, X,
-  FileText, Tag, Ticket, RotateCcw
+  FileText, Tag, Ticket, RotateCcw, UserCircle, Sun, Moon
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import '../../styles/admin.css';
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('pustak-theme') === 'dark');
   const navigate = useNavigate();
   const { signOut } = useApp();
   const token = localStorage.getItem('adminToken');
@@ -35,8 +36,16 @@ export default function AdminLayout() {
     { path: '/admin/orders',     icon: <ShoppingCart size={20} />, label: 'Orders' },
     { path: '/admin/returns',    icon: <RotateCcw size={20} />, label: 'Returns' },
     { path: '/admin/reviews', icon: <MessageSquare size={20} />, label: 'Reviews' },
-    { path: '/admin/analytics', icon: <BarChart3 size={20} />, label: 'Analytics' }
+    { path: '/admin/analytics', icon: <BarChart3 size={20} />, label: 'Analytics' },
+    { path: '/admin/account', icon: <UserCircle size={20} />, label: 'My Account' }
   ];
+
+  const toggleTheme = () => {
+    const nextTheme = !isDarkMode;
+    setIsDarkMode(nextTheme);
+    document.documentElement.setAttribute('data-theme', nextTheme ? 'dark' : '');
+    localStorage.setItem('pustak-theme', nextTheme ? 'dark' : 'light');
+  };
 
   console.log('AdminLayout - Rendering layout with sidebar');
 
@@ -75,6 +84,17 @@ export default function AdminLayout() {
       </aside>
 
       <main className={`admin-main ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+        <div className="admin-topbar">
+          <button
+            type="button"
+            className="admin-theme-toggle"
+            onClick={toggleTheme}
+            aria-label={isDarkMode ? 'Switch to bright mode' : 'Switch to dark mode'}
+            title={isDarkMode ? 'Bright mode' : 'Dark mode'}
+          >
+            {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+        </div>
         <Outlet />
       </main>
     </div>

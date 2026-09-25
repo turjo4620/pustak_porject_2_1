@@ -25,7 +25,8 @@ class AdminController {
       const filters = {
         search: req.query.search,
         category_id: req.query.category_id,
-        availability: req.query.availability
+        availability: req.query.availability,
+        admin_id: req.query.admin_id === 'me' ? req.admin.user_id : req.query.admin_id
       };
 
       const result = await adminService.getAllBooks(page, limit, filters);
@@ -61,7 +62,7 @@ class AdminController {
 
   async updateBook(req, res) {
     try {
-      const book = await adminService.updateBook(req.params.id, req.body);
+      const book = await adminService.updateBook(req.params.id, req.body, req.admin.user_id);
       res.json(book);
     } catch (error) {
       console.error('Update book error:', error);

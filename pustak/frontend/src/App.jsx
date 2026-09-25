@@ -52,6 +52,7 @@ import AdminReturns     from './pages/admin/AdminReturns.jsx'
 import AdminReviews     from './pages/admin/AdminReviews.jsx'
 import AdminAnalytics   from './pages/admin/AdminAnalytics.jsx'
 import AdminCoupons     from './pages/admin/AdminCoupons.jsx'
+import AdminAccount      from './pages/admin/AdminAccount.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import CustomerAuthRoute from './components/CustomerAuthRoute.jsx'
 
@@ -178,6 +179,7 @@ export default function App() {
               <Route path="returns" element={<AdminReturns />} />
               <Route path="reviews" element={<AdminReviews />} />
               <Route path="analytics" element={<AdminAnalytics />} />
+              <Route path="account" element={<AdminAccount />} />
             </Route>
 
             <Route path="/orders"            element={<LoginPage />} />

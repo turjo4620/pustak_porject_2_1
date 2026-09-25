@@ -84,6 +84,11 @@ class AdminService {
       queryParams.push(filters.availability);
       paramIndex++;
     }
+    if (filters.admin_id) {
+      whereConditions.push(`b.admin_id = $${paramIndex}`);
+      queryParams.push(filters.admin_id);
+      paramIndex++;
+    }
 
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
@@ -230,7 +235,7 @@ class AdminService {
     }
   }
 
-  async updateBook(bookId, bookData) {
+  async updateBook(bookId, bookData, adminId) {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
@@ -244,6 +249,12 @@ class AdminService {
         'num_pages', 'edition', 'price', 'discount_percentage',
         'availability', 'description'
       ];
+
+      if (adminId) {
+        updateFields.push(`admin_id = $${paramIndex}`);
+        updateValues.push(adminId);
+        paramIndex++;
+      }
 
       allowedFields.forEach(field => {
         if (bookData[field] !== undefined) {
