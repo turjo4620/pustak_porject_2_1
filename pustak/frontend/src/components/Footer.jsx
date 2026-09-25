@@ -1,4 +1,5 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react'
 import './Footer.css'
 
 // ── "বই খুঁজুন" — link to /categories page and direct category search ──────
@@ -29,10 +30,10 @@ const companyLinks = [
 
 // ── Social — real platform URLs (replace href values when accounts exist) ────
 const socialLinks = [
-  { name: 'Facebook',  icon: 'ফ',  href: 'https://facebook.com'  },
-  { name: 'Instagram', icon: 'ই',  href: 'https://instagram.com' },
-  { name: 'Twitter',   icon: 'ট',  href: 'https://twitter.com'   },
-  { name: 'YouTube',   icon: 'ই',  href: 'https://youtube.com'   },
+  { name: 'Facebook',  icon: Facebook,  href: 'https://facebook.com'  },
+  { name: 'Instagram', icon: Instagram, href: 'https://instagram.com' },
+  { name: 'Twitter',   icon: Twitter,   href: 'https://twitter.com'   },
+  { name: 'YouTube',   icon: Youtube,   href: 'https://youtube.com'   },
 ]
 
 const payments = ['Visa', 'MasterCard', 'bKash', 'Nagad', 'DBBL']
@@ -69,7 +70,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {s.icon}
+                  <s.icon size={18} aria-hidden="true" />
                 </a>
               ))}
             </div>
@@ -123,7 +124,7 @@ export default function Footer() {
 
         {/* ── Bottom bar ── */}
         <div className="footer__bottom">
-          <p className="footer__copy">© ২০২৪ পুস্তক। সকল অধিকার সংরক্ষিত।</p>
+          <p className="footer__copy">© {new Date().getFullYear()} পুস্তক। সকল অধিকার সংরক্ষিত।</p>
 
           <div className="footer__payments" aria-label="পেমেন্ট পদ্ধতি">
             {payments.map((p) => (

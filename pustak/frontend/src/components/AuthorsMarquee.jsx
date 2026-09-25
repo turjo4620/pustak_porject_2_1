@@ -38,6 +38,7 @@ export default function AuthorsMarquee() {
       .then(json => {
         const list = json.data || (Array.isArray(json) ? json : [])
         const sorted = [...list]
+          .filter(author => !/^(Stephen King|স্টিফেন কিং)$/i.test(author.name?.trim()))
           .sort((a, b) => Number(b.count || 0) - Number(a.count || 0))
           .slice(0, 20)
         setAuthors(sorted)
@@ -57,7 +58,7 @@ export default function AuthorsMarquee() {
           label="লেখক"
           title="জনপ্রিয় লেখক"
           subtitle="আপনার প্রিয় লেখকের বই খুঁজুন"
-          linkText="সব লেখক"
+          linkText="সব দেখুন"
           linkHref="/authors"
         />
       </div>

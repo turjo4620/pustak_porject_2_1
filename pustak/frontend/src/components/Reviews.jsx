@@ -37,18 +37,21 @@ export default function Reviews() {
           topBooks.map(async (book) => {
             const response = await fetch(`${BASE}/reviews/book/${book.id}`)
             const data = await response.json()
-            return (data.data || [])
+            const bookReviews = data.data || []
+            return bookReviews
               .filter(review => review.comment)
               .map(review => ({
                 ...review,
                 book_name: book.book_name,
-                book_id: book.id
+                book_id: book.id,
+                review_count: bookReviews.length
               }))
           })
         )
 
         const bestReviews = reviewGroups
           .flat()
+          .filter(review => Number(review.review_count || 0) >= 5)
           .sort((a, b) => {
             const ratingDifference = Number(b.rating || 0) - Number(a.rating || 0)
             return ratingDifference || Number(b.review_id || 0) - Number(a.review_id || 0)

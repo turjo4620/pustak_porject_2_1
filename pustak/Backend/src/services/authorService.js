@@ -1,66 +1,6 @@
 const pool = require('../config/db');
 
-const mergeAuthorRows = (rows) => {
-    const parent = new Map(rows.map((author) => [author.author_id, author.author_id]));
-    const identityOwners = new Map();
-
-    const find = (id) => {
-        let root = parent.get(id);
-        while (root !== parent.get(root)) {
-            parent.set(root, parent.get(parent.get(root)));
-            root = parent.get(root);
-        }
-        return root;
-    };
-
-    const union = (firstId, secondId) => {
-        const firstRoot = find(firstId);
-        const secondRoot = find(secondId);
-        if (firstRoot !== secondRoot) parent.set(secondRoot, firstRoot);
-    };
-
-    rows.forEach((author) => {
-        const identities = [
-            author.photo_url && `photo:${author.photo_url.trim()}`,
-            author.bio && `bio:${author.bio.trim()}`,
-        ].filter(Boolean);
-
-        identities.forEach((identity) => {
-            const ownerId = identityOwners.get(identity);
-            if (ownerId !== undefined) union(author.author_id, ownerId);
-            else identityOwners.set(identity, author.author_id);
-        });
-    });
-
-    const groups = new Map();
-    rows.forEach((author) => {
-        const root = find(author.author_id);
-        const group = groups.get(root);
-
-        if (group) {
-            group.author_ids.push(author.author_id);
-            group.count += Number(author.count || 0);
-            if (Number(author.count || 0) > Number(group._canonicalCount || 0)) {
-                group.name = author.name;
-                group.bio = author.bio || group.bio;
-                group.photo_url = author.photo_url || group.photo_url;
-                group._canonicalCount = Number(author.count || 0);
-            }
-            return;
-        }
-
-        groups.set(root, {
-            ...author,
-            author_ids: [author.author_id],
-            count: Number(author.count || 0),
-            _canonicalCount: Number(author.count || 0),
-        });
-    });
-
-    return Array.from(groups.values())
-        .map(({ _canonicalCount, ...author }) => author)
-        .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-};
+const normalizeAuthorName = (name) => name.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 
 const getAllAuthors = async (searchTerm = '') => {
     let query = `
@@ -76,14 +16,19 @@ const getAllAuthors = async (searchTerm = '') => {
     
     const params = [];
     if (searchTerm) {
-        query += ` WHERE authors.name ILIKE $1`;
+        query += ` WHERE authors.name ILIKE $1
+            OR EXISTS (
+                SELECT 1 FROM author_aliases aa
+                WHERE aa.author_id = authors.author_id
+                  AND aa.alias_name ILIKE $1
+            )`;
         params.push(`%${searchTerm}%`);
     }
     
     query += ` GROUP BY authors.author_id ORDER BY count DESC`;
     
     const result = await pool.query(query, params);
-    return mergeAuthorRows(result.rows);
+    return result.rows;
 };
 
 const getAuthorByID = async (id) => {
@@ -93,20 +38,7 @@ const getAuthorByID = async (id) => {
     const author = authorResult.rows[0];
     if (!author) return null;
 
-    const identityColumn = author.photo_url ? 'photo_url' : author.bio ? 'bio' : null;
-    const groupResult = identityColumn
-        ? await pool.query(
-            `SELECT author_id FROM authors WHERE ${identityColumn} IS NOT DISTINCT FROM $1`,
-            [author[identityColumn]]
-        )
-        : { rows: [author] };
-    const groupIds = groupResult.rows.map((row) => row.author_id);
-    const canonicalId = Math.min(...groupIds);
-    const canonical = groupIds.includes(author.author_id)
-        ? (await pool.query('SELECT * FROM authors WHERE author_id = $1', [canonicalId])).rows[0]
-        : author;
-
-    return { ...canonical, author_ids: groupIds };
+    return { ...author, author_ids: [author.author_id] };
 };
 
 const getAuthorByName = async (name) => {
@@ -120,23 +52,61 @@ const getAuthorByName = async (name) => {
             COUNT(ba.book_id) AS count
          FROM authors a
          LEFT JOIN book_author ba ON a.author_id = ba.author_id
-         WHERE a.name ILIKE $1
+         WHERE EXISTS (
+             SELECT 1 FROM author_aliases aa
+             WHERE aa.author_id = a.author_id
+               AND aa.alias_name = $1
+         )
          GROUP BY a.author_id
          LIMIT 1`,
-        [name]
+        [normalizeAuthorName(name)]
     );
     return result.rows[0] || null;
 };
 
 const createAuthor = async (authorData) => {
     const { name, bio, photo_url } = authorData;
-    const query = `
-        INSERT INTO authors (name, bio, photo_url)
-        VALUES ($1, $2, $3)
-        RETURNING *
-    `;
-    const result = await pool.query(query, [name, bio || null, photo_url || null]);
-    return result.rows[0];
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+        const aliasName = normalizeAuthorName(name);
+        const existing = await client.query(
+            `SELECT a.*
+             FROM authors a
+             LEFT JOIN author_aliases aa ON aa.author_id = a.author_id
+             WHERE aa.alias_name = $1
+                OR LOWER(TRIM(a.name)) = $1
+             LIMIT 1`,
+            [aliasName]
+        );
+
+        if (existing.rows[0]) {
+            await client.query(
+                'INSERT INTO author_aliases (alias_name, author_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+                [aliasName, existing.rows[0].author_id]
+            );
+            await client.query('COMMIT');
+            return existing.rows[0];
+        }
+
+        const result = await client.query(
+            `INSERT INTO authors (name, bio, photo_url)
+             VALUES ($1, $2, $3)
+             RETURNING *`,
+            [name.trim(), bio || null, photo_url || null]
+        );
+        await client.query(
+            'INSERT INTO author_aliases (alias_name, author_id) VALUES ($1, $2)',
+            [aliasName, result.rows[0].author_id]
+        );
+        await client.query('COMMIT');
+        return result.rows[0];
+    } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+    } finally {
+        client.release();
+    }
 };
 
 const updateAuthor = async (id, authorData) => {
@@ -148,6 +118,12 @@ const updateAuthor = async (id, authorData) => {
         RETURNING *
     `;
     const result = await pool.query(query, [name, bio || null, photo_url || null, id]);
+    if (result.rows[0]) {
+        await pool.query(
+            'INSERT INTO author_aliases (alias_name, author_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+            [normalizeAuthorName(name), id]
+        );
+    }
     return result.rows[0];
 };
 
@@ -162,7 +138,7 @@ module.exports = {
     getAuthorByID,
     getAuthorGroupIds: async (id) => {
         const author = await getAuthorByID(id);
-        return author ? author.author_ids : [];
+        return author ? [author.author_id] : [];
     },
     getAuthorByName,
     createAuthor,

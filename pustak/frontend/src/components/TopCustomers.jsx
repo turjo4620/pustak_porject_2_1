@@ -75,7 +75,12 @@ export default function TopCustomers() {
 
               {/* Info */}
               <div className="top-customers__info">
-                <p className="top-customers__name">{formatCustomerName(c.name)}</p>
+                <p
+                  className="top-customers__name"
+                  title={formatCustomerName(c.name)}
+                >
+                  {formatCustomerName(c.name)}
+                </p>
                 <p className="top-customers__orders">
                   {toBn(c.total_orders)} টি অর্ডার
                 </p>

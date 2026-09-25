@@ -1,5 +1,4 @@
 import Hero from '../components/Hero'
-import SearchBar from '../components/SearchBar'
 import AuthorsMarquee from '../components/AuthorsMarquee'
 import BestSellers from '../components/BestSellers'
 import RankedBestsellers from '../components/RankedBestsellers'
@@ -18,7 +17,6 @@ export default function HomePage() {
     <>
       <Hero />
       <div className="homepage-shell">
-        <SearchBar />
         <AuthorsMarquee />
         <div className="landing-highlights">
           <RankedBestsellers />

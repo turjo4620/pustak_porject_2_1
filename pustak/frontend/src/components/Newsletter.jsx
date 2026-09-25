@@ -72,7 +72,7 @@ export default function Newsletter() {
             <div className="newsletter__stats" aria-label="পরিসংখ্যান">
               <div className="newsletter__stat">
                 <strong>২৫,০০০+</strong>
-                <span>সদস্য</span>
+                <span>নিউজলেটার সদস্য</span>
               </div>
               <div className="newsletter__stat-divider" aria-hidden="true" />
               <div className="newsletter__stat">

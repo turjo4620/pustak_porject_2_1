@@ -63,6 +63,18 @@
   font-weight: 500;
 }
 
+[data-theme="dark"] .publication-page__info h1 {
+  color: #f9fafb;
+}
+
+[data-theme="dark"] .publication-page__bio {
+  color: #d1d5db;
+}
+
+[data-theme="dark"] .publication-page__book-count {
+  color: #d1d5db;
+}
+
 .publication-page__books {
   margin-top: var(--space-6, 2.5rem);
   margin-bottom: var(--space-8, 4rem);

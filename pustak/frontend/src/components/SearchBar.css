@@ -79,15 +79,25 @@
 /* ── Dropdown ── */
 .search-dropdown {
   position: relative;
+<<<<<<< HEAD
   margin: 8px 0 0;
+=======
+  margin-top: 8px;
+>>>>>>> 1ec7747 (added)
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
+<<<<<<< HEAD
   overflow: hidden;
   z-index: 500;
   max-height: min(28rem, 60vh);
   overflow-y: auto;
+=======
+  overflow: auto;
+  max-height: min(28rem, 55vh);
+  z-index: 2;
+>>>>>>> 1ec7747 (added)
   animation: scale-in 150ms ease;
 }
 

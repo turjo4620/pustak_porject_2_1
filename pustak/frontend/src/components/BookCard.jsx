@@ -11,6 +11,14 @@ const fmtPrice = (n) => {
   // Drop trailing .00 for round numbers
   return toBn(Number.isInteger(num) ? String(num) : num.toFixed(2))
 }
+const getSalePrice = (book, originalPrice) => {
+  const salePrice = Number(book.discount_price)
+  if (salePrice > 0 && salePrice < originalPrice) return salePrice
+  const percentage = Number(book.discount_percentage) || 0
+  return percentage > 0
+    ? Math.round(originalPrice * (1 - percentage / 100) * 100) / 100
+    : null
+}
 
 export default function BookCard({ book, size = 'default' }) {
   const navigate = useNavigate()
@@ -26,7 +34,6 @@ export default function BookCard({ book, size = 'default' }) {
   const cover         = book.cover_image_url || book.cover
   const author        = book.author || 'অজ্ঞাত'
   const rawPrice      = Number(book.price) || 0
-  const discountPct   = Number(book.discount_percentage) || 0
   const category      = book.category || null
   const rating        = Number(book.rating) || 0
   const reviews       = Number(book.num_reviews) || Number(book.reviews) || 0
@@ -36,10 +43,10 @@ export default function BookCard({ book, size = 'default' }) {
   const badge         = book.badge || null
   const badgeColor    = book.badgeColor || '#000'
 
-  // Discounted price: use pre-computed field from backend, or calculate from percentage
-  const discountedPrice = discountPct > 0
-    ? (Number(book.discount_price) || Math.round(rawPrice * (1 - discountPct / 100)))
-    : null
+  const discountedPrice = getSalePrice(book, rawPrice)
+  const discountPct = discountedPrice
+    ? Math.max(0, Math.round(((rawPrice - discountedPrice) / rawPrice) * 100))
+    : 0
   // What to show as the main (bold) price
   const displayPrice  = discountedPrice || rawPrice
   // Original price — only shown when there's a discount

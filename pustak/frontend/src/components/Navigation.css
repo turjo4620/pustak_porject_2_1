@@ -722,6 +722,7 @@
 .search-modal__close:hover { color: var(--text-primary); }
 
 .search-modal__trending { padding: var(--space-4) var(--space-5); }
+<<<<<<< HEAD
 .search-modal__results { max-height: min(28rem, 60vh); overflow-y: auto; }
 .search-modal__status {
   padding: var(--space-5);
@@ -734,21 +735,45 @@
   width: 100%;
   display: flex; align-items: center; gap: var(--space-3);
   padding: var(--space-3) var(--space-5);
+=======
+.search-modal__status {
+  margin: 0;
+  padding: var(--space-3) 0;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+}
+.search-modal__suggestion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+>>>>>>> 1ec7747 (added)
   text-align: left;
   background: none;
   border: none;
   cursor: pointer;
   font-family: var(--font-sans);
+<<<<<<< HEAD
   transition: background var(--transition-fast);
 }
 .search-modal__result:hover,
 .search-modal__result:focus-visible { background: var(--bg-secondary); outline: none; }
 .search-modal__result-cover {
   width: 36px; height: 50px;
+=======
+}
+.search-modal__suggestion:hover { background: var(--bg-secondary); }
+.search-modal__suggestion-cover {
+  width: 36px;
+  height: 50px;
+>>>>>>> 1ec7747 (added)
   object-fit: cover;
   border-radius: 3px;
   flex-shrink: 0;
 }
+<<<<<<< HEAD
 .search-modal__result-cover--fallback {
   display: flex; align-items: center; justify-content: center;
   background: var(--bg-secondary);
@@ -784,6 +809,24 @@
   text-align: left;
   font-family: var(--font-sans);
   cursor: pointer;
+=======
+.search-modal__suggestion-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.search-modal__suggestion-info strong {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.search-modal__suggestion-info small {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+>>>>>>> 1ec7747 (added)
 }
 .search-modal__label {
   font-size: 0.75rem; font-weight: 600; text-transform: uppercase;

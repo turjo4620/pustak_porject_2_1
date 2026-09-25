@@ -27,11 +27,18 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
   const [searchOpen, setSearchOpen] = useState(false)
   const [userOpen, setUserOpen]   = useState(false)
   const [query, setQuery]         = useState('')
+<<<<<<< HEAD
   const [searchResults, setSearchResults] = useState([])
   const [searchLoading, setSearchLoading] = useState(false)
   const searchRef = useRef(null)
   const searchDebounce = useRef(null)
   const searchRequestSeq = useRef(0)
+=======
+  const [suggestions, setSuggestions] = useState([])
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false)
+  const searchRef = useRef(null)
+  const searchRequest = useRef(0)
+>>>>>>> 1ec7747 (added)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -44,6 +51,7 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
   }, [searchOpen])
 
   useEffect(() => {
+<<<<<<< HEAD
     clearTimeout(searchDebounce.current)
     const term = query.trim()
     if (term.length < 2) {
@@ -68,6 +76,35 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
 
     return () => clearTimeout(searchDebounce.current)
   }, [query])
+=======
+    const term = query.trim()
+    if (!searchOpen || term.length < 2) {
+      setSuggestions([])
+      setSuggestionsLoading(false)
+      return
+    }
+
+    const requestId = ++searchRequest.current
+    setSuggestionsLoading(true)
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/books/search?q=${encodeURIComponent(term)}&limit=6`
+        )
+        if (!response.ok) throw new Error(`Search request failed: ${response.status}`)
+        const data = await response.json()
+        if (requestId === searchRequest.current) setSuggestions(data.data || [])
+      } catch (error) {
+        console.error('Navigation search error:', error)
+        if (requestId === searchRequest.current) setSuggestions([])
+      } finally {
+        if (requestId === searchRequest.current) setSuggestionsLoading(false)
+      }
+    }, 250)
+
+    return () => clearTimeout(timer)
+  }, [query, searchOpen])
+>>>>>>> 1ec7747 (added)
 
   
   // Close drawers on route change
@@ -84,6 +121,7 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
       navigate(`/search?q=${encodeURIComponent(query.trim())}`)
       setSearchOpen(false)
       setQuery('')
+      setSuggestions([])
     }
   }
 
@@ -554,6 +592,7 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
                 <X size={20} />
               </button>
             </form>
+<<<<<<< HEAD
             {query.trim().length >= 2 ? (
               <div className="search-modal__results" role="listbox" aria-label="অনুসন্ধান ফলাফল">
                 {searchLoading && <p className="search-modal__status">খুঁজছি...</p>}
@@ -601,6 +640,53 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
                 </div>
               </div>
             )}
+=======
+            <div className="search-modal__trending">
+              {query.trim().length >= 2 ? (
+                <>
+                  {suggestionsLoading && <p className="search-modal__status">খুঁজছি...</p>}
+                  {!suggestionsLoading && suggestions.length === 0 && (
+                    <p className="search-modal__status">কোনো ফলাফল পাওয়া যায়নি।</p>
+                  )}
+                  {!suggestionsLoading && suggestions.map((book) => (
+                    <button
+                      key={book.id}
+                      type="button"
+                      className="search-modal__suggestion"
+                      onClick={() => {
+                        setSearchOpen(false)
+                        setQuery('')
+                        navigate(`/book/${book.id}`)
+                      }}
+                    >
+                      {book.cover_image_url && (
+                        <img src={book.cover_image_url} alt="" className="search-modal__suggestion-cover" />
+                      )}
+                      <span className="search-modal__suggestion-info">
+                        <strong>{book.book_name}</strong>
+                        <small>{book.author || ''}</small>
+                      </span>
+                    </button>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <p className="search-modal__label">ট্রেন্ডিং অনুসন্ধান</p>
+                  <div className="search-modal__chips">
+                    {trendingSearches.map((t) => (
+                      <button
+                        key={t}
+                        className="search-modal__chip"
+                        onClick={() => handleSearchChip(t)}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+>>>>>>> 1ec7747 (added)
           </div>
         </div>
       )}

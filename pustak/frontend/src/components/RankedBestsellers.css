@@ -26,6 +26,22 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Ranking cards also use rank-card--N for medal styling elsewhere. Keep their
+   text dark on the light medal backgrounds for accessible contrast. */
+.ranked-bestsellers__item.rank-card--1,
+.ranked-bestsellers__item.rank-card--2,
+.ranked-bestsellers__item.rank-card--3 {
+  color: #1f2937;
+}
+.ranked-bestsellers__item.rank-card--1 .ranked-bestsellers__title,
+.ranked-bestsellers__item.rank-card--1 .ranked-bestsellers__author,
+.ranked-bestsellers__item.rank-card--2 .ranked-bestsellers__title,
+.ranked-bestsellers__item.rank-card--2 .ranked-bestsellers__author,
+.ranked-bestsellers__item.rank-card--3 .ranked-bestsellers__title,
+.ranked-bestsellers__item.rank-card--3 .ranked-bestsellers__author {
+  color: #1f2937;
+}
+
 .ranked-bestsellers__rank {
   width: 2rem;
   flex-shrink: 0;

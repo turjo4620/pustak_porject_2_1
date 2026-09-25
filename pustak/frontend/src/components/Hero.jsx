@@ -38,9 +38,13 @@ const floatingBooks = [
 ]
 
 const quotes = [
-  { text: '"একটি বই পড়া মানে একটি নতুন জগতে প্রবেশ করা"', attr: '— রবীন্দ্রনাথ ঠাকুর' },
-  { text: '"বইয়ের চেয়ে ভালো বন্ধু আর কেউ নেই"',          attr: '— হুমায়ূন আহমেদ' },
-  { text: '"যে বই পড়ে না, সে অর্ধেক অন্ধ"',               attr: '— বাংলা প্রবাদ' },
+  { text: '“বই কিনে কেউ তো কখনো দেউলে হয় নি।”', attr: '— সৈয়দ মুজতবা আলী' },
+  { text: '“বই হচ্ছে অতীত আর বর্তমানের মধ্যে বেঁধে দেয়া সাঁকো।”', attr: '— রবীন্দ্রনাথ ঠাকুর' },
+  { text: '“বই হচ্ছে শ্রেষ্ঠ আত্মীয়, যার সঙ্গে কোনদিন ঝগড়া হয় না, কোনদিন মনোমালিন্য হয় না।”', attr: '— প্রতিভা বসু' },
+  { text: '“বই পড়াকে যথার্থ হিসেবে যে সঙ্গী করে নিতে পারে, তার জীবনের দুঃখ-কষ্টের বোঝা অনেক কমে যায়।”', attr: '— শরৎচন্দ্র চট্টোপাধ্যায়' },
+  { text: '“চোখ বাড়াবার পন্থাটা কী? প্রথমত—বই পড়া এবং তার জন্য দরকার বই কেনার প্রবৃত্তি।”', attr: '— সৈয়দ মুজতবা আলী, বই কেনা' },
+  { text: '“রুটি মদ ফুরিয়ে যাবে, প্রিয়ার কালো চোখ ঘোলাটে হয়ে আসবে, কিন্তু বইখানা অনন্ত-যৌবনা—যদি তেমন বই হয়।”', attr: '— সৈয়দ মুজতবা আলী, বই কেনা' },
+  { text: '“অতলস্পর্শ কালসমুদ্রের উপর কেবল এক-একখানি বই দিয়া সাঁকো বাঁধিয়া দিবে।”', attr: '— রবীন্দ্রনাথ ঠাকুর' },
 ]
 
 const toBn = (n) => String(n).replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d])
@@ -144,8 +148,18 @@ export default function Hero() {
 
       {/* Central content */}
       <div className={`hero__content ${visible ? 'hero__content--visible' : ''}`}>
-        <div className="hero__badge">
-          <span>বাংলাদেশের সেরা বইয়ের দোকান</span>
+        <div className="hero__badges">
+          <Link to="/offers" className="hero__promo" aria-label="আজকের অফার দেখুন">
+            <span className="hero__promo-tag">বিশেষ অফার</span>
+            <span className="hero__promo-copy">
+              প্রথম অর্ডারে <strong>১০% ছাড়</strong>
+            </span>
+            <span className="hero__promo-action">অফার দেখুন <span aria-hidden="true">→</span></span>
+          </Link>
+
+          <div className="hero__badge">
+            <span>বাংলাদেশের সেরা বইয়ের দোকান</span>
+          </div>
         </div>
 
         <h1 className="hero__title">
@@ -171,7 +185,7 @@ export default function Hero() {
           <div className="hero__stat-divider" aria-hidden="true" />
           <div className="hero__stat">
             <strong>৫ লক্ষ+</strong>
-            <span>পাঠক</span>
+            <span>মোট পাঠক</span>
           </div>
         </div>
 

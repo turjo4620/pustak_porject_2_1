@@ -24,7 +24,7 @@ export default function NewlyReleased() {
           label="নতুন প্রকাশ"
           title="সদ্য প্রকাশিত"
           subtitle="সর্বশেষ প্রকাশিত বই"
-          linkText="সব নতুন বই"
+          linkText="সব দেখুন"
           linkHref="/new-arrivals"
         />
         <div className="newly__grid">

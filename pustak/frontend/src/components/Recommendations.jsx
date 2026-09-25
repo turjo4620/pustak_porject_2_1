@@ -68,8 +68,8 @@ export default function Recommendations() {
           label="বিভাগ অনুযায়ী"
           title="পছন্দের বিভাগ থেকে বেছে নিন"
           subtitle="বিভাগ বেছে নিয়ে আপনার পছন্দের বই খুঁজুন"
-          linkText="সব বিভাগ"
-          linkTo="/categories"
+          linkText="সব দেখুন"
+          linkHref="/categories"
         />
 
         {/* Filter tabs */}

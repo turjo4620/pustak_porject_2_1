@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" role="img" aria-label="বইয়ের প্রচ্ছদ অনুপস্থিত">
+  <rect width="400" height="600" fill="#e8e4dd"/>
+  <rect x="34" y="34" width="332" height="532" rx="12" fill="#d5cfc4"/>
+  <path d="M112 180h176M112 220h176M112 260h120" stroke="#6b7280" stroke-width="14" stroke-linecap="round"/>
+  <path d="M200 326c-44 0-80 36-80 80h160c0-44-36-80-80-80Z" fill="#1e3a2f"/>
+  <circle cx="200" cy="294" r="32" fill="#1e3a2f"/>
+  <text x="200" y="484" text-anchor="middle" fill="#374151" font-family="sans-serif" font-size="24">পুস্তক</text>
+</svg>

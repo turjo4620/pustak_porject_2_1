@@ -14,7 +14,7 @@ export default function FeaturedCollections() {
           label="কিউরেটেড সংগ্রহ"
           title="প্রতিটি মুডের জন্য"
           subtitle="পাঠকের রুচি ও আগ্রহ অনুযায়ী সাজানো বিশেষ সংগ্রহ"
-          linkText="সব সংগ্রহ"
+          linkText="সব দেখুন"
           linkHref="/bestsellers"
         />
 

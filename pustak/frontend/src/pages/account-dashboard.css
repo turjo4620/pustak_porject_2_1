@@ -2044,6 +2044,13 @@
   color: var(--accent) !important;
 }
 
+[data-theme="dark"] .sidebar-profile-info h3 {
+  color: #ffffff;
+}
+[data-theme="dark"] .sidebar-profile-info p {
+  color: #d1d5db;
+}
+
 /* Review, return, and refund text must stay readable on dark cards. */
 [data-theme="dark"] .ar-header__icon,
 [data-theme="dark"] .ar-header__title,

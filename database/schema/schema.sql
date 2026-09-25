@@ -414,6 +414,17 @@ CREATE TABLE IF NOT EXISTS authors
     CONSTRAINT authors_pkey PRIMARY KEY (author_id)
 );
 
+-- Alternate spellings (including translated names) resolve to one author.
+CREATE TABLE IF NOT EXISTS author_aliases
+(
+    alias_name varchar(150) NOT NULL,
+    author_id integer NOT NULL,
+    CONSTRAINT author_aliases_pkey PRIMARY KEY (alias_name),
+    CONSTRAINT author_aliases_author_id_fkey FOREIGN KEY (author_id)
+        REFERENCES authors (author_id)
+        ON DELETE CASCADE
+);
+
 
 
 -- Table: admin
