@@ -106,7 +106,12 @@ publication_id serial NOT NULL,
 title varchar(150) NOT NULL,
 bio text,
 cover_image_url varchar(255),
+created_by bigint,
+updated_by bigint,
 CONSTRAINT publications_pkey PRIMARY KEY (publication_id)
+,
+CONSTRAINT publications_created_by_admin_fkey FOREIGN KEY (created_by) REFERENCES admin (user_id),
+CONSTRAINT publications_updated_by_admin_fkey FOREIGN KEY (updated_by) REFERENCES admin (user_id)
 );
 
 
@@ -237,7 +242,11 @@ min_order_amount numeric(10,2),
 max_order_amount numeric(10,2),
 start_date timestamp,
 end_date timestamp,
+created_by bigint,
+updated_by bigint,
 CONSTRAINT coupons_pkey PRIMARY KEY (coupon_id),
+CONSTRAINT coupons_created_by_admin_fkey FOREIGN KEY (created_by) REFERENCES admin (user_id),
+CONSTRAINT coupons_updated_by_admin_fkey FOREIGN KEY (updated_by) REFERENCES admin (user_id),
 CONSTRAINT coupons_code_key UNIQUE (code)
 );
 
@@ -248,7 +257,11 @@ CREATE TABLE IF NOT EXISTS categories
 (
 category_id serial NOT NULL,
 category_name varchar(100) NOT NULL,
+created_by bigint,
+updated_by bigint,
 CONSTRAINT categories_pkey PRIMARY KEY (category_id),
+CONSTRAINT categories_created_by_admin_fkey FOREIGN KEY (created_by) REFERENCES admin (user_id),
+CONSTRAINT categories_updated_by_admin_fkey FOREIGN KEY (updated_by) REFERENCES admin (user_id),
 CONSTRAINT category_name_unique UNIQUE (category_name)
 );
 
@@ -340,11 +353,14 @@ CREATE TABLE IF NOT EXISTS books
     initial_stock integer DEFAULT 0,
     publication_id integer,
     discount_percentage integer DEFAULT 0,
-    admin_id bigint DEFAULT 1786484073,
+    created_by bigint,
+    updated_by bigint,
     CONSTRAINT books_pkey PRIMARY KEY (id),
     CONSTRAINT books_publication_id_fkey FOREIGN KEY (publication_id)
         REFERENCES publications (publication_id),
-    CONSTRAINT fk_books_admin FOREIGN KEY (admin_id)
+    CONSTRAINT fk_books_admin FOREIGN KEY (created_by)
+        REFERENCES admin (user_id),
+    CONSTRAINT books_updated_by_admin_fkey FOREIGN KEY (updated_by)
         REFERENCES admin (user_id)
 );
 
@@ -411,7 +427,11 @@ CREATE TABLE IF NOT EXISTS authors
     name varchar(150) NOT NULL,
     bio text,
     photo_url varchar(255),
+    created_by bigint,
+    updated_by bigint,
     CONSTRAINT authors_pkey PRIMARY KEY (author_id)
+    ,CONSTRAINT authors_created_by_admin_fkey FOREIGN KEY (created_by) REFERENCES admin (user_id)
+    ,CONSTRAINT authors_updated_by_admin_fkey FOREIGN KEY (updated_by) REFERENCES admin (user_id)
 );
 
 -- Alternate spellings (including translated names) resolve to one author.

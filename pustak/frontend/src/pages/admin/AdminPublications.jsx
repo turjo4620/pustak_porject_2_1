@@ -185,13 +185,14 @@ function PublicationModal({ publication, onClose, onSuccess }) {
         body: JSON.stringify(formData)
       });
 
-      if (!response.ok) throw new Error('Failed to save publication');
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.message || data.error || 'Failed to save publication');
 
       alert(`Publication ${publication ? 'updated' : 'created'} successfully`);
       onSuccess();
     } catch (error) {
       console.error('Error saving publication:', error);
-      alert('Failed to save publication');
+      alert(error.message || 'Failed to save publication');
     }
   };
 

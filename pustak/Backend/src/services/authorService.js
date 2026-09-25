@@ -64,7 +64,7 @@ const getAuthorByName = async (name) => {
     return result.rows[0] || null;
 };
 
-const createAuthor = async (authorData) => {
+const createAuthor = async (authorData, adminId) => {
     const { name, bio, photo_url } = authorData;
     const client = await pool.connect();
     try {
@@ -90,10 +90,10 @@ const createAuthor = async (authorData) => {
         }
 
         const result = await client.query(
-            `INSERT INTO authors (name, bio, photo_url)
-             VALUES ($1, $2, $3)
+            `INSERT INTO authors (name, bio, photo_url, created_by, updated_by)
+             VALUES ($1, $2, $3, $4, $4)
              RETURNING *`,
-            [name.trim(), bio || null, photo_url || null]
+            [name.trim(), bio || null, photo_url || null, adminId]
         );
         await client.query(
             'INSERT INTO author_aliases (alias_name, author_id) VALUES ($1, $2)',
@@ -109,15 +109,15 @@ const createAuthor = async (authorData) => {
     }
 };
 
-const updateAuthor = async (id, authorData) => {
+const updateAuthor = async (id, authorData, adminId) => {
     const { name, bio, photo_url } = authorData;
     const query = `
         UPDATE authors
-        SET name = $1, bio = $2, photo_url = $3
-        WHERE author_id = $4
+        SET name = $1, bio = $2, photo_url = $3, updated_by = $4
+        WHERE author_id = $5
         RETURNING *
     `;
-    const result = await pool.query(query, [name, bio || null, photo_url || null, id]);
+    const result = await pool.query(query, [name, bio || null, photo_url || null, adminId, id]);
     if (result.rows[0]) {
         await pool.query(
             'INSERT INTO author_aliases (alias_name, author_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',

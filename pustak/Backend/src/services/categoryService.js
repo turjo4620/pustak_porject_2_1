@@ -29,26 +29,26 @@ const getCategoryByID = async (id) => {
     return result.rows[0];
 };
 
-const createCategory = async (categoryData) => {
+const createCategory = async (categoryData, adminId) => {
     const { category_name } = categoryData;
     const query = `
-        INSERT INTO categories (category_name)
-        VALUES ($1)
+        INSERT INTO categories (category_name, created_by, updated_by)
+        VALUES ($1, $2, $2)
         RETURNING *
     `;
-    const result = await pool.query(query, [category_name]);
+    const result = await pool.query(query, [category_name, adminId]);
     return result.rows[0];
 };
 
-const updateCategory = async (id, categoryData) => {
+const updateCategory = async (id, categoryData, adminId) => {
     const { category_name } = categoryData;
     const query = `
         UPDATE categories
-        SET category_name = $1
-        WHERE category_id = $2
+        SET category_name = $1, updated_by = $2
+        WHERE category_id = $3
         RETURNING *
     `;
-    const result = await pool.query(query, [category_name, id]);
+    const result = await pool.query(query, [category_name, adminId, id]);
     return result.rows[0];
 };
 

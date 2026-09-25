@@ -52,26 +52,26 @@ const getPublicationByID = async (id) => {
   return result.rows[0];
 };
 
-const createPublication = async (publicationData) => {
+const createPublication = async (publicationData, adminId) => {
   const { title, bio, cover_image_url } = publicationData;
   const query = `
-    INSERT INTO publications (title, bio, cover_image_url)
-    VALUES ($1, $2, $3)
+    INSERT INTO publications (title, bio, cover_image_url, created_by, updated_by)
+    VALUES ($1, $2, $3, $4, $4)
     RETURNING *
   `;
-  const result = await pool.query(query, [title, bio || null, cover_image_url || null]);
+  const result = await pool.query(query, [title, bio || null, cover_image_url || null, adminId]);
   return result.rows[0];
 };
 
-const updatePublication = async (id, publicationData) => {
+const updatePublication = async (id, publicationData, adminId) => {
   const { title, bio, cover_image_url } = publicationData;
   const query = `
     UPDATE publications
-    SET title = $1, bio = $2, cover_image_url = $3
-    WHERE publication_id = $4
+    SET title = $1, bio = $2, cover_image_url = $3, updated_by = $4
+    WHERE publication_id = $5
     RETURNING *
   `;
-  const result = await pool.query(query, [title, bio || null, cover_image_url || null, id]);
+  const result = await pool.query(query, [title, bio || null, cover_image_url || null, adminId, id]);
   return result.rows[0];
 };
 

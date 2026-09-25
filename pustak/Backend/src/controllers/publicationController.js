@@ -46,7 +46,7 @@ const getPublication = async (req, res) => {
 const createPublication = async (req, res) => {
   try {
     const publicationData = req.body;
-    const newPublication = await publicationService.createPublication(publicationData);
+    const newPublication = await publicationService.createPublication(publicationData, req.admin.user_id);
     res.status(201).json({ success: true, data: newPublication });
   } catch (error) {
     console.error('Error creating publication:', error.message);
@@ -58,7 +58,7 @@ const updatePublication = async (req, res) => {
   try {
     const { id } = req.params;
     const publicationData = req.body;
-    const updatedPublication = await publicationService.updatePublication(id, publicationData);
+    const updatedPublication = await publicationService.updatePublication(id, publicationData, req.admin.user_id);
     
     if (!updatedPublication) {
       return res.status(404).json({ success: false, message: 'Publication not found' });

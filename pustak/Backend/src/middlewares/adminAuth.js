@@ -36,6 +36,13 @@ const verifyAdmin = async (req, res, next) => {
       return res.status(403).json({ error: 'Access denied. Admin privileges required.' });
     }
 
+    await pool.query(
+      `INSERT INTO admin (user_id)
+       VALUES ($1)
+       ON CONFLICT (user_id) DO NOTHING`,
+      [user.user_id]
+    );
+
     req.admin = user;
     next();
   } catch (error) {

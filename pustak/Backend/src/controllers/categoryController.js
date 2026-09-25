@@ -30,7 +30,7 @@ const getCategory = async (req, res) => {
 const createCategory = async (req, res) => {
     try {
         const categoryData = req.body;
-        const newCategory = await categoryService.createCategory(categoryData);
+        const newCategory = await categoryService.createCategory(categoryData, req.admin.user_id);
         res.status(201).json({ success: true, data: newCategory });
     } catch (error) {
         console.error("Error creating category:", error.message);
@@ -42,7 +42,7 @@ const updateCategory = async (req, res) => {
     try {
         const { id } = req.params;
         const categoryData = req.body;
-        const updatedCategory = await categoryService.updateCategory(id, categoryData);
+        const updatedCategory = await categoryService.updateCategory(id, categoryData, req.admin.user_id);
         
         if (!updatedCategory) {
             return res.status(404).json({ success: false, message: "Category not found" });

@@ -85,7 +85,7 @@ class AdminService {
       paramIndex++;
     }
     if (filters.admin_id) {
-      whereConditions.push(`b.admin_id = $${paramIndex}`);
+      whereConditions.push(`b.created_by = $${paramIndex}`);
       queryParams.push(filters.admin_id);
       paramIndex++;
     }
@@ -177,8 +177,8 @@ class AdminService {
         INSERT INTO books (
           book_name, cover_image_url, isbn, language,
           num_pages, edition, price, discount_percentage,
-          availability, description, initial_stock, admin_id
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+          availability, description, initial_stock, created_by, updated_by
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $12)
         RETURNING *
       `, [
         bookData.book_name,
@@ -251,7 +251,7 @@ class AdminService {
       ];
 
       if (adminId) {
-        updateFields.push(`admin_id = $${paramIndex}`);
+        updateFields.push(`updated_by = $${paramIndex}`);
         updateValues.push(adminId);
         paramIndex++;
       }
@@ -336,10 +336,17 @@ class AdminService {
     }
   }
 
-  async updateBookStock(bookId, quantity) {
+  async updateBookStock(bookId, quantity, adminId) {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
+
+      if (adminId) {
+        await client.query(
+          'UPDATE books SET updated_by = $1 WHERE id = $2',
+          [adminId, bookId]
+        );
+      }
 
       // Clean up any stale 'unavailable' rows first (legacy from old update logic)
       await client.query(

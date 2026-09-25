@@ -128,8 +128,8 @@ const createCoupon = async (req, res) => {
          (code, description, discount_type, discount_value,
           min_order_amount, max_order_amount,
           usage_limit, times_used,
-          start_date, end_date, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 0, $8, $9, $10)
+          start_date, end_date, status, created_by, updated_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, 0, $8, $9, $10, $11, $11)
        RETURNING
          coupon_id AS id, code, description,
          discount_type, discount_value,
@@ -147,6 +147,7 @@ const createCoupon = async (req, res) => {
         start_date          || null,
         end_date            || null,
         status              === 'Inactive' ? 'Inactive' : 'Active',
+        req.admin.user_id,
       ]
     );
 
@@ -197,8 +198,9 @@ const updateCoupon = async (req, res) => {
          usage_limit      = $7,
          start_date       = $8,
          end_date         = $9,
-         status           = COALESCE(NULLIF($10, ''), status)
-       WHERE coupon_id = $11
+         status           = COALESCE(NULLIF($10, ''), status),
+         updated_by       = $11
+       WHERE coupon_id = $12
        RETURNING
          coupon_id AS id, code, description,
          discount_type, discount_value,
@@ -216,6 +218,7 @@ const updateCoupon = async (req, res) => {
         start_date       || null,
         end_date         || null,
         status           || '',
+        req.admin.user_id,
         id,
       ]
     );

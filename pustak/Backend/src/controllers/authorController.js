@@ -44,7 +44,7 @@ const getAuthor = async (req, res) => {
 const createAuthor = async (req, res) => {
     try {
         const authorData = req.body;
-        const newAuthor = await authorService.createAuthor(authorData);
+        const newAuthor = await authorService.createAuthor(authorData, req.admin.user_id);
         res.status(201).json({ success: true, data: newAuthor });
     } catch (error) {
         console.error("Error creating author:", error.message);
@@ -56,7 +56,7 @@ const updateAuthor = async (req, res) => {
     try {
         const { id } = req.params;
         const authorData = req.body;
-        const updatedAuthor = await authorService.updateAuthor(id, authorData);
+        const updatedAuthor = await authorService.updateAuthor(id, authorData, req.admin.user_id);
         
         if (!updatedAuthor) {
             return res.status(404).json({ success: false, message: "Author not found" });

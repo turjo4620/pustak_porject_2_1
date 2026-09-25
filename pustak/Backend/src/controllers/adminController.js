@@ -56,7 +56,7 @@ class AdminController {
       res.status(201).json(book);
     } catch (error) {
       console.error('Create book error:', error);
-      res.status(500).json({ error: 'Failed to create book' });
+      res.status(500).json({ error: 'Failed to create book', detail: error.message });
     }
   }
 
@@ -66,7 +66,7 @@ class AdminController {
       res.json(book);
     } catch (error) {
       console.error('Update book error:', error);
-      res.status(500).json({ error: 'Failed to update book' });
+      res.status(500).json({ error: 'Failed to update book', detail: error.message });
     }
   }
 
@@ -83,7 +83,7 @@ class AdminController {
   async updateBookStock(req, res) {
     try {
       const { quantity } = req.body;
-      const result = await adminService.updateBookStock(req.params.id, quantity);
+      const result = await adminService.updateBookStock(req.params.id, quantity, req.admin.user_id);
       res.json(result);
     } catch (error) {
       console.error('Update stock error:', error);
