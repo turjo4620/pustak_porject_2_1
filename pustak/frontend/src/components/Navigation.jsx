@@ -19,7 +19,7 @@ const BASE = 'https://putak-porject-2-1.onrender.com/api'
 
 export default function Navigation({ isDarkMode, toggleDarkMode }) {
   const navigate = useNavigate()
-  const { cartItems, wishItems, removeFromCart, totalCartPrice,
+  const { cartItems, wishItems, removeFromCart, removeFromWishlist, totalCartPrice,
           cartOpen, setCartOpen, wishOpen, setWishOpen, authUser, signOut } = useApp()
 
   const [scrolled, setScrolled]   = useState(false)
@@ -316,7 +316,7 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
                 </div>
                 <button
                   className="drawer__item-remove"
-                  onClick={() => toggleWish(b)}
+                  onClick={() => removeFromWishlist(b.wishlist_item_id)}
                   aria-label={`${b.book_name} সরান`}
                 >
                   <Trash2 size={15} />

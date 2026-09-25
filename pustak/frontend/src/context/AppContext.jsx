@@ -110,7 +110,23 @@ export function AppProvider({ children }) {
     }
     const quantity = (Number.isInteger(book.qty) && book.qty > 0) ? book.qty : 1
     const item = await api.post('/cart/items', { bookId: book.id, quantity })
-    await fetchCart()
+    setCartItems((prev) => {
+      const bookId = item.book_id || book.id
+      const existing = prev.find((cartItem) => cartItem.book_id === bookId)
+      if (existing) {
+        return prev.map((cartItem) => cartItem.book_id === bookId
+          ? { ...cartItem, ...item }
+          : cartItem)
+      }
+      return [...prev, {
+        ...book,
+        ...item,
+        book_id: bookId,
+        book_name: item.book_name || book.book_name || book.title,
+        cover_image_url: item.cover_image_url || book.cover_image_url || book.cover,
+        locked_price: item.locked_price || book.discount_price || book.price,
+      }]
+    })
     setCartOpen(true)
     return item
   }
