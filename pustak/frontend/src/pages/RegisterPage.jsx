@@ -3,7 +3,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
 import './AuthPage.css'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || ''
+const API_BASE_URL = (() => {
+  const configuredUrl = (import.meta.env.VITE_API_URL || '').trim()
+  const normalizedUrl = configuredUrl.replace(/\/+$/, '').replace(/\/api$/, '')
+  return normalizedUrl || 'https://putak-porject-2-1.onrender.com'
+})()
 
 async function parseApiResponse(response) {
   const text = await response.text()
