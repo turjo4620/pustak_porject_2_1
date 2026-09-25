@@ -1,4 +1,4 @@
-﻿import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import './ListPage.css'
 import './AuthorsPage.css'
@@ -28,18 +28,18 @@ export default function AuthorsPage() {
 
         <div className="list-page__header">
           <p className="list-page__breadcrumb">
-            <Link to="/">à¦¹à§‹à¦®</Link> â€º à¦²à§‡à¦–à¦•
+            <Link to="/">হোম</Link> › লেখক
           </p>
-          <h1>à¦¸à¦•à¦² à¦²à§‡à¦–à¦•</h1>
+          <h1>সকল লেখক</h1>
           <p className="list-page__subtitle">
-            {loading ? 'à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...' : `${authors.length} à¦œà¦¨ à¦²à§‡à¦–à¦•`}
+            {loading ? 'লোড হচ্ছে...' : `${authors.length} জন লেখক`}
           </p>
         </div>
 
         <div className="authors-grid">
           {loading ? (
             <p style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '2rem' }}>
-              à¦²à§‡à¦–à¦•à¦¦à§‡à¦° à¦¤à¦¥à§à¦¯ à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...
+              লেখকদের তথ্য লোড হচ্ছে...
             </p>
           ) : (
             authors.map((author) => (
@@ -74,4 +74,3 @@ export default function AuthorsPage() {
     </div>
   )
 }
-

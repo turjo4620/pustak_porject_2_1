@@ -1,27 +1,27 @@
-﻿import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, X, ShoppingBag, BookOpen, LayoutGrid, Users, Building2, ShoppingCart } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import './account-dashboard.css'
 
-const toBn = (n) => String(n).replace(/[0-9]/g, (d) => 'à§¦à§§à§¨à§©à§ªà§«à§¬à§­à§®à§¯'[d])
+const toBn = (n) => String(n).replace(/[0-9]/g, (d) => '০১২৩৪৫৬৭৮৯'[d])
 const fmtPrice = (n) => {
   const num = Number(n)
   return toBn(Number.isInteger(num) ? String(num) : num.toFixed(2))
 }
 
 const TABS = [
-  { value: 'books',      label: 'à¦¬à¦‡',      icon: BookOpen   },
-  { value: 'categories', label: 'à¦¬à¦¿à¦­à¦¾à¦—',   icon: LayoutGrid },
-  { value: 'authors',    label: 'à¦²à§‡à¦–à¦•',    icon: Users      },
-  { value: 'publishers', label: 'à¦ªà§à¦°à¦•à¦¾à¦¶à¦•', icon: Building2  },
+  { value: 'books',      label: 'বই',      icon: BookOpen   },
+  { value: 'categories', label: 'বিভাগ',   icon: LayoutGrid },
+  { value: 'authors',    label: 'লেখক',    icon: Users      },
+  { value: 'publishers', label: 'প্রকাশক', icon: Building2  },
 ]
 
 const TAB_HINTS = {
-  books:      'à¦¬à¦‡à¦¯à¦¼à§‡à¦° à¦¨à¦¾à¦® à¦¬à¦¾ à¦²à§‡à¦–à¦•à§‡à¦° à¦¨à¦¾à¦® à¦²à¦¿à¦–à§‡ à¦–à§à¦à¦œà§à¦¨, à¦¤à¦¾à¦°à¦ªà¦° à¦¸à¦°à¦¾à¦¸à¦°à¦¿ à¦•à¦¾à¦°à§à¦Ÿà§‡ à¦¯à§‹à¦— à¦•à¦°à§à¦¨à¥¤',
-  categories: 'à¦¯à§‡à¦•à§‹à¦¨à§‹ à¦¬à¦¿à¦­à¦¾à¦—à§‡ à¦•à§à¦²à¦¿à¦• à¦•à¦°à¦²à§‡ à¦¸à§‡à¦‡ à¦¬à¦¿à¦­à¦¾à¦—à§‡à¦° à¦¸à¦¬ à¦¬à¦‡ à¦–à§à¦²à§‡ à¦¯à¦¾à¦¬à§‡à¥¤',
-  authors:    'à¦¯à§‡à¦•à§‹à¦¨à§‹ à¦²à§‡à¦–à¦•à§‡à¦° à¦¨à¦¾à¦®à§‡ à¦•à§à¦²à¦¿à¦• à¦•à¦°à¦²à§‡ à¦¤à¦¾à¦à¦° à¦¸à¦¬ à¦¬à¦‡ à¦–à§à¦²à§‡ à¦¯à¦¾à¦¬à§‡à¥¤',
-  publishers: 'à¦¯à§‡à¦•à§‹à¦¨à§‹ à¦ªà§à¦°à¦•à¦¾à¦¶à¦¨à§€à¦¤à§‡ à¦•à§à¦²à¦¿à¦• à¦•à¦°à¦²à§‡ à¦¤à¦¾à¦¦à§‡à¦° à¦ªà§à¦°à¦•à¦¾à¦¶à¦¿à¦¤ à¦¬à¦‡à¦—à§à¦²à§‹ à¦–à§à¦²à§‡ à¦¯à¦¾à¦¬à§‡à¥¤',
+  books:      'বইয়ের নাম বা লেখকের নাম লিখে খুঁজুন, তারপর সরাসরি কার্টে যোগ করুন।',
+  categories: 'যেকোনো বিভাগে ক্লিক করলে সেই বিভাগের সব বই খুলে যাবে।',
+  authors:    'যেকোনো লেখকের নামে ক্লিক করলে তাঁর সব বই খুলে যাবে।',
+  publishers: 'যেকোনো প্রকাশনীতে ক্লিক করলে তাদের প্রকাশিত বইগুলো খুলে যাবে।',
 }
 
 export default function OrderDinPage() {
@@ -31,18 +31,18 @@ export default function OrderDinPage() {
   const [tab, setTab] = useState('books')
   const [q, setQ] = useState('')
 
-  // â”€â”€ Book search state â”€â”€
+  // ── Book search state ──
   const [books, setBooks] = useState([])
   const [booksLoading, setBooksLoading] = useState(false)
   const [addedId, setAddedId] = useState(null)
 
-  // â”€â”€ Entity lists (fetched once, filtered client-side) â”€â”€
+  // ── Entity lists (fetched once, filtered client-side) ──
   const [categories, setCategories] = useState(null)
   const [authors, setAuthors] = useState(null)
   const [publications, setPublications] = useState(null)
   const [entitiesLoading, setEntitiesLoading] = useState(true)
 
-  // â”€â”€ Fetch entity lists on mount â”€â”€
+  // ── Fetch entity lists on mount ──
   useEffect(() => {
     Promise.all([
       fetch('https://putak-porject-2-1.onrender.com/api/categories').then(r => r.json()).catch(() => null),
@@ -57,7 +57,7 @@ export default function OrderDinPage() {
       })
   }, [])
 
-  // â”€â”€ Debounced book search â”€â”€
+  // ── Debounced book search ──
   const seqRef = useRef(0)
   useEffect(() => {
     const term = q.trim()
@@ -85,7 +85,7 @@ export default function OrderDinPage() {
     return () => clearTimeout(timer)
   }, [q, tab])
 
-  // â”€â”€ Client-side entity filtering â”€â”€
+  // ── Client-side entity filtering ──
   const filterList = (list, nameKey) => {
     if (!list) return []
     const term = q.trim().toLowerCase()
@@ -97,7 +97,7 @@ export default function OrderDinPage() {
   const visibleAuthors    = useMemo(() => filterList(authors, 'name'), [authors, q])
   const visiblePublications = useMemo(() => filterList(publications, 'title'), [publications, q])
 
-  // â”€â”€ Add to cart â”€â”€
+  // ── Add to cart ──
   const handleAdd = async (e, book) => {
     e.stopPropagation()
     try {
@@ -105,7 +105,7 @@ export default function OrderDinPage() {
       setAddedId(book.id)
       setTimeout(() => setAddedId(null), 1500)
     } catch (err) {
-      alert(err.message || 'à¦•à¦¾à¦°à§à¦Ÿà§‡ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿')
+      alert(err.message || 'কার্টে যোগ করা যায়নি')
     }
   }
 
@@ -114,24 +114,24 @@ export default function OrderDinPage() {
   return (
     <div className="od-section">
 
-      {/* â”€â”€ Header / search card â”€â”€ */}
+      {/* ── Header / search card ── */}
       <div className="card od-search-card">
         <div className="od-title-row">
           <ShoppingBag size={20} className="od-title-icon" />
-          <h2 className="od-title">à¦…à¦°à§à¦¡à¦¾à¦° à¦¦à¦¿à¦¨</h2>
+          <h2 className="od-title">অর্ডার দিন</h2>
         </div>
-        <p className="od-sub">à¦¬à¦‡ à¦–à§à¦à¦œà§‡ à¦…à¦°à§à¦¡à¦¾à¦° à¦•à¦°à§à¦¨, à¦…à¦¥à¦¬à¦¾ à¦¬à¦¿à¦­à¦¾à¦— / à¦²à§‡à¦–à¦• / à¦ªà§à¦°à¦•à¦¾à¦¶à¦• à¦¬à§‡à¦›à§‡ à¦¨à¦¿à¦¯à¦¼à§‡ à¦¬à§à¦°à¦¾à¦‰à¦œ à¦•à¦°à§à¦¨à¥¤</p>
+        <p className="od-sub">বই খুঁজে অর্ডার করুন, অথবা বিভাগ / লেখক / প্রকাশক বেছে নিয়ে ব্রাউজ করুন।</p>
 
         <div className="orders-search-wrap">
           <Search size={16} className="orders-search-icon" />
           <input
             className="orders-search-input"
-            placeholder={tab === 'books' ? 'à¦¬à¦‡ à¦¬à¦¾ à¦²à§‡à¦–à¦•à§‡à¦° à¦¨à¦¾à¦® à¦²à¦¿à¦–à§à¦¨...' : 'à¦¨à¦¾à¦® à¦²à¦¿à¦–à§‡ à¦–à§à¦à¦œà§à¦¨...'}
+            placeholder={tab === 'books' ? 'বই বা লেখকের নাম লিখুন...' : 'নাম লিখে খুঁজুন...'}
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
           {q && (
-            <button className="orders-search-clear" onClick={() => setQ('')} aria-label="à¦¸à¦¾à¦°à§à¦š à¦®à§à¦›à§à¦¨" type="button">
+            <button className="orders-search-clear" onClick={() => setQ('')} aria-label="সার্চ মুছুন" type="button">
               <X size={15} />
             </button>
           )}
@@ -154,20 +154,20 @@ export default function OrderDinPage() {
         <p className="od-tab-hint">{TAB_HINTS[tab]}</p>
       </div>
 
-      {/* â”€â”€ Results card â”€â”€ */}
+      {/* ── Results card ── */}
       <div className="card od-results-card">
 
         {/* Books */}
         {tab === 'books' && (
           booksLoading ? (
-            <p className="od-empty">à¦–à§à¦à¦œà¦›à¦¿...</p>
+            <p className="od-empty">খুঁজছি...</p>
           ) : showEmptyBooks ? (
-            <p className="od-empty">à¦•à§‹à¦¨à§‹ à¦¬à¦‡ à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿à¥¤ à¦…à¦¨à§à¦¯ à¦•à¦¿à¦›à§ à¦²à¦¿à¦–à§‡ à¦¦à§‡à¦–à§à¦¨à¥¤</p>
+            <p className="od-empty">কোনো বই পাওয়া যায়নি। অন্য কিছু লিখে দেখুন।</p>
           ) : !q.trim() ? (
             <div className="od-prompt">
               <BookOpen size={40} className="od-prompt-icon" />
-              <p>à¦…à¦¨à§à¦¸à¦¨à§à¦§à¦¾à¦¨ à¦•à¦°à¦¤à§‡ à¦‰à¦ªà¦°à§‡ à¦¬à¦‡à¦¯à¦¼à§‡à¦° à¦¨à¦¾à¦® à¦¬à¦¾ à¦²à§‡à¦–à¦•à§‡à¦° à¦¨à¦¾à¦® à¦²à¦¿à¦–à§à¦¨à¥¤</p>
-              <p className="od-prompt-sub">à¦¬à¦¿à¦­à¦¾à¦—, à¦²à§‡à¦–à¦• à¦¬à¦¾ à¦ªà§à¦°à¦•à¦¾à¦¶à¦• à¦Ÿà§à¦¯à¦¾à¦¬ à¦¥à§‡à¦•à§‡à¦“ à¦¬à§à¦°à¦¾à¦‰à¦œ à¦•à¦°à¦¤à§‡ à¦ªà¦¾à¦°à§‡à¦¨à¥¤</p>
+              <p>অনুসন্ধান করতে উপরে বইয়ের নাম বা লেখকের নাম লিখুন।</p>
+              <p className="od-prompt-sub">বিভাগ, লেখক বা প্রকাশক ট্যাব থেকেও ব্রাউজ করতে পারেন।</p>
             </div>
           ) : (
             <div className="od-book-list">
@@ -186,8 +186,8 @@ export default function OrderDinPage() {
                       <span className="od-book-title">{b.book_name}</span>
                       <span className="od-book-author">{b.author}</span>
                       <span className="od-book-price">
-                        à§³{fmtPrice(discounted || price)}
-                        {discounted && <s>à§³{fmtPrice(price)}</s>}
+                        ৳{fmtPrice(discounted || price)}
+                        {discounted && <s>৳{fmtPrice(price)}</s>}
                       </span>
                     </div>
                     <button
@@ -196,7 +196,7 @@ export default function OrderDinPage() {
                       type="button"
                     >
                       <ShoppingCart size={14} />
-                      {addedId === b.id ? 'à¦¯à§‹à¦— à¦¹à¦¯à¦¼à§‡à¦›à§‡' : 'à¦•à¦¾à¦°à§à¦Ÿà§‡ à¦¯à§‹à¦—'}
+                      {addedId === b.id ? 'যোগ হয়েছে' : 'কার্টে যোগ'}
                     </button>
                   </div>
                 )
@@ -208,9 +208,9 @@ export default function OrderDinPage() {
         {/* Categories */}
         {tab === 'categories' && (
           entitiesLoading ? (
-            <p className="od-empty">à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...</p>
+            <p className="od-empty">লোড হচ্ছে...</p>
           ) : visibleCategories.length === 0 ? (
-            <p className="od-empty">à¦•à§‹à¦¨à§‹ à¦¬à¦¿à¦­à¦¾à¦— à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿à¥¤</p>
+            <p className="od-empty">কোনো বিভাগ পাওয়া যায়নি।</p>
           ) : (
             <div className="od-entity-list">
               {visibleCategories.map((c) => (
@@ -219,7 +219,7 @@ export default function OrderDinPage() {
                   <span className="od-entity-avatar od-entity-avatar--square"><LayoutGrid size={18} /></span>
                   <span className="od-entity-meta">
                     <span className="od-entity-name">{c.category_name}</span>
-                    <span className="od-entity-count">{toBn(c.count || 0)} à¦Ÿà¦¿ à¦¬à¦‡</span>
+                    <span className="od-entity-count">{toBn(c.count || 0)} টি বই</span>
                   </span>
                 </button>
               ))}
@@ -230,9 +230,9 @@ export default function OrderDinPage() {
         {/* Authors */}
         {tab === 'authors' && (
           entitiesLoading ? (
-            <p className="od-empty">à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...</p>
+            <p className="od-empty">লোড হচ্ছে...</p>
           ) : visibleAuthors.length === 0 ? (
-            <p className="od-empty">à¦•à§‹à¦¨à§‹ à¦²à§‡à¦–à¦• à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿à¥¤</p>
+            <p className="od-empty">কোনো লেখক পাওয়া যায়নি।</p>
           ) : (
             <div className="od-entity-list">
               {visibleAuthors.map((a) => (
@@ -245,7 +245,7 @@ export default function OrderDinPage() {
                   </span>
                   <span className="od-entity-meta">
                     <span className="od-entity-name">{a.name}</span>
-                    <span className="od-entity-count">{toBn(a.count || 0)} à¦Ÿà¦¿ à¦¬à¦‡</span>
+                    <span className="od-entity-count">{toBn(a.count || 0)} টি বই</span>
                   </span>
                 </button>
               ))}
@@ -256,9 +256,9 @@ export default function OrderDinPage() {
         {/* Publishers */}
         {tab === 'publishers' && (
           entitiesLoading ? (
-            <p className="od-empty">à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...</p>
+            <p className="od-empty">লোড হচ্ছে...</p>
           ) : visiblePublications.length === 0 ? (
-            <p className="od-empty">à¦•à§‹à¦¨à§‹ à¦ªà§à¦°à¦•à¦¾à¦¶à¦¨à§€ à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿à¥¤</p>
+            <p className="od-empty">কোনো প্রকাশনী পাওয়া যায়নি।</p>
           ) : (
             <div className="od-entity-list">
               {visiblePublications.map((p) => (
@@ -267,11 +267,11 @@ export default function OrderDinPage() {
                   <span className="od-entity-avatar od-entity-avatar--square">
                     {p.cover_image_url
                       ? <img src={p.cover_image_url} alt={p.title} loading="lazy" />
-                      : (p.title || 'à¦ªà§à¦°').slice(0, 2)}
+                      : (p.title || 'প্র').slice(0, 2)}
                   </span>
                   <span className="od-entity-meta">
                     <span className="od-entity-name">{p.title}</span>
-                    <span className="od-entity-count">{toBn(p.book_count || 0)} à¦Ÿà¦¿ à¦¬à¦‡</span>
+                    <span className="od-entity-count">{toBn(p.book_count || 0)} টি বই</span>
                   </span>
                 </button>
               ))}
@@ -282,4 +282,3 @@ export default function OrderDinPage() {
     </div>
   )
 }
-

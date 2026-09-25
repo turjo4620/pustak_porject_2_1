@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import './Hero.css'
 
@@ -6,53 +6,53 @@ const BASE = 'https://putak-porject-2-1.onrender.com/api'
 
 const floatingBooks = [
   {
-    id: 1, title: 'à¦¹à¦¿à¦®à§', author: 'à¦¹à§à¦®à¦¾à¦¯à¦¼à§‚à¦¨ à¦†à¦¹à¦®à§‡à¦¦',
+    id: 1, title: 'হিমু', author: 'হুমায়ূন আহমেদ',
     cover: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=180&h=260&fit=crop&q=80',
     style: { top: '18%', left: '8%', width: 110, height: 160, animDelay: '0s', animDuration: '6s', rotate: '-8deg' },
   },
   {
-    id: 2, title: 'à¦°à¦¬à§€à¦¨à§à¦¦à§à¦° à¦°à¦šà¦¨à¦¾à¦¬à¦²à§€', author: 'à¦°à¦¬à§€à¦¨à§à¦¦à§à¦°à¦¨à¦¾à¦¥ à¦ à¦¾à¦•à§à¦°',
+    id: 2, title: 'রবীন্দ্র রচনাবলী', author: 'রবীন্দ্রনাথ ঠাকুর',
     cover: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=180&h=260&fit=crop&q=80',
     style: { top: '12%', right: '10%', width: 95, height: 140, animDelay: '1.2s', animDuration: '7s', rotate: '6deg' },
   },
   {
-    id: 3, title: 'à¦à¦•à¦¾à¦¤à§à¦¤à¦°à§‡à¦° à¦¦à¦¿à¦¨à¦—à§à¦²à¦¿', author: 'à¦œà¦¾à¦¹à¦¾à¦¨à¦¾à¦°à¦¾ à¦‡à¦®à¦¾à¦®',
+    id: 3, title: 'একাত্তরের দিনগুলি', author: 'জাহানারা ইমাম',
     cover: 'https://images.unsplash.com/photo-1535905557558-afc4877a26fc?w=180&h=260&fit=crop&q=80',
     style: { bottom: '20%', left: '12%', width: 100, height: 148, animDelay: '2s', animDuration: '8s', rotate: '5deg' },
   },
   {
-    id: 4, title: 'à¦¦à§‡à¦¯à¦¼à¦¾à¦²', author: 'à¦¹à§à¦®à¦¾à¦¯à¦¼à§‚à¦¨ à¦†à¦¹à¦®à§‡à¦¦',
+    id: 4, title: 'দেয়াল', author: 'হুমায়ূন আহমেদ',
     cover: 'https://images.unsplash.com/photo-1509021436665-8f07dbf5bf1d?w=180&h=260&fit=crop&q=80',
     style: { bottom: '24%', right: '8%', width: 90, height: 132, animDelay: '0.7s', animDuration: '6.5s', rotate: '-5deg' },
   },
   {
-    id: 5, title: 'à¦†à¦®à¦¾à¦° à¦›à§‡à¦²à§‡à¦¬à§‡à¦²à¦¾', author: 'à¦¸à§à¦¨à§€à¦² à¦—à¦™à§à¦—à§‹à¦ªà¦¾à¦§à§à¦¯à¦¾à¦¯à¦¼',
+    id: 5, title: 'আমার ছেলেবেলা', author: 'সুনীল গঙ্গোপাধ্যায়',
     cover: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=180&h=260&fit=crop&q=80',
     style: { top: '45%', right: '3%', width: 80, height: 118, animDelay: '3s', animDuration: '9s', rotate: '10deg' },
   },
   {
-    id: 6, title: 'à¦¶à§‡à¦° à¦¶à¦¾à¦¹ à¦¸à§à¦°à¦¿', author: 'à¦®à§à¦¹à¦®à§à¦®à¦¦ à¦œà¦¾à¦«à¦° à¦‡à¦•à¦¬à¦¾à¦²',
+    id: 6, title: 'শের শাহ সুরি', author: 'মুহম্মদ জাফর ইকবাল',
     cover: 'https://images.unsplash.com/photo-1589998059171-988d887df646?w=180&h=260&fit=crop&q=80',
     style: { top: '50%', left: '3%', width: 78, height: 115, animDelay: '1.8s', animDuration: '7.5s', rotate: '-12deg' },
   },
 ]
 
 const quotes = [
-  { text: 'â€œà¦¬à¦‡ à¦•à¦¿à¦¨à§‡ à¦•à§‡à¦‰ à¦¤à§‹ à¦•à¦–à¦¨à§‹ à¦¦à§‡à¦‰à¦²à§‡ à¦¹à¦¯à¦¼ à¦¨à¦¿à¥¤â€', attr: 'â€” à¦¸à§ˆà¦¯à¦¼à¦¦ à¦®à§à¦œà¦¤à¦¬à¦¾ à¦†à¦²à§€' },
-  { text: 'â€œà¦¬à¦‡ à¦¹à¦šà§à¦›à§‡ à¦…à¦¤à§€à¦¤ à¦†à¦° à¦¬à¦°à§à¦¤à¦®à¦¾à¦¨à§‡à¦° à¦®à¦§à§à¦¯à§‡ à¦¬à§‡à¦à¦§à§‡ à¦¦à§‡à¦¯à¦¼à¦¾ à¦¸à¦¾à¦à¦•à§‹à¥¤â€', attr: 'â€” à¦°à¦¬à§€à¦¨à§à¦¦à§à¦°à¦¨à¦¾à¦¥ à¦ à¦¾à¦•à§à¦°' },
-  { text: 'â€œà¦¬à¦‡ à¦¹à¦šà§à¦›à§‡ à¦¶à§à¦°à§‡à¦·à§à¦  à¦†à¦¤à§à¦®à§€à¦¯à¦¼, à¦¯à¦¾à¦° à¦¸à¦™à§à¦—à§‡ à¦•à§‹à¦¨à¦¦à¦¿à¦¨ à¦à¦—à¦¡à¦¼à¦¾ à¦¹à¦¯à¦¼ à¦¨à¦¾, à¦•à§‹à¦¨à¦¦à¦¿à¦¨ à¦®à¦¨à§‹à¦®à¦¾à¦²à¦¿à¦¨à§à¦¯ à¦¹à¦¯à¦¼ à¦¨à¦¾à¥¤â€', attr: 'â€” à¦ªà§à¦°à¦¤à¦¿à¦­à¦¾ à¦¬à¦¸à§' },
-  { text: 'â€œà¦¬à¦‡ à¦ªà¦¡à¦¼à¦¾à¦•à§‡ à¦¯à¦¥à¦¾à¦°à§à¦¥ à¦¹à¦¿à¦¸à§‡à¦¬à§‡ à¦¯à§‡ à¦¸à¦™à§à¦—à§€ à¦•à¦°à§‡ à¦¨à¦¿à¦¤à§‡ à¦ªà¦¾à¦°à§‡, à¦¤à¦¾à¦° à¦œà§€à¦¬à¦¨à§‡à¦° à¦¦à§à¦ƒà¦–-à¦•à¦·à§à¦Ÿà§‡à¦° à¦¬à§‹à¦à¦¾ à¦…à¦¨à§‡à¦• à¦•à¦®à§‡ à¦¯à¦¾à¦¯à¦¼à¥¤â€', attr: 'â€” à¦¶à¦°à§Žà¦šà¦¨à§à¦¦à§à¦° à¦šà¦Ÿà§à¦Ÿà§‹à¦ªà¦¾à¦§à§à¦¯à¦¾à¦¯à¦¼' },
-  { text: 'â€œà¦šà§‹à¦– à¦¬à¦¾à¦¡à¦¼à¦¾à¦¬à¦¾à¦° à¦ªà¦¨à§à¦¥à¦¾à¦Ÿà¦¾ à¦•à§€? à¦ªà§à¦°à¦¥à¦®à¦¤â€”à¦¬à¦‡ à¦ªà¦¡à¦¼à¦¾ à¦à¦¬à¦‚ à¦¤à¦¾à¦° à¦œà¦¨à§à¦¯ à¦¦à¦°à¦•à¦¾à¦° à¦¬à¦‡ à¦•à§‡à¦¨à¦¾à¦° à¦ªà§à¦°à¦¬à§ƒà¦¤à§à¦¤à¦¿à¥¤â€', attr: 'â€” à¦¸à§ˆà¦¯à¦¼à¦¦ à¦®à§à¦œà¦¤à¦¬à¦¾ à¦†à¦²à§€, à¦¬à¦‡ à¦•à§‡à¦¨à¦¾' },
-  { text: 'â€œà¦°à§à¦Ÿà¦¿ à¦®à¦¦ à¦«à§à¦°à¦¿à¦¯à¦¼à§‡ à¦¯à¦¾à¦¬à§‡, à¦ªà§à¦°à¦¿à¦¯à¦¼à¦¾à¦° à¦•à¦¾à¦²à§‹ à¦šà§‹à¦– à¦˜à§‹à¦²à¦¾à¦Ÿà§‡ à¦¹à¦¯à¦¼à§‡ à¦†à¦¸à¦¬à§‡, à¦•à¦¿à¦¨à§à¦¤à§ à¦¬à¦‡à¦–à¦¾à¦¨à¦¾ à¦…à¦¨à¦¨à§à¦¤-à¦¯à§Œà¦¬à¦¨à¦¾â€”à¦¯à¦¦à¦¿ à¦¤à§‡à¦®à¦¨ à¦¬à¦‡ à¦¹à¦¯à¦¼à¥¤â€', attr: 'â€” à¦¸à§ˆà¦¯à¦¼à¦¦ à¦®à§à¦œà¦¤à¦¬à¦¾ à¦†à¦²à§€, à¦¬à¦‡ à¦•à§‡à¦¨à¦¾' },
-  { text: 'â€œà¦…à¦¤à¦²à¦¸à§à¦ªà¦°à§à¦¶ à¦•à¦¾à¦²à¦¸à¦®à§à¦¦à§à¦°à§‡à¦° à¦‰à¦ªà¦° à¦•à§‡à¦¬à¦² à¦à¦•-à¦à¦•à¦–à¦¾à¦¨à¦¿ à¦¬à¦‡ à¦¦à¦¿à¦¯à¦¼à¦¾ à¦¸à¦¾à¦à¦•à§‹ à¦¬à¦¾à¦à¦§à¦¿à¦¯à¦¼à¦¾ à¦¦à¦¿à¦¬à§‡à¥¤â€', attr: 'â€” à¦°à¦¬à§€à¦¨à§à¦¦à§à¦°à¦¨à¦¾à¦¥ à¦ à¦¾à¦•à§à¦°' },
+  { text: '“বই কিনে কেউ তো কখনো দেউলে হয় নি।”', attr: '— সৈয়দ মুজতবা আলী' },
+  { text: '“বই হচ্ছে অতীত আর বর্তমানের মধ্যে বেঁধে দেয়া সাঁকো।”', attr: '— রবীন্দ্রনাথ ঠাকুর' },
+  { text: '“বই হচ্ছে শ্রেষ্ঠ আত্মীয়, যার সঙ্গে কোনদিন ঝগড়া হয় না, কোনদিন মনোমালিন্য হয় না।”', attr: '— প্রতিভা বসু' },
+  { text: '“বই পড়াকে যথার্থ হিসেবে যে সঙ্গী করে নিতে পারে, তার জীবনের দুঃখ-কষ্টের বোঝা অনেক কমে যায়।”', attr: '— শরৎচন্দ্র চট্টোপাধ্যায়' },
+  { text: '“চোখ বাড়াবার পন্থাটা কী? প্রথমত—বই পড়া এবং তার জন্য দরকার বই কেনার প্রবৃত্তি।”', attr: '— সৈয়দ মুজতবা আলী, বই কেনা' },
+  { text: '“রুটি মদ ফুরিয়ে যাবে, প্রিয়ার কালো চোখ ঘোলাটে হয়ে আসবে, কিন্তু বইখানা অনন্ত-যৌবনা—যদি তেমন বই হয়।”', attr: '— সৈয়দ মুজতবা আলী, বই কেনা' },
+  { text: '“অতলস্পর্শ কালসমুদ্রের উপর কেবল এক-একখানি বই দিয়া সাঁকো বাঁধিয়া দিবে।”', attr: '— রবীন্দ্রনাথ ঠাকুর' },
 ]
 
-const toBn = (n) => String(n).replace(/[0-9]/g, d => 'à§¦à§§à§¨à§©à§ªà§«à§¬à§­à§®à§¯'[d])
+const toBn = (n) => String(n).replace(/[0-9]/g, d => '০১২৩৪৫৬৭৮৯'[d])
 
 function fmtCount(n) {
-  if (!n) return 'â€”'
-  if (n >= 100000) return `${toBn(Math.floor(n / 100000))} à¦²à¦•à§à¦·+`
-  if (n >= 1000)   return `${toBn(Math.floor(n / 1000))},à§¦à§¦à§¦+`
+  if (!n) return '—'
+  if (n >= 100000) return `${toBn(Math.floor(n / 100000))} লক্ষ+`
+  if (n >= 1000)   return `${toBn(Math.floor(n / 1000))},০০০+`
   return `${toBn(n)}+`
 }
 
@@ -112,7 +112,7 @@ export default function Hero() {
   }, [])
 
   return (
-    <section className="hero" ref={heroRef} aria-label="à¦¨à¦¾à¦¯à¦¼à¦• à¦¬à¦¿à¦­à¦¾à¦—">
+    <section className="hero" ref={heroRef} aria-label="নায়ক বিভাগ">
       {/* Ambient background */}
       <div className="hero__ambient" aria-hidden="true">
         <div className="hero__ambient-circle hero__ambient-circle--1" />
@@ -149,22 +149,22 @@ export default function Hero() {
       {/* Central content */}
       <div className={`hero__content ${visible ? 'hero__content--visible' : ''}`}>
         <div className="hero__badges">
-          <Link to="/offers" className="hero__promo" aria-label="à¦†à¦œà¦•à§‡à¦° à¦…à¦«à¦¾à¦° à¦¦à§‡à¦–à§à¦¨">
-            <span className="hero__promo-tag">à¦¬à¦¿à¦¶à§‡à¦· à¦…à¦«à¦¾à¦°</span>
+          <Link to="/offers" className="hero__promo" aria-label="আজকের অফার দেখুন">
+            <span className="hero__promo-tag">বিশেষ অফার</span>
             <span className="hero__promo-copy">
-              à¦ªà§à¦°à¦¥à¦® à¦…à¦°à§à¦¡à¦¾à¦°à§‡ <strong>à§§à§¦% à¦›à¦¾à¦¡à¦¼</strong>
+              প্রথম অর্ডারে <strong>১০% ছাড়</strong>
             </span>
-            <span className="hero__promo-action">à¦…à¦«à¦¾à¦° à¦¦à§‡à¦–à§à¦¨ <span aria-hidden="true">â†’</span></span>
+            <span className="hero__promo-action">অফার দেখুন <span aria-hidden="true">→</span></span>
           </Link>
 
           <div className="hero__badge">
-            <span>à¦¬à¦¾à¦‚à¦²à¦¾à¦¦à§‡à¦¶à§‡à¦° à¦¸à§‡à¦°à¦¾ à¦¬à¦‡à¦¯à¦¼à§‡à¦° à¦¦à§‹à¦•à¦¾à¦¨</span>
+            <span>বাংলাদেশের সেরা বইয়ের দোকান</span>
           </div>
         </div>
 
         <h1 className="hero__title">
-          <span className="hero__title-line">à¦œà§à¦žà¦¾à¦¨à§‡à¦° à¦†à¦²à§‹à¦¯à¦¼</span>
-          <span className="hero__title-line hero__title-line--accent">à¦†à¦²à§‹à¦•à¦¿à¦¤ à¦¹à§‹à¦¨</span>
+          <span className="hero__title-line">জ্ঞানের আলোয়</span>
+          <span className="hero__title-line hero__title-line--accent">আলোকিত হোন</span>
         </h1>
 
         <div className="hero__quote-wrap" key={quoteIdx}>
@@ -174,37 +174,36 @@ export default function Hero() {
 
         <div className="hero__stats">
           <div className="hero__stat">
-            <strong>{stats.totalBooks ? fmtCount(stats.totalBooks) : 'à§«à§¦,à§¦à§¦à§¦+'}</strong>
-            <span>à¦¬à¦‡</span>
+            <strong>{stats.totalBooks ? fmtCount(stats.totalBooks) : '৫০,০০০+'}</strong>
+            <span>বই</span>
           </div>
           <div className="hero__stat-divider" aria-hidden="true" />
           <div className="hero__stat">
-            <strong>{stats.totalAuthors ? fmtCount(stats.totalAuthors) : 'à§§,à§¦à§¦à§¦+'}</strong>
-            <span>à¦²à§‡à¦–à¦•</span>
+            <strong>{stats.totalAuthors ? fmtCount(stats.totalAuthors) : '১,০০০+'}</strong>
+            <span>লেখক</span>
           </div>
           <div className="hero__stat-divider" aria-hidden="true" />
           <div className="hero__stat">
-            <strong>à§« à¦²à¦•à§à¦·+</strong>
-            <span>à¦®à§‹à¦Ÿ à¦ªà¦¾à¦ à¦•</span>
+            <strong>৫ লক্ষ+</strong>
+            <span>মোট পাঠক</span>
           </div>
         </div>
 
         <div className="hero__cta-group">
           <Link to="/bestsellers" className="hero__btn hero__btn--primary">
-            à¦¬à¦‡ à¦¦à§‡à¦–à¦¾ à¦¶à§à¦°à§ à¦•à¦°à§à¦¨
+            বই দেখা শুরু করুন
           </Link>
           <Link to="/new-arrivals" className="hero__btn hero__btn--ghost">
-            à¦¨à¦¤à§à¦¨ à¦¬à¦‡ à¦¦à§‡à¦–à§à¦¨
+            নতুন বই দেখুন
           </Link>
         </div>
       </div>
 
       {/* Scroll indicator */}
-      <div className="hero__scroll" aria-label="à¦¨à¦¿à¦šà§‡ à¦¸à§à¦•à§à¦°à¦² à¦•à¦°à§à¦¨">
+      <div className="hero__scroll" aria-label="নিচে স্ক্রল করুন">
         <div className="hero__scroll-dot" />
-        <span>à¦¨à¦¿à¦šà§‡ à¦¸à§à¦•à§à¦°à¦² à¦•à¦°à§à¦¨</span>
+        <span>নিচে স্ক্রল করুন</span>
       </div>
     </section>
   )
 }
-

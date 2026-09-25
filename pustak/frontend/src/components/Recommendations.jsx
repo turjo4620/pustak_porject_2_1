@@ -1,16 +1,16 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import BookCard from './BookCard'
 import SectionHeader from './SectionHeader'
 import './Recommendations.css'
 
 const CATEGORIES = [
-  { label: 'à¦¸à¦¬', id: null },
-  { label: 'à¦‰à¦ªà¦¨à§à¦¯à¦¾à¦¸', id: null, name: 'à¦‰à¦ªà¦¨à§à¦¯à¦¾à¦¸' },
-  { label: 'à¦•à¦¬à¦¿à¦¤à¦¾',   id: null, name: 'à¦•à¦¬à¦¿à¦¤à¦¾'   },
-  { label: 'à¦¬à¦¿à¦œà§à¦žà¦¾à¦¨', id: null, name: 'à¦¬à¦¿à¦œà§à¦žà¦¾à¦¨' },
-  { label: 'à¦‡à¦¤à¦¿à¦¹à¦¾à¦¸',  id: null, name: 'à¦‡à¦¤à¦¿à¦¹à¦¾à¦¸'  },
-  { label: 'à¦‡à¦¸à¦²à¦¾à¦®à¦¿à¦•', id: null, name: 'à¦‡à¦¸à¦²à¦¾à¦®à¦¿à¦•' },
+  { label: 'সব', id: null },
+  { label: 'উপন্যাস', id: null, name: 'উপন্যাস' },
+  { label: 'কবিতা',   id: null, name: 'কবিতা'   },
+  { label: 'বিজ্ঞান', id: null, name: 'বিজ্ঞান' },
+  { label: 'ইতিহাস',  id: null, name: 'ইতিহাস'  },
+  { label: 'ইসলামিক', id: null, name: 'ইসলামিক' },
 ]
 
 const BASE = 'https://putak-porject-2-1.onrender.com/api'
@@ -21,7 +21,7 @@ export default function Recommendations() {
   const [cats, setCats]       = useState([])  // fetched from DB
   const [loading, setLoading] = useState(true)
 
-  // Fetch categories once so we can map labels â†’ IDs
+  // Fetch categories once so we can map labels → IDs
   useEffect(() => {
     fetch(`${BASE}/categories`)
       .then(r => r.json())
@@ -36,7 +36,7 @@ export default function Recommendations() {
 
     let url
     if (active === 0 || !tab.name) {
-      // "à¦¸à¦¬" tab â€” show bestsellers
+      // "সব" tab — show bestsellers
       url = `${BASE}/books/bestsellers?limit=8`
     } else {
       // Find matching category from DB
@@ -62,18 +62,18 @@ export default function Recommendations() {
   if (!loading && books.length === 0) return null
 
   return (
-    <section className="reco section" aria-label="à¦¬à¦¿à¦­à¦¾à¦— à¦…à¦¨à§à¦¯à¦¾à¦¯à¦¼à§€ à¦¬à¦‡">
+    <section className="reco section" aria-label="বিভাগ অনুযায়ী বই">
       <div className="container">
         <SectionHeader
-          label="à¦¬à¦¿à¦­à¦¾à¦— à¦…à¦¨à§à¦¯à¦¾à¦¯à¦¼à§€"
-          title="à¦ªà¦›à¦¨à§à¦¦à§‡à¦° à¦¬à¦¿à¦­à¦¾à¦— à¦¥à§‡à¦•à§‡ à¦¬à§‡à¦›à§‡ à¦¨à¦¿à¦¨"
-          subtitle="à¦¬à¦¿à¦­à¦¾à¦— à¦¬à§‡à¦›à§‡ à¦¨à¦¿à¦¯à¦¼à§‡ à¦†à¦ªà¦¨à¦¾à¦° à¦ªà¦›à¦¨à§à¦¦à§‡à¦° à¦¬à¦‡ à¦–à§à¦à¦œà§à¦¨"
-          linkText="à¦¸à¦¬ à¦¦à§‡à¦–à§à¦¨"
+          label="বিভাগ অনুযায়ী"
+          title="পছন্দের বিভাগ থেকে বেছে নিন"
+          subtitle="বিভাগ বেছে নিয়ে আপনার পছন্দের বই খুঁজুন"
+          linkText="সব দেখুন"
           linkHref="/categories"
         />
 
         {/* Filter tabs */}
-        <div className="reco__tabs" role="tablist" aria-label="à¦¬à¦¿à¦­à¦¾à¦— à¦«à¦¿à¦²à§à¦Ÿà¦¾à¦°">
+        <div className="reco__tabs" role="tablist" aria-label="বিভাগ ফিল্টার">
           {CATEGORIES.map((t, i) => (
             <button
               key={t.label}
@@ -105,11 +105,10 @@ export default function Recommendations() {
 
         <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
           <Link to="/categories" className="reco__all-link">
-            à¦¸à¦¬ à¦¬à¦¿à¦­à¦¾à¦— à¦¦à§‡à¦–à§à¦¨ â†’
+            সব বিভাগ দেখুন →
           </Link>
         </div>
       </div>
     </section>
   )
 }
-

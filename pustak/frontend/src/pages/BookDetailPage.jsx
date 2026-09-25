@@ -1,4 +1,4 @@
-﻿import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom'
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   ArrowLeft, Heart, ShoppingBag, Star, Share2, Check,
@@ -9,10 +9,10 @@ import { useApp } from '../context/AppContext'
 import { api } from '../api/http'
 import './BookDetailPage.css'
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // HELPERS
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const fmtBn = (n) => String(n).replace(/[0-9]/g, (d) => 'à§¦à§§à§¨à§©à§ªà§«à§¬à§­à§®à§¯'[d])
+// ─────────────────────────────────────────────────────────────────────────────
+const fmtBn = (n) => String(n).replace(/[0-9]/g, (d) => '০১২৩৪৫৬৭৮৯'[d])
 
 function StarDisplay({ rating, size = 16 }) {
   return (
@@ -28,9 +28,9 @@ function StarDisplay({ rating, size = 16 }) {
   )
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // 1. PRODUCT MEDIA  (left column)
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 function ProductMedia({ book, wished, onWish, onShare, copied, discountPct }) {
   const coverUrl = book.cover_image_url
     ? book.cover_image_url.replace('w=300&h=420', 'w=600&h=840')
@@ -41,10 +41,10 @@ function ProductMedia({ book, wished, onWish, onShare, copied, discountPct }) {
       {/* Cover */}
       <div className="pdp-media__cover-wrap">
         {discountPct && (
-          <span className="pdp-media__discount-pill">{discountPct} à¦›à¦¾à¦¡à¦¼</span>
+          <span className="pdp-media__discount-pill">{discountPct} ছাড়</span>
         )}
         <div className="pdp-media__cover">
-          <img src={coverUrl} alt={`${book.book_name} à¦¬à¦‡à¦¯à¦¼à§‡à¦° à¦ªà§à¦°à¦šà§à¦›à¦¦`} />
+          <img src={coverUrl} alt={`${book.book_name} বইয়ের প্রচ্ছদ`} />
           <div className="pdp-media__spine" aria-hidden="true" />
         </div>
       </div>
@@ -54,19 +54,19 @@ function ProductMedia({ book, wished, onWish, onShare, copied, discountPct }) {
         <button
           className={`pdp-media__action-btn ${wished ? 'pdp-media__action-btn--wished' : ''}`}
           onClick={onWish}
-          aria-label={wished ? 'à¦‰à¦‡à¦¶à¦²à¦¿à¦¸à§à¦Ÿ à¦¥à§‡à¦•à§‡ à¦¸à¦°à¦¾à¦¨' : 'à¦‰à¦‡à¦¶à¦²à¦¿à¦¸à§à¦Ÿà§‡ à¦¯à§‹à¦— à¦•à¦°à§à¦¨'}
+          aria-label={wished ? 'উইশলিস্ট থেকে সরান' : 'উইশলিস্টে যোগ করুন'}
           aria-pressed={wished}
         >
           <Heart size={15} fill={wished ? 'currentColor' : 'none'} />
-          {wished ? 'à¦¸à¦‚à¦°à¦•à§à¦·à¦¿à¦¤' : 'à¦‰à¦‡à¦¶à¦²à¦¿à¦¸à§à¦Ÿ'}
+          {wished ? 'সংরক্ষিত' : 'উইশলিস্ট'}
         </button>
         <button
           className="pdp-media__action-btn"
           onClick={onShare}
-          aria-label="à¦²à¦¿à¦™à§à¦• à¦•à¦ªà¦¿ à¦•à¦°à§à¦¨"
+          aria-label="লিঙ্ক কপি করুন"
         >
           {copied ? <Check size={15} /> : <Share2 size={15} />}
-          {copied ? 'à¦•à¦ªà¦¿ à¦¹à¦¯à¦¼à§‡à¦›à§‡!' : 'à¦¶à§‡à¦¯à¦¼à¦¾à¦°'}
+          {copied ? 'কপি হয়েছে!' : 'শেয়ার'}
         </button>
       </div>
 
@@ -74,29 +74,29 @@ function ProductMedia({ book, wished, onWish, onShare, copied, discountPct }) {
       <div className="pdp-trust">
         <div className="pdp-trust__item">
           <ShieldCheck size={17} className="pdp-trust__icon pdp-trust__icon--green" />
-          <span>à§§à§¦à§¦% à¦…à¦°à¦¿à¦œà¦¿à¦¨à¦¾à¦² à¦¬à¦‡ à¦—à§à¦¯à¦¾à¦°à¦¾à¦¨à§à¦Ÿà¦¿</span>
+          <span>১০০% অরিজিনাল বই গ্যারান্টি</span>
         </div>
         <div className="pdp-trust__item">
           <RotateCcw size={17} className="pdp-trust__icon pdp-trust__icon--blue" />
-          <span>à§­ à¦¦à¦¿à¦¨à§‡à¦° à¦°à¦¿à¦Ÿà¦¾à¦°à§à¦¨ à¦ªà¦²à¦¿à¦¸à¦¿</span>
+          <span>৭ দিনের রিটার্ন পলিসি</span>
         </div>
         <div className="pdp-trust__item">
           <Truck size={17} className="pdp-trust__icon pdp-trust__icon--orange" />
-          <span>à¦•à§à¦¯à¦¾à¦¶ à¦…à¦¨ à¦¡à§‡à¦²à¦¿à¦­à¦¾à¦°à¦¿ à¦¸à§à¦¬à¦¿à¦§à¦¾</span>
+          <span>ক্যাশ অন ডেলিভারি সুবিধা</span>
         </div>
       </div>
     </div>
   )
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // 2. METADATA GRID
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 function MetadataGrid({ language, numPages, edition, isbn }) {
   const items = [
-    { label: 'à¦­à¦¾à¦·à¦¾',      value: language },
-    { label: 'à¦ªà§ƒà¦·à§à¦ à¦¾à¦¸à¦‚à¦–à§à¦¯à¦¾', value: numPages },
-    { label: 'à¦¸à¦‚à¦¸à§à¦•à¦°à¦£',   value: edition  },
+    { label: 'ভাষা',      value: language },
+    { label: 'পৃষ্ঠাসংখ্যা', value: numPages },
+    { label: 'সংস্করণ',   value: edition  },
     { label: 'ISBN',      value: isbn     },
   ]
   return (
@@ -111,9 +111,9 @@ function MetadataGrid({ language, numPages, edition, isbn }) {
   )
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // 3. PURCHASE ACTIONS  (quantity + add-to-cart + buy-now)
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 function PurchaseActions({
   inStock, qty, onQtyChange,
   inCart, added, adding, onCart,
@@ -123,18 +123,18 @@ function PurchaseActions({
     <div className="pdp-purchase">
       <div className="pdp-purchase__row">
         {/* Qty stepper */}
-        <div className="pdp-qty" role="group" aria-label="à¦ªà¦°à¦¿à¦®à¦¾à¦£">
+        <div className="pdp-qty" role="group" aria-label="পরিমাণ">
           <button
             className="pdp-qty__btn"
             onClick={() => onQtyChange(Math.max(1, qty - 1))}
             disabled={qty <= 1}
-            aria-label="à¦•à¦®à¦¾à¦¨"
-          >âˆ’</button>
+            aria-label="কমান"
+          >−</button>
           <span className="pdp-qty__count" aria-live="polite">{qty}</span>
           <button
             className="pdp-qty__btn"
             onClick={() => onQtyChange(qty + 1)}
-            aria-label="à¦¬à¦¾à¦¡à¦¼à¦¾à¦¨"
+            aria-label="বাড়ান"
           >+</button>
         </div>
 
@@ -143,10 +143,10 @@ function PurchaseActions({
           className={`pdp-cart-btn ${inCart ? 'pdp-cart-btn--in' : ''} ${added ? 'pdp-cart-btn--added' : ''}`}
           onClick={onCart}
           disabled={!inStock || adding}
-          aria-label="à¦•à¦¾à¦°à§à¦Ÿà§‡ à¦¯à§‹à¦— à¦•à¦°à§à¦¨"
+          aria-label="কার্টে যোগ করুন"
         >
           <ShoppingBag size={18} />
-          {added ? 'à¦•à¦¾à¦°à§à¦Ÿà§‡ à¦¯à§‹à¦— à¦¹à¦¯à¦¼à§‡à¦›à§‡' : adding ? 'à¦¯à§‹à¦— à¦¹à¦šà§à¦›à§‡...' : inCart ? 'à¦•à¦¾à¦°à§à¦Ÿà§‡ à¦†à¦›à§‡' : 'à¦•à¦¾à¦°à§à¦Ÿà§‡ à¦¯à§‹à¦— à¦•à¦°à§à¦¨'}
+          {added ? 'কার্টে যোগ হয়েছে' : adding ? 'যোগ হচ্ছে...' : inCart ? 'কার্টে আছে' : 'কার্টে যোগ করুন'}
         </button>
       </div>
 
@@ -156,15 +156,15 @@ function PurchaseActions({
         disabled={!inStock}
         onClick={onBuyNow}
       >
-        à¦à¦–à¦¨à¦‡ à¦•à¦¿à¦¨à§à¦¨
+        এখনই কিনুন
       </button>
     </div>
   )
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // 4. PRODUCT INFO  (center column)
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 function ProductInfo({
   book, category, publisher, publicationId,
   rating_avg, num_reviews, reviewSectionRef,
@@ -173,15 +173,15 @@ function ProductInfo({
   cartError,
 }) {
   const [expanded, setExpanded] = useState(false)
-  const description = (book.description || 'à¦à¦‡ à¦¬à¦‡à¦Ÿà¦¿à¦° à¦•à§‹à¦¨à§‹ à¦¬à¦¿à¦¬à¦°à¦£ à¦¦à§‡à¦“à¦¯à¦¼à¦¾ à¦¨à§‡à¦‡à¥¤')
-    .replace(/show more/gi, '').replace(/à¦†à¦°à§‹ à¦ªà¦¡à¦¼à§à¦¨/g, '').replace(/à¦†à¦°à¦“ à¦¦à§‡à¦–à§à¦¨/g, '').trim()
+  const description = (book.description || 'এই বইটির কোনো বিবরণ দেওয়া নেই।')
+    .replace(/show more/gi, '').replace(/আরো পড়ুন/g, '').replace(/আরও দেখুন/g, '').trim()
   const SHORT_LIMIT = 280
   const isLong = description.length > SHORT_LIMIT
 
-  const language = book.language  || 'à¦¬à¦¾à¦‚à¦²à¦¾'
-  const numPages = book.num_pages  || 'â€”'
-  const edition  = book.edition    || 'à§§à¦®'
-  const isbn     = book.isbn       || 'â€”'
+  const language = book.language  || 'বাংলা'
+  const numPages = book.num_pages  || '—'
+  const edition  = book.edition    || '১ম'
+  const isbn     = book.isbn       || '—'
 
   const scrollToReviews = () => {
     reviewSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -190,13 +190,13 @@ function ProductInfo({
   return (
     <div className="pdp-info">
       {/* Breadcrumb */}
-      <nav className="pdp-breadcrumb" aria-label="à¦ªà¦¥ à¦šà¦¿à¦¹à§à¦¨">
-        <Link to="/">à¦¹à§‹à¦®</Link>
-        <span aria-hidden="true">â€º</span>
+      <nav className="pdp-breadcrumb" aria-label="পথ চিহ্ন">
+        <Link to="/">হোম</Link>
+        <span aria-hidden="true">›</span>
         {book.category_id
           ? <Link to={`/category/${book.category_id}`}>{category}</Link>
           : <span>{category}</span>}
-        <span aria-hidden="true">â€º</span>
+        <span aria-hidden="true">›</span>
         <span aria-current="page">{book.book_name}</span>
       </nav>
 
@@ -205,7 +205,7 @@ function ProductInfo({
 
       {/* Author + publisher */}
       <p className="pdp-author">
-        à¦²à§‡à¦–à¦•:{' '}
+        লেখক:{' '}
         {book.authors?.length > 0
           ? book.authors.map((a, i) => (
               <span key={a.author_id}>
@@ -213,11 +213,11 @@ function ProductInfo({
                 {i < book.authors.length - 1 && ', '}
               </span>
             ))
-          : <span className="pdp-link">{book.author || 'à¦…à¦œà§à¦žà¦¾à¦¤'}</span>
+          : <span className="pdp-link">{book.author || 'অজ্ঞাত'}</span>
         }
       </p>
       <p className="pdp-publisher">
-        à¦ªà§à¦°à¦•à¦¾à¦¶à¦•:{' '}
+        প্রকাশক:{' '}
         {publicationId
           ? <Link to={`/publisher/${publicationId}`} className="pdp-link--muted"><strong>{publisher}</strong></Link>
           : <strong>{publisher}</strong>
@@ -231,23 +231,23 @@ function ProductInfo({
         <button
           className="pdp-rating-row__count"
           onClick={scrollToReviews}
-          aria-label={`${num_reviews} à¦Ÿà¦¿ à¦°à¦¿à¦­à¦¿à¦‰ à¦¦à§‡à¦–à§à¦¨`}
+          aria-label={`${num_reviews} টি রিভিউ দেখুন`}
         >
-          {fmtBn(num_reviews)} à¦Ÿà¦¿ à¦°à¦¿à¦­à¦¿à¦‰
+          {fmtBn(num_reviews)} টি রিভিউ
         </button>
-        <span className="pdp-rating-row__sep">Â·</span>
+        <span className="pdp-rating-row__sep">·</span>
         <button className="pdp-rating-row__write" onClick={scrollToReviews}>
-          à¦°à¦¿à¦­à¦¿à¦‰ à¦²à¦¿à¦–à§à¦¨
+          রিভিউ লিখুন
         </button>
       </div>
 
       {/* Price block */}
       <div className="pdp-price-block">
-        <strong className="pdp-price-block__current">à§³{currentPrice}</strong>
+        <strong className="pdp-price-block__current">৳{currentPrice}</strong>
         {originalPrice && (
           <>
-            <s className="pdp-price-block__original">à§³{originalPrice}</s>
-            {discountPct && <span className="pdp-price-block__badge">{discountPct} à¦›à¦¾à¦¡à¦¼</span>}
+            <s className="pdp-price-block__original">৳{originalPrice}</s>
+            {discountPct && <span className="pdp-price-block__badge">{discountPct} ছাড়</span>}
           </>
         )}
       </div>
@@ -255,7 +255,7 @@ function ProductInfo({
       {/* Stock */}
       <span className={`pdp-stock ${inStock ? 'pdp-stock--in' : 'pdp-stock--out'}`}>
         <span className="pdp-stock__dot" />
-        {inStock ? 'à¦¸à§à¦Ÿà¦•à§‡ à¦†à¦›à§‡' : 'à¦¸à§à¦Ÿà¦• à¦¨à§‡à¦‡'}
+        {inStock ? 'স্টকে আছে' : 'স্টক নেই'}
       </span>
 
       {/* Purchase actions */}
@@ -275,10 +275,10 @@ function ProductInfo({
 
       {/* Description */}
       <div className="pdp-desc">
-        <h3 className="pdp-desc__title">à¦¬à¦‡ à¦¸à¦®à§à¦ªà¦°à§à¦•à§‡</h3>
+        <h3 className="pdp-desc__title">বই সম্পর্কে</h3>
         <p className="pdp-desc__body">
           {isLong && !expanded
-            ? description.slice(0, SHORT_LIMIT) + 'â€¦'
+            ? description.slice(0, SHORT_LIMIT) + '…'
             : description}
         </p>
         {isLong && (
@@ -288,8 +288,8 @@ function ProductInfo({
             aria-expanded={expanded}
           >
             {expanded
-              ? <><ChevronUp size={14} /> à¦•à¦® à¦¦à§‡à¦–à§à¦¨</>
-              : <><ChevronDown size={14} /> à¦†à¦°à¦“ à¦ªà¦¡à¦¼à§à¦¨</>
+              ? <><ChevronUp size={14} /> কম দেখুন</>
+              : <><ChevronDown size={14} /> আরও পড়ুন</>
             }
           </button>
         )}
@@ -298,12 +298,12 @@ function ProductInfo({
   )
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // 5. STAR PICKER
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 function StarPicker({ value, onChange, disabled }) {
   const [hovered, setHovered] = useState(0)
-  const labels = ['', 'à¦–à§à¦¬ à¦–à¦¾à¦°à¦¾à¦ª', 'à¦–à¦¾à¦°à¦¾à¦ª', 'à¦ à¦¿à¦•à¦ à¦¾à¦•', 'à¦­à¦¾à¦²à§‹', 'à¦…à¦¸à¦¾à¦§à¦¾à¦°à¦£']
+  const labels = ['', 'খুব খারাপ', 'খারাপ', 'ঠিকঠাক', 'ভালো', 'অসাধারণ']
   return (
     <div className="pdp-star-picker">
       <div className="pdp-star-picker__stars">
@@ -314,7 +314,7 @@ function StarPicker({ value, onChange, disabled }) {
             onClick={() => !disabled && onChange(n)}
             onMouseEnter={() => !disabled && setHovered(n)}
             onMouseLeave={() => !disabled && setHovered(0)}
-            aria-label={`${n} à¦¤à¦¾à¦°à¦¾`}
+            aria-label={`${n} তারা`}
             disabled={disabled}
           >
             <Star size={28}
@@ -331,9 +331,9 @@ function StarPicker({ value, onChange, disabled }) {
   )
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // 6. REVIEW MODAL
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 function ReviewModal({ myReview, onClose, onSubmit, onDelete, submitting }) {
   const [rating,  setRating]  = useState(myReview?.rating  || 0)
   const [comment, setComment] = useState(myReview?.comment || '')
@@ -355,7 +355,7 @@ function ReviewModal({ myReview, onClose, onSubmit, onDelete, submitting }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!rating) { setError('à¦…à¦¨à§à¦—à§à¦°à¦¹ à¦•à¦°à§‡ à¦à¦•à¦Ÿà¦¿ à¦°à§‡à¦Ÿà¦¿à¦‚ à¦¦à¦¿à¦¨à¥¤'); return }
+    if (!rating) { setError('অনুগ্রহ করে একটি রেটিং দিন।'); return }
     setError('')
     onSubmit(rating, comment)
   }
@@ -364,53 +364,53 @@ function ReviewModal({ myReview, onClose, onSubmit, onDelete, submitting }) {
     <div
       className="pdp-modal-backdrop"
       onClick={(e) => e.target === e.currentTarget && onClose()}
-      role="dialog" aria-modal="true" aria-label="à¦°à¦¿à¦­à¦¿à¦‰ à¦²à¦¿à¦–à§à¦¨"
+      role="dialog" aria-modal="true" aria-label="রিভিউ লিখুন"
     >
       <div className="pdp-modal">
         <div className="pdp-modal__header">
           <h2 className="pdp-modal__title">
-            {myReview ? 'à¦°à¦¿à¦­à¦¿à¦‰ à¦¸à¦®à§à¦ªà¦¾à¦¦à¦¨à¦¾ à¦•à¦°à§à¦¨' : 'à¦à¦•à¦Ÿà¦¿ à¦°à¦¿à¦­à¦¿à¦‰ à¦²à¦¿à¦–à§à¦¨'}
+            {myReview ? 'রিভিউ সম্পাদনা করুন' : 'একটি রিভিউ লিখুন'}
           </h2>
-          <button className="pdp-modal__close" onClick={onClose} aria-label="à¦¬à¦¨à§à¦§ à¦•à¦°à§à¦¨">
+          <button className="pdp-modal__close" onClick={onClose} aria-label="বন্ধ করুন">
             <X size={18} />
           </button>
         </div>
 
         <form className="pdp-modal__form" onSubmit={handleSubmit} noValidate>
           <div className="pdp-modal__field">
-            <label className="pdp-modal__label">à¦°à§‡à¦Ÿà¦¿à¦‚ <span aria-hidden="true">*</span></label>
+            <label className="pdp-modal__label">রেটিং <span aria-hidden="true">*</span></label>
             <StarPicker value={rating} onChange={setRating} disabled={submitting} />
           </div>
 
           <div className="pdp-modal__field">
             <label className="pdp-modal__label" htmlFor="review-comment">
-              à¦†à¦ªà¦¨à¦¾à¦° à¦®à¦¤à¦¾à¦®à¦¤ <span className="pdp-modal__optional">(à¦à¦šà§à¦›à¦¿à¦•)</span>
+              আপনার মতামত <span className="pdp-modal__optional">(ঐচ্ছিক)</span>
             </label>
             <textarea
               id="review-comment"
               className="pdp-modal__textarea"
               rows={5}
-              placeholder="à¦¬à¦‡à¦Ÿà¦¿ à¦¸à¦®à§à¦ªà¦°à§à¦•à§‡ à¦†à¦ªà¦¨à¦¾à¦° à¦…à¦¨à§à¦­à§‚à¦¤à¦¿ à¦¶à§‡à¦¯à¦¼à¦¾à¦° à¦•à¦°à§à¦¨..."
+              placeholder="বইটি সম্পর্কে আপনার অনুভূতি শেয়ার করুন..."
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               maxLength={1000}
               disabled={submitting}
             />
-            <span className="pdp-modal__char">{comment.length}/à§§à§¦à§¦à§¦</span>
+            <span className="pdp-modal__char">{comment.length}/১০০০</span>
           </div>
 
           {error && <p className="pdp-modal__error" role="alert">{error}</p>}
 
           <div className="pdp-modal__actions">
             <button type="button" className="pdp-modal__cancel" onClick={onClose} disabled={submitting}>
-              à¦¬à¦¾à¦¤à¦¿à¦²
+              বাতিল
             </button>
             {myReview && (
               <button
                 type="button" className="pdp-modal__delete"
                 onClick={onDelete} disabled={submitting}
               >
-                <Trash2 size={14} /> à¦®à§à¦›à§à¦¨
+                <Trash2 size={14} /> মুছুন
               </button>
             )}
             <button
@@ -418,7 +418,7 @@ function ReviewModal({ myReview, onClose, onSubmit, onDelete, submitting }) {
               disabled={submitting || !rating}
             >
               <Send size={14} />
-              {submitting ? 'à¦œà¦®à¦¾ à¦¹à¦šà§à¦›à§‡...' : myReview ? 'à¦†à¦ªà¦¡à§‡à¦Ÿ' : 'à¦œà¦®à¦¾ à¦¦à¦¿à¦¨'}
+              {submitting ? 'জমা হচ্ছে...' : myReview ? 'আপডেট' : 'জমা দিন'}
             </button>
           </div>
         </form>
@@ -427,13 +427,13 @@ function ReviewModal({ myReview, onClose, onSubmit, onDelete, submitting }) {
   )
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // 7. REVIEW SECTION  (right / bottom)
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 const SORT_OPTIONS = [
-  { value: 'recent',  label: 'à¦¸à¦¾à¦®à§à¦ªà§à¦°à¦¤à¦¿à¦•'      },
-  { value: 'highest', label: 'à¦¸à¦°à§à¦¬à§‹à¦šà§à¦š à¦°à§‡à¦Ÿà¦¿à¦‚' },
-  { value: 'lowest',  label: 'à¦¸à¦°à§à¦¬à¦¨à¦¿à¦®à§à¦¨ à¦°à§‡à¦Ÿà¦¿à¦‚' },
+  { value: 'recent',  label: 'সাম্প্রতিক'      },
+  { value: 'highest', label: 'সর্বোচ্চ রেটিং' },
+  { value: 'lowest',  label: 'সর্বনিম্ন রেটিং' },
 ]
 
 function ReviewSection({
@@ -460,9 +460,9 @@ function ReviewSection({
     })
 
   return (
-    <section className="pdp-reviews" ref={sectionRef} aria-label="à¦°à¦¿à¦­à¦¿à¦‰">
+    <section className="pdp-reviews" ref={sectionRef} aria-label="রিভিউ">
 
-      {/* â”€â”€ Top: aggregate + breakdown â”€â”€ */}
+      {/* ── Top: aggregate + breakdown ── */}
       <div className="pdp-reviews__summary">
         <div className="pdp-reviews__aggregate">
           <span className="pdp-reviews__big-score">
@@ -470,15 +470,15 @@ function ReviewSection({
           </span>
           <StarDisplay rating={rating_avg || 0} size={20} />
           <span className="pdp-reviews__total-count">
-            {fmtBn(num_reviews)} à¦Ÿà¦¿ à¦°à¦¿à¦­à¦¿à¦‰à§‡à¦° à¦­à¦¿à¦¤à§à¦¤à¦¿à¦¤à§‡
+            {fmtBn(num_reviews)} টি রিভিউের ভিত্তিতে
           </span>
           <button
             className="pdp-reviews__write-cta"
             onClick={onOpenModal}
-            aria-label="à¦°à¦¿à¦­à¦¿à¦‰ à¦²à¦¿à¦–à§à¦¨"
+            aria-label="রিভিউ লিখুন"
           >
             <Star size={15} />
-            {myReview ? 'à¦°à¦¿à¦­à¦¿à¦‰ à¦¸à¦®à§à¦ªà¦¾à¦¦à¦¨à¦¾ à¦•à¦°à§à¦¨' : 'à¦à¦•à¦Ÿà¦¿ à¦°à¦¿à¦­à¦¿à¦‰ à¦²à¦¿à¦–à§à¦¨'}
+            {myReview ? 'রিভিউ সম্পাদনা করুন' : 'একটি রিভিউ লিখুন'}
           </button>
         </div>
 
@@ -492,10 +492,10 @@ function ReviewSection({
                 key={star}
                 className={`pdp-reviews__bar-row ${active ? 'pdp-reviews__bar-row--active' : ''}`}
                 onClick={() => setFilterStar(active ? 0 : star)}
-                aria-label={`${star} à¦¤à¦¾à¦°à¦¾ â€” ${count} à¦Ÿà¦¿ à¦°à¦¿à¦­à¦¿à¦‰`}
+                aria-label={`${star} তারা — ${count} টি রিভিউ`}
                 aria-pressed={active}
               >
-                <span className="pdp-reviews__bar-label">{star} â˜…</span>
+                <span className="pdp-reviews__bar-label">{star} ★</span>
                 <div className="pdp-reviews__bar-track">
                   <div
                     className="pdp-reviews__bar-fill"
@@ -509,17 +509,17 @@ function ReviewSection({
         </div>
       </div>
 
-      {/* â”€â”€ Sort + filter controls â”€â”€ */}
+      {/* ── Sort + filter controls ── */}
       <div className="pdp-reviews__controls">
         <h2 className="pdp-reviews__title">
-          à¦ªà¦¾à¦ à¦• à¦°à¦¿à¦­à¦¿à¦‰
+          পাঠক রিভিউ
           {filterStar > 0 && (
             <button
               className="pdp-reviews__filter-clear"
               onClick={() => setFilterStar(0)}
-              aria-label="à¦«à¦¿à¦²à§à¦Ÿà¦¾à¦° à¦¸à¦°à¦¾à¦¨"
+              aria-label="ফিল্টার সরান"
             >
-              {filterStar} â˜… <X size={11} />
+              {filterStar} ★ <X size={11} />
             </button>
           )}
         </h2>
@@ -527,7 +527,7 @@ function ReviewSection({
           className="pdp-reviews__sort"
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          aria-label="à¦¬à¦¾à¦›à¦¾à¦‡ à¦•à¦°à§à¦¨"
+          aria-label="বাছাই করুন"
         >
           {SORT_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
@@ -535,24 +535,24 @@ function ReviewSection({
         </select>
       </div>
 
-      {/* â”€â”€ Loading / empty â”€â”€ */}
-      {reviewsLoading && <p className="pdp-reviews__loading">à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...</p>}
+      {/* ── Loading / empty ── */}
+      {reviewsLoading && <p className="pdp-reviews__loading">লোড হচ্ছে...</p>}
 
       {!reviewsLoading && sorted.length === 0 && (
         <div className="pdp-reviews__empty">
           <Star size={40} strokeWidth={1.2} className="pdp-reviews__empty-icon" />
           <p>
             {filterStar > 0
-              ? `${filterStar} à¦¤à¦¾à¦°à¦¾à¦° à¦•à§‹à¦¨à§‹ à¦°à¦¿à¦­à¦¿à¦‰ à¦¨à§‡à¦‡à¥¤`
-              : 'à¦à¦‡ à¦¬à¦‡à¦¯à¦¼à§‡ à¦à¦–à¦¨à§‹ à¦•à§‹à¦¨à§‹ à¦°à¦¿à¦­à¦¿à¦‰ à¦¨à§‡à¦‡à¥¤ à¦ªà§à¦°à¦¥à¦® à¦°à¦¿à¦­à¦¿à¦‰à¦Ÿà¦¿ à¦†à¦ªà¦¨à¦¿ à¦¦à¦¿à¦¨!'}
+              ? `${filterStar} তারার কোনো রিভিউ নেই।`
+              : 'এই বইয়ে এখনো কোনো রিভিউ নেই। প্রথম রিভিউটি আপনি দিন!'}
           </p>
           {!authUser && (
-            <span className="pdp-reviews__empty-sub">à¦°à¦¿à¦­à¦¿à¦‰ à¦¦à¦¿à¦¤à§‡ à¦²à¦—à¦‡à¦¨ à¦•à¦°à§à¦¨à¥¤</span>
+            <span className="pdp-reviews__empty-sub">রিভিউ দিতে লগইন করুন।</span>
           )}
         </div>
       )}
 
-      {/* â”€â”€ Review cards â”€â”€ */}
+      {/* ── Review cards ── */}
       <div className="pdp-reviews__list">
         {!reviewsLoading && sorted.map((r) => {
           const isOwn = myReview?.review_id === r.review_id
@@ -563,12 +563,12 @@ function ReviewSection({
             >
               <div className="pdp-review-card__header">
                 <div className="pdp-review-card__avatar">
-                  {(r.reviewer_name || 'à¦…')[0].toUpperCase()}
+                  {(r.reviewer_name || 'অ')[0].toUpperCase()}
                 </div>
                 <div className="pdp-review-card__meta">
                   <span className="pdp-review-card__name">
-                    {r.reviewer_name || 'à¦…à¦œà§à¦žà¦¾à¦¤ à¦ªà¦¾à¦ à¦•'}
-                    {isOwn && <span className="pdp-review-card__you">à¦†à¦ªà¦¨à¦¿</span>}
+                    {r.reviewer_name || 'অজ্ঞাত পাঠক'}
+                    {isOwn && <span className="pdp-review-card__you">আপনি</span>}
                   </span>
                   <div className="pdp-review-card__stars-row">
                     <StarDisplay rating={r.rating} size={13} />
@@ -578,10 +578,10 @@ function ReviewSection({
                   <button
                     className="pdp-review-card__edit-btn"
                     onClick={onOpenModal}
-                    aria-label="à¦°à¦¿à¦­à¦¿à¦‰ à¦¸à¦®à§à¦ªà¦¾à¦¦à¦¨à¦¾"
-                    title="à¦¸à¦®à§à¦ªà¦¾à¦¦à¦¨à¦¾ à¦•à¦°à§à¦¨"
+                    aria-label="রিভিউ সম্পাদনা"
+                    title="সম্পাদনা করুন"
                   >
-                    à¦¸à¦®à§à¦ªà¦¾à¦¦à¦¨à¦¾
+                    সম্পাদনা
                   </button>
                 )}
               </div>
@@ -596,16 +596,16 @@ function ReviewSection({
   )
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 // 8. MAIN PAGE
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 export default function BookDetailPage() {
   const { id }          = useParams()
   const navigate        = useNavigate()
   const [searchParams]  = useSearchParams()
   const { addToCart, toggleWish, isWished, isInCart, authUser } = useApp()
 
-  // â”€â”€ Book state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Book state ───────────────────────────────────────────────────────────
   const [book,      setBook]      = useState(null)
   const [loading,   setLoading]   = useState(true)
   const [qty,       setQty]       = useState(1)
@@ -614,7 +614,7 @@ export default function BookDetailPage() {
   const [cartError, setCartError] = useState('')
   const [copied,    setCopied]    = useState(false)
 
-  // â”€â”€ Reviews state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Reviews state ────────────────────────────────────────────────────────
   const [reviews,        setReviews]        = useState([])
   const [reviewsLoading, setReviewsLoading] = useState(true)
   const [myReview,       setMyReview]       = useState(null)
@@ -624,7 +624,7 @@ export default function BookDetailPage() {
 
   const reviewSectionRef = useRef(null)
 
-  // â”€â”€ Fetch book â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Fetch book ───────────────────────────────────────────────────────────
   useEffect(() => {
     setLoading(true)
     fetch(`https://putak-porject-2-1.onrender.com/api/books/${id}`)
@@ -634,7 +634,7 @@ export default function BookDetailPage() {
       .finally(() => setLoading(false))
   }, [id])
 
-  // â”€â”€ Fetch reviews â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Fetch reviews ────────────────────────────────────────────────────────
   useEffect(() => {
     setReviewsLoading(true)
     const pub  = api.get(`/reviews/book/${id}`).then((d) => setReviews(d?.data || [])).catch(() => {})
@@ -646,7 +646,7 @@ export default function BookDetailPage() {
     Promise.all([pub, mine]).finally(() => setReviewsLoading(false))
   }, [id, authUser])
 
-  // â”€â”€ Auto-scroll on ?review=1 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Auto-scroll on ?review=1 ─────────────────────────────────────────────
   useEffect(() => {
     if (searchParams.get('review') === '1' && !loading) {
       const t = setTimeout(() => {
@@ -657,7 +657,7 @@ export default function BookDetailPage() {
     }
   }, [searchParams, loading, authUser])
 
-  // â”€â”€ Review submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Review submit ────────────────────────────────────────────────────────
   const handleReviewSubmit = useCallback(async (rating, comment) => {
     if (!authUser) { navigate('/login'); return }
     setSubmitting(true)
@@ -675,15 +675,15 @@ export default function BookDetailPage() {
       const updated = await api.get(`/reviews/book/${id}`)
       setReviews(updated?.data || [])
     } catch (err) {
-      alert(err.message || 'à¦°à¦¿à¦­à¦¿à¦‰ à¦œà¦®à¦¾ à¦¦à§‡à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿à¥¤')
+      alert(err.message || 'রিভিউ জমা দেওয়া যায়নি।')
     } finally {
       setSubmitting(false)
     }
   }, [authUser, id, navigate])
 
-  // â”€â”€ Review delete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Review delete ─────────────────────────────────────────────────────────
   const handleDeleteReview = useCallback(async () => {
-    if (!myReview || !window.confirm('à¦°à¦¿à¦­à¦¿à¦‰à¦Ÿà¦¿ à¦®à§à¦›à§‡ à¦¦à¦¿à¦¤à§‡ à¦šà¦¾à¦¨?')) return
+    if (!myReview || !window.confirm('রিভিউটি মুছে দিতে চান?')) return
     try {
       const result = await api.del(`/reviews/${myReview.review_id}`)
       setMyReview(null)
@@ -696,11 +696,11 @@ export default function BookDetailPage() {
       const updated = await api.get(`/reviews/book/${id}`)
       setReviews(updated?.data || [])
     } catch (err) {
-      alert(err.message || 'à¦°à¦¿à¦­à¦¿à¦‰ à¦®à§à¦›à§‡ à¦«à§‡à¦²à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿')
+      alert(err.message || 'রিভিউ মুছে ফেলা যায়নি')
     }
   }, [myReview, id])
 
-  // â”€â”€ Cart â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Cart ─────────────────────────────────────────────────────────────────
   const handleCart = async () => {
     if (!authUser) { navigate('/login'); return }
     setCartError('')
@@ -710,7 +710,7 @@ export default function BookDetailPage() {
       setAdded(true)
       setTimeout(() => setAdded(false), 2000)
     } catch (err) {
-      setCartError(err.message || 'à¦•à¦¾à¦°à§à¦Ÿà§‡ à¦¯à§‹à¦— à¦•à¦°à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿')
+      setCartError(err.message || 'কার্টে যোগ করা যায়নি')
     } finally {
       setAdding(false)
     }
@@ -738,7 +738,7 @@ export default function BookDetailPage() {
     })
   }
 
-  // â”€â”€ Loading / not found â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Loading / not found ──────────────────────────────────────────────────
   if (loading) return (
     <div className="pdp-notfound">
       <div className="pdp-skeleton">
@@ -754,15 +754,15 @@ export default function BookDetailPage() {
 
   if (!book) return (
     <div className="pdp-notfound">
-      <h2>à¦¬à¦‡à¦Ÿà¦¿ à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿</h2>
-      <button onClick={() => navigate('/')}>à¦¹à§‹à¦®à§‡ à¦«à¦¿à¦°à§à¦¨</button>
+      <h2>বইটি পাওয়া যায়নি</h2>
+      <button onClick={() => navigate('/')}>হোমে ফিরুন</button>
     </div>
   )
 
-  // â”€â”€ Derived values â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  const category      = book.category_name || book.raw_category || 'à¦¸à¦¾à¦§à¦¾à¦°à¦£'
+  // ── Derived values ───────────────────────────────────────────────────────
+  const category      = book.category_name || book.raw_category || 'সাধারণ'
   const publicationId = book.publications?.[0]?.publication_id || null
-  const publisher     = book.publications?.[0]?.title || book.publisher || 'à¦…à¦œà§à¦žà¦¾à¦¤ à¦ªà§à¦°à¦•à¦¾à¦¶à¦•'
+  const publisher     = book.publications?.[0]?.title || book.publisher || 'অজ্ঞাত প্রকাশক'
   const rating_avg    = book.rating     ? Number(book.rating) : 0
   const num_reviews   = book.num_reviews || 0
   const inStock       = book.availability !== 'Out of stock' && book.availability !== 'Unavailable'
@@ -780,14 +780,14 @@ export default function BookDetailPage() {
         <div className="pdp__container">
 
           {/* Back button (mobile only) */}
-          <button className="pdp__back" onClick={() => navigate(-1)} aria-label="à¦ªà¦¿à¦›à¦¨à§‡ à¦¯à¦¾à¦¨">
-            <ArrowLeft size={16} /> à¦ªà¦¿à¦›à¦¨à§‡ à¦¯à¦¾à¦¨
+          <button className="pdp__back" onClick={() => navigate(-1)} aria-label="পিছনে যান">
+            <ArrowLeft size={16} /> পিছনে যান
           </button>
 
-          {/* â”€â”€ 3-column grid â”€â”€ */}
+          {/* ── 3-column grid ── */}
           <div className="pdp__grid">
 
-            {/* LEFT â€” media + trust */}
+            {/* LEFT — media + trust */}
             <ProductMedia
               book={book}
               wished={wished}
@@ -797,7 +797,7 @@ export default function BookDetailPage() {
               discountPct={discountPct}
             />
 
-            {/* CENTER â€” info + purchase */}
+            {/* CENTER — info + purchase */}
             <ProductInfo
               book={book}
               category={category}
@@ -821,10 +821,10 @@ export default function BookDetailPage() {
             />
           </div>
 
-          {/* â”€â”€ Reviews (full width below grid) â”€â”€ */}
+          {/* ── Reviews (full width below grid) ── */}
           {reviewSuccess && (
             <div className="pdp-review-success" role="status">
-              <Check size={15} /> à¦°à¦¿à¦­à¦¿à¦‰ à¦¸à¦«à¦²à¦­à¦¾à¦¬à§‡ à¦œà¦®à¦¾ à¦¹à¦¯à¦¼à§‡à¦›à§‡!
+              <Check size={15} /> রিভিউ সফলভাবে জমা হয়েছে!
             </div>
           )}
 
@@ -844,12 +844,12 @@ export default function BookDetailPage() {
         </div>
       </div>
 
-      {/* â”€â”€ Sticky mobile CTA â”€â”€ */}
+      {/* ── Sticky mobile CTA ── */}
       {inStock && (
-        <div className="pdp-sticky-cta" aria-label="à¦®à§‹à¦¬à¦¾à¦‡à¦² à¦•à§à¦°à¦¯à¦¼ à¦¬à¦¾à¦°">
+        <div className="pdp-sticky-cta" aria-label="মোবাইল ক্রয় বার">
           <div className="pdp-sticky-cta__price">
-            <strong>à§³{currentPrice}</strong>
-            {originalPrice && <s>à§³{originalPrice}</s>}
+            <strong>৳{currentPrice}</strong>
+            {originalPrice && <s>৳{originalPrice}</s>}
           </div>
           <button
             className="pdp-sticky-cta__cart"
@@ -857,18 +857,18 @@ export default function BookDetailPage() {
             disabled={adding}
           >
             <ShoppingBag size={16} />
-            {added ? 'à¦¯à§‹à¦— à¦¹à¦¯à¦¼à§‡à¦›à§‡' : 'à¦•à¦¾à¦°à§à¦Ÿà§‡ à¦¯à§‹à¦— à¦•à¦°à§à¦¨'}
+            {added ? 'যোগ হয়েছে' : 'কার্টে যোগ করুন'}
           </button>
           <button
             className="pdp-sticky-cta__buy"
             onClick={handleBuyNow}
           >
-            à¦à¦–à¦¨à¦‡ à¦•à¦¿à¦¨à§à¦¨
+            এখনই কিনুন
           </button>
         </div>
       )}
 
-      {/* â”€â”€ Review modal â”€â”€ */}
+      {/* ── Review modal ── */}
       {modalOpen && (
         <ReviewModal
           myReview={myReview}
@@ -881,4 +881,3 @@ export default function BookDetailPage() {
     </>
   )
 }
-

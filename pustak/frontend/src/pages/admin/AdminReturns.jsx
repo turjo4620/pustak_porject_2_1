@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Check, CircleCheck, CircleX, Search, X } from 'lucide-react';
 import '../../styles/admin.css';
 
@@ -12,11 +12,11 @@ function statusColor(status) {
 }
 
 function formatDate(value) {
-  return value ? new Date(value).toLocaleString() : 'â€”';
+  return value ? new Date(value).toLocaleString() : '—';
 }
 
 function formatAmount(value) {
-  return value == null ? 'â€”' : `à§³${Number(value).toFixed(2)}`;
+  return value == null ? '—' : `৳${Number(value).toFixed(2)}`;
 }
 
 export default function AdminReturns() {
@@ -188,7 +188,7 @@ export default function AdminReturns() {
                       </td>
                       <td>
                         <span className={`status-badge ${statusColor(item.return_status)}`}>{item.return_status}</span>
-                        <div className="admin-table-note" title={item.reason}>{item.reason || 'â€”'}</div>
+                        <div className="admin-table-note" title={item.reason}>{item.reason || '—'}</div>
                       </td>
                       <td>
                         {item.refund_id ? (
@@ -196,7 +196,7 @@ export default function AdminReturns() {
                             <strong>{formatAmount(item.refund_amount)}</strong>
                             <div><span className={`status-badge ${statusColor(item.refund_status)}`}>{item.refund_status}</span></div>
                           </>
-                        ) : 'â€”'}
+                        ) : '—'}
                       </td>
                       <td>{formatDate(item.request_date)}</td>
                       <td className="actions-cell">
@@ -240,7 +240,7 @@ export default function AdminReturns() {
                             </button>
                           </>
                         )}
-                        {item.return_status !== 'initiated' && item.refund_status !== 'Pending' && 'â€”'}
+                        {item.return_status !== 'initiated' && item.refund_status !== 'Pending' && '—'}
                       </td>
                     </tr>
                   );
@@ -259,4 +259,3 @@ export default function AdminReturns() {
     </div>
   );
 }
-

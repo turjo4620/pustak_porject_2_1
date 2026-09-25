@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import BookCard from './BookCard'
 import SectionHeader from './SectionHeader'
 import { useApp } from '../context/AppContext'
@@ -56,10 +56,10 @@ export default function Categories() {
   if (!categories.length) return null
 
   return (
-    <section className="categories section" aria-label="à¦†à¦ªà¦¨à¦¾à¦° à¦†à¦—à§à¦°à¦¹à§‡à¦° à¦¬à¦¿à¦·à¦¯à¦¼">
+    <section className="categories section" aria-label="আপনার আগ্রহের বিষয়">
       <div className="container">
         <SectionHeader
-          title="à¦†à¦ªà¦¨à¦¾à¦° à¦†à¦—à§à¦°à¦¹à§‡à¦° à¦¬à¦¿à¦·à¦¯à¦¼"
+          title="আপনার আগ্রহের বিষয়"
           align="center"
         />
         {interestBooks.length > 0 && (
@@ -73,4 +73,3 @@ export default function Categories() {
     </section>
   )
 }
-

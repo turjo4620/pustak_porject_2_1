@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SectionHeader from './SectionHeader'
 import './PublisherShowcase.css'
@@ -22,10 +22,10 @@ export default function PublisherShowcase() {
   if (!publications.length) return null
 
   return (
-    <section className="publishers section-sm" aria-label="à¦ªà§à¦°à¦•à¦¾à¦¶à¦• à¦ªà¦°à¦¿à¦šà¦¿à¦¤à¦¿">
+    <section className="publishers section-sm" aria-label="প্রকাশক পরিচিতি">
       <div className="container">
         <SectionHeader
-          title="à¦¬à¦¿à¦¶à§à¦¬à¦¸à§à¦¤ à¦ªà§à¦°à¦•à¦¾à¦¶à¦¨à§€"
+          title="বিশ্বস্ত প্রকাশনী"
           align="center"
         />
         <div className="publishers__grid">
@@ -52,7 +52,7 @@ export default function PublisherShowcase() {
                 <strong>{pub.title}</strong>
                 {pub.bio && (
                   <span className="publisher-card__bio">
-                    {pub.bio.slice(0, 60)}{pub.bio.length > 60 ? 'â€¦' : ''}
+                    {pub.bio.slice(0, 60)}{pub.bio.length > 60 ? '…' : ''}
                   </span>
                 )}
               </div>
@@ -63,4 +63,3 @@ export default function PublisherShowcase() {
     </section>
   )
 }
-

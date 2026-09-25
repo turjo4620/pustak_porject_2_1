@@ -1,8 +1,8 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, Plus, Edit2, Trash2, Copy, Check, AlertCircle } from 'lucide-react';
 import '../../styles/admin.css';
 
-// â”€â”€ API helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── API helpers ──────────────────────────────────────────────────────────────
 const BASE = 'https://putak-porject-2-1.onrender.com/api';
 
 async function apiFetch(path, opts = {}) {
@@ -20,7 +20,7 @@ async function apiFetch(path, opts = {}) {
   return body;
 }
 
-// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Helpers ──────────────────────────────────────────────────────────────────
 /**
  * Derive a display status from the real DB columns.
  * 'status' column holds 'Active' or 'Inactive'.
@@ -35,18 +35,18 @@ function derivedStatus(c) {
 }
 
 function fmtDate(iso) {
-  if (!iso) return 'â€”';
+  if (!iso) return '—';
   return new Date(iso).toLocaleDateString('en-GB', {
     day: '2-digit', month: 'short', year: 'numeric',
   });
 }
 
 function discountLabel(c) {
-  if (!c) return 'â€”';
+  if (!c) return '—';
   if ((c.discount_type || '').toLowerCase() === 'percentage') {
     return `${c.discount_value}%`;
   }
-  return `à§³${c.discount_value}`;
+  return `৳${c.discount_value}`;
 }
 
 const STATUS_META = {
@@ -56,7 +56,7 @@ const STATUS_META = {
   scheduled: { label: 'Scheduled', badge: 'coupon-badge coupon-badge--scheduled' },
 };
 
-// â”€â”€ Blank form (matches real DB columns only) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Blank form (matches real DB columns only) ────────────────────────────────
 const BLANK = {
   code:             '',
   description:      '',
@@ -70,9 +70,9 @@ const BLANK = {
   status:           'Active',       // 'Active' | 'Inactive'
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ════════════════════════════════════════════════════════════════════════════
 // CopyBtn
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ════════════════════════════════════════════════════════════════════════════
 function CopyBtn({ text }) {
   const [done, setDone] = useState(false);
   const copy = (e) => {
@@ -94,9 +94,9 @@ function CopyBtn({ text }) {
   );
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// CouponModal  â€”  Add / Edit
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ════════════════════════════════════════════════════════════════════════════
+// CouponModal  —  Add / Edit
+// ════════════════════════════════════════════════════════════════════════════
 function CouponModal({ coupon, onClose, onSuccess }) {
   const isEdit = Boolean(coupon);
 
@@ -125,7 +125,7 @@ function CouponModal({ coupon, onClose, onSuccess }) {
     setErrors(p => ({ ...p, [k]: '' }));
   };
 
-  // â”€â”€ Validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Validation ──────────────────────────────────────────────────────────
   function validate() {
     const e = {};
     const code = form.code.trim().toUpperCase();
@@ -133,7 +133,7 @@ function CouponModal({ coupon, onClose, onSuccess }) {
     if (!code)
       e.code = 'Coupon code is required.';
     else if (!/^[A-Z0-9_-]{3,32}$/.test(code))
-      e.code = 'Code must be 3â€“32 characters: Aâ€“Z, 0â€“9, hyphen, or underscore.';
+      e.code = 'Code must be 3–32 characters: A–Z, 0–9, hyphen, or underscore.';
 
     const val = Number(form.discount_value);
     if (!form.discount_value || isNaN(val) || val <= 0)
@@ -160,7 +160,7 @@ function CouponModal({ coupon, onClose, onSuccess }) {
     return !Object.keys(e).length;
   }
 
-  // â”€â”€ Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Submit ──────────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -259,12 +259,12 @@ function CouponModal({ coupon, onClose, onSuccess }) {
                   onChange={e => set('discount_type', e.target.value)}
                 >
                   <option value="percentage">Percentage (%)</option>
-                  <option value="flat">Flat Amount (à§³)</option>
+                  <option value="flat">Flat Amount (৳)</option>
                 </select>
               </div>
               <div className="form-group">
                 <label>
-                  {form.discount_type === 'percentage' ? 'Percentage Value *' : 'Flat Amount (à§³) *'}
+                  {form.discount_type === 'percentage' ? 'Percentage Value *' : 'Flat Amount (৳) *'}
                 </label>
                 <input
                   type="number"
@@ -285,7 +285,7 @@ function CouponModal({ coupon, onClose, onSuccess }) {
             {/* Min / Max order amounts */}
             <div className="form-row">
               <div className="form-group">
-                <label>Minimum Order Amount (à§³)</label>
+                <label>Minimum Order Amount (৳)</label>
                 <input
                   type="number"
                   min="0"
@@ -300,7 +300,7 @@ function CouponModal({ coupon, onClose, onSuccess }) {
                 )}
               </div>
               <div className="form-group">
-                <label>Maximum Order Amount (à§³)</label>
+                <label>Maximum Order Amount (৳)</label>
                 <input
                   type="number"
                   min="1"
@@ -325,7 +325,7 @@ function CouponModal({ coupon, onClose, onSuccess }) {
                 step="1"
                 value={form.usage_limit}
                 onChange={e => set('usage_limit', e.target.value)}
-                placeholder="e.g. 100 â€” leave blank for unlimited"
+                placeholder="e.g. 100 — leave blank for unlimited"
                 className={errors.usage_limit ? 'input-error' : ''}
               />
               {errors.usage_limit && (
@@ -364,8 +364,8 @@ function CouponModal({ coupon, onClose, onSuccess }) {
               <div className="coupon-toggle-row">
                 <span className="coupon-toggle-hint">
                   {form.status === 'Active'
-                    ? 'Active â€” customers can apply this coupon'
-                    : 'Inactive â€” coupon is disabled'}
+                    ? 'Active — customers can apply this coupon'
+                    : 'Inactive — coupon is disabled'}
                 </span>
                 <button
                   type="button"
@@ -386,7 +386,7 @@ function CouponModal({ coupon, onClose, onSuccess }) {
               Cancel
             </button>
             <button type="submit" className="btn-primary" disabled={saving}>
-              {saving ? 'Savingâ€¦' : isEdit ? 'Update Coupon' : 'Create Coupon'}
+              {saving ? 'Saving…' : isEdit ? 'Update Coupon' : 'Create Coupon'}
             </button>
           </div>
         </form>
@@ -395,9 +395,9 @@ function CouponModal({ coupon, onClose, onSuccess }) {
   );
 }
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// AdminCoupons â€” main page
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ════════════════════════════════════════════════════════════════════════════
+// AdminCoupons — main page
+// ════════════════════════════════════════════════════════════════════════════
 export default function AdminCoupons() {
   const [coupons,      setCoupons]      = useState([]);
   const [loading,      setLoading]      = useState(true);
@@ -412,7 +412,7 @@ export default function AdminCoupons() {
     setTimeout(() => setToast(''), 2800);
   };
 
-  // â”€â”€ Fetch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Fetch ─────────────────────────────────────────────────────────────────
   const fetchCoupons = useCallback(async () => {
     setLoading(true);
     try {
@@ -431,7 +431,7 @@ export default function AdminCoupons() {
 
   useEffect(() => { fetchCoupons(); }, [fetchCoupons]);
 
-  // â”€â”€ Quick status toggle (Active â†” Inactive) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Quick status toggle (Active ↔ Inactive) ───────────────────────────────
   const handleToggleStatus = async (c) => {
     const newStatus = c.status === 'Active' ? 'Inactive' : 'Active';
     try {
@@ -446,7 +446,7 @@ export default function AdminCoupons() {
     }
   };
 
-  // â”€â”€ Delete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Delete ────────────────────────────────────────────────────────────────
   const handleDelete = async (c) => {
     if (!confirm(`Delete coupon "${c.code}"? This cannot be undone.`)) return;
     try {
@@ -463,7 +463,7 @@ export default function AdminCoupons() {
   const closeModal = ()  => { setShowModal(false); setEditing(null); };
   const onSuccess  = (msg) => { closeModal(); fetchCoupons(); showToast(msg); };
 
-  // â”€â”€ Summary counts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Summary counts ────────────────────────────────────────────────────────
   const counts = coupons.reduce((acc, c) => {
     const s = derivedStatus(c);
     acc[s] = (acc[s] || 0) + 1;
@@ -489,7 +489,7 @@ export default function AdminCoupons() {
         </button>
       </div>
 
-      {/* Stats pills â€” clickable to filter */}
+      {/* Stats pills — clickable to filter */}
       {!loading && coupons.length > 0 && (
         <div className="coupon-stats-bar">
           {['active', 'scheduled', 'inactive', 'expired'].map(s =>
@@ -533,7 +533,7 @@ export default function AdminCoupons() {
 
       {/* Table */}
       {loading ? (
-        <div className="admin-loading">Loading couponsâ€¦</div>
+        <div className="admin-loading">Loading coupons…</div>
       ) : (
         <div className="admin-table-container">
           <table className="admin-table">
@@ -556,13 +556,13 @@ export default function AdminCoupons() {
                   <td colSpan={9} className="no-data">
                     {search || statusFilter !== 'all'
                       ? 'No coupons match the current filters.'
-                      : 'No coupons yet â€” create your first one!'}
+                      : 'No coupons yet — create your first one!'}
                   </td>
                 </tr>
               ) : coupons.map(c => {
                 const st       = derivedStatus(c);
                 const meta     = STATUS_META[st];
-                const usageLim = c.usage_limit != null ? c.usage_limit : 'âˆž';
+                const usageLim = c.usage_limit != null ? c.usage_limit : '∞';
                 const usedN    = c.usage_count ?? 0;
                 const isFull   = c.usage_limit != null && usedN >= c.usage_limit;
                 const isExpired = st === 'expired';
@@ -587,13 +587,13 @@ export default function AdminCoupons() {
                     {/* Min order */}
                     <td>
                       {c.min_order_amount != null && Number(c.min_order_amount) > 0
-                        ? `à§³${c.min_order_amount}` : 'â€”'}
+                        ? `৳${c.min_order_amount}` : '—'}
                     </td>
 
                     {/* Max order */}
                     <td>
                       {c.max_order_amount != null && Number(c.max_order_amount) > 0
-                        ? `à§³${c.max_order_amount}` : 'â€”'}
+                        ? `৳${c.max_order_amount}` : '—'}
                     </td>
 
                     {/* Usage count / limit */}
@@ -662,4 +662,3 @@ export default function AdminCoupons() {
     </div>
   );
 }
-

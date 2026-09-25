@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import BookCard from './BookCard'
 import SectionHeader from './SectionHeader'
 import './BestSellers.css'
@@ -25,9 +25,9 @@ export default function BestSellers() {
 
   if (loading) {
     return (
-      <section className="bestsellers section" id="books" aria-label="à¦¬à§‡à¦¸à§à¦Ÿà¦¸à§‡à¦²à¦¾à¦° à¦¬à¦‡">
+      <section className="bestsellers section" id="books" aria-label="বেস্টসেলার বই">
         <div className="container">
-          <p style={{ textAlign: 'center', padding: '2rem' }}>à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...</p>
+          <p style={{ textAlign: 'center', padding: '2rem' }}>লোড হচ্ছে...</p>
         </div>
       </section>
     )
@@ -38,17 +38,17 @@ export default function BestSellers() {
   }
 
   return (
-    <section className="bestsellers section" id="books" aria-label="à¦¬à§‡à¦¸à§à¦Ÿà¦¸à§‡à¦²à¦¾à¦° à¦¬à¦‡">
+    <section className="bestsellers section" id="books" aria-label="বেস্টসেলার বই">
         <div className="container">
           <SectionHeader
-            label="à¦¬à§‡à¦¸à§à¦Ÿà¦¸à§‡à¦²à¦¾à¦°"
-            title="à¦†à¦œà¦•à§‡à¦° à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¿à¦¤ à¦¬à¦‡"
-            subtitle="à¦ªà¦¾à¦ à¦•à¦¦à§‡à¦° à¦ªà¦›à¦¨à§à¦¦à§‡à¦° à¦†à¦œà¦•à§‡à¦° à¦¸à§‡à¦°à¦¾ à¦¬à¦‡à¦—à§à¦²à§‹"
-            linkText="à¦¸à¦¬ à¦¦à§‡à¦–à§à¦¨"
+            label="বেস্টসেলার"
+            title="আজকের নির্বাচিত বই"
+            subtitle="পাঠকদের পছন্দের আজকের সেরা বইগুলো"
+            linkText="সব দেখুন"
             linkHref="/bestsellers"
           />
 
-          <div className="bestsellers__grid" role="list" aria-label="à¦¨à¦¿à¦°à§à¦¬à¦¾à¦šà¦¿à¦¤ à¦¬à¦‡à¦¯à¦¼à§‡à¦° à¦¤à¦¾à¦²à¦¿à¦•à¦¾">
+          <div className="bestsellers__grid" role="list" aria-label="নির্বাচিত বইয়ের তালিকা">
             {bestSellers.slice(0, 5).map((book) => (
               <div key={book.id} className="bestsellers__item" role="listitem">
                 <BookCard book={book} />
@@ -59,4 +59,3 @@ export default function BestSellers() {
     </section>
   )
 }
-

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Eye } from 'lucide-react';
 import '../../styles/admin.css';
 
@@ -173,7 +173,7 @@ export default function AdminOrders() {
                       <small style={{ color: '#888' }}>{order.user_email}</small>
                     </td>
                     <td style={{ textAlign: 'center' }}>{order.item_count}</td>
-                    <td>à§³{parseFloat(order.total_amount).toFixed(2)}</td>
+                    <td>৳{parseFloat(order.total_amount).toFixed(2)}</td>
                     <td>
                       <span className={`status-badge ${getStatusColor(order.status)}`}>
                         {order.status}
@@ -181,7 +181,7 @@ export default function AdminOrders() {
                     </td>
                     <td>{new Date(order.order_date).toLocaleDateString()}</td>
                     <td className="actions-cell">
-                      {/* Quick approve â€” only for Pending orders */}
+                      {/* Quick approve — only for Pending orders */}
                       {order.status === 'Pending' && (
                         <button
                           className="btn-icon"
@@ -193,7 +193,7 @@ export default function AdminOrders() {
                             }
                           }}
                         >
-                          âœ…
+                          ✅
                         </button>
                       )}
                       {/* Quick ship opens the address-aware courier selector */}
@@ -204,7 +204,7 @@ export default function AdminOrders() {
                           style={{ color: '#0369a1', marginRight: '4px' }}
                           onClick={() => fetchOrderDetails(order.order_id)}
                         >
-                          ðŸšš
+                          🚚
                         </button>
                       )}
                       <button
@@ -234,7 +234,7 @@ export default function AdminOrders() {
         <div className="modal-overlay" onClick={() => setSelectedOrder(null)}>
           <div className="modal-content large" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h2>Order Details â€” {selectedOrder.order.order_number}</h2>
+              <h2>Order Details — {selectedOrder.order.order_number}</h2>
               <button className="modal-close" onClick={() => setSelectedOrder(null)}>&times;</button>
             </div>
 
@@ -292,13 +292,13 @@ export default function AdminOrders() {
                             <span>{item.book_name}</span>
                           </div>
                         </td>
-                        <td>à§³{parseFloat(item.price_sold).toFixed(2)}</td>
+                        <td>৳{parseFloat(item.price_sold).toFixed(2)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
                 <div className="order-total">
-                  <strong>Total: à§³{parseFloat(selectedOrder.order.total_amount).toFixed(2)}</strong>
+                  <strong>Total: ৳{parseFloat(selectedOrder.order.total_amount).toFixed(2)}</strong>
                 </div>
               </div>
 
@@ -325,36 +325,36 @@ export default function AdminOrders() {
                           color: isActive ? '#fff' : isDone ? '#065f46' : '#9ca3af',
                           border: isActive ? '2px solid #0f766e' : '1.5px solid transparent',
                         }}>
-                          {isActive ? 'â–¶ ' : isDone ? 'âœ“ ' : ''}{s}
+                          {isActive ? '▶ ' : isDone ? '✓ ' : ''}{s}
                         </span>
-                        {i < arr.length - 1 && <span style={{ color: '#d1d5db', fontSize: '10px' }}>â†’</span>}
+                        {i < arr.length - 1 && <span style={{ color: '#d1d5db', fontSize: '10px' }}>→</span>}
                       </span>
                     );
                   })}
                 </div>
 
                 <div className="order-actions">
-                  {/* Approve â€” visible when Pending */}
+                  {/* Approve — visible when Pending */}
                   {selectedOrder.order.status === 'Pending' && (
                     <button
                       className="order-action-btn approve"
                       onClick={() => updateOrderStatus(selectedOrder.order.order_id, 'Confirmed')}
                     >
-                      âœ… Approve Order
+                      ✅ Approve Order
                     </button>
                   )}
 
-                  {/* Mark Processing â€” visible when Confirmed */}
+                  {/* Mark Processing — visible when Confirmed */}
                   {selectedOrder.order.status === 'Confirmed' && (
                     <button
                       className="order-action-btn courier"
                       onClick={() => updateOrderStatus(selectedOrder.order.order_id, 'Processing')}
                     >
-                      ðŸ“¦ Mark as Processing
+                      📦 Mark as Processing
                     </button>
                   )}
 
-                  {/* Ship â€” visible when Confirmed or Processing */}
+                  {/* Ship — visible when Confirmed or Processing */}
                   {(selectedOrder.order.status === 'Confirmed' || selectedOrder.order.status === 'Processing') && (
                     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
                       <select
@@ -378,22 +378,22 @@ export default function AdminOrders() {
                         disabled={couriersLoading || !selectedCourierId}
                         onClick={() => updateOrderStatus(selectedOrder.order.order_id, 'Shipped', selectedCourierId)}
                       >
-                        ðŸšš Ship Order
+                        🚚 Ship Order
                       </button>
                     </div>
                   )}
 
-                  {/* Mark Delivered â€” visible when Shipped */}
+                  {/* Mark Delivered — visible when Shipped */}
                   {selectedOrder.order.status === 'Shipped' && (
                     <button
                       className="order-action-btn deliver"
                       onClick={() => updateOrderStatus(selectedOrder.order.order_id, 'Delivered')}
                     >
-                      ðŸŽ‰ Mark as Delivered
+                      🎉 Mark as Delivered
                     </button>
                   )}
 
-                  {/* Cancel â€” visible for any non-terminal status */}
+                  {/* Cancel — visible for any non-terminal status */}
                   {!['Cancelled', 'Returned', 'Delivered'].includes(selectedOrder.order.status) && (
                     <button
                       className="order-action-btn cancel"
@@ -403,14 +403,14 @@ export default function AdminOrders() {
                         }
                       }}
                     >
-                      âŒ Cancel Order
+                      ❌ Cancel Order
                     </button>
                   )}
 
                   {/* Terminal state message */}
                   {['Cancelled', 'Returned', 'Delivered'].includes(selectedOrder.order.status) && (
                     <p style={{ color: '#888', margin: 0 }}>
-                      This order is <strong>{selectedOrder.order.status}</strong> â€” no further actions available.
+                      This order is <strong>{selectedOrder.order.status}</strong> — no further actions available.
                     </p>
                   )}
                 </div>
@@ -420,7 +420,7 @@ export default function AdminOrders() {
               {selectedOrder.delivery && (
                 <div className="details-section">
                   <h3>Delivery</h3>
-                  {selectedOrder.delivery.courier_name && <p><strong>à¦•à§à¦°à¦¿à¦¯à¦¼à¦¾à¦°:</strong> {selectedOrder.delivery.courier_name}</p>}
+                  {selectedOrder.delivery.courier_name && <p><strong>কুরিয়ার:</strong> {selectedOrder.delivery.courier_name}</p>}
                   {selectedOrder.delivery.tracking_no && <p><strong>Tracking:</strong> {selectedOrder.delivery.tracking_no}</p>}
                   <p><strong>Status:</strong> {selectedOrder.delivery.status}</p>
                   {selectedOrder.delivery.dispatch_date && (
@@ -439,7 +439,7 @@ export default function AdminOrders() {
               {selectedOrder.payment && (
                 <div className="details-section">
                   <h3>Payment</h3>
-                  <p><strong>Amount:</strong> à§³{parseFloat(selectedOrder.payment.amount).toFixed(2)}</p>
+                  <p><strong>Amount:</strong> ৳{parseFloat(selectedOrder.payment.amount).toFixed(2)}</p>
                   <p><strong>Status:</strong> {selectedOrder.payment.payment_status}</p>
                   <p><strong>Date:</strong> {new Date(selectedOrder.payment.payment_date).toLocaleString()}</p>
                 </div>
@@ -452,4 +452,3 @@ export default function AdminOrders() {
     </div>
   );
 }
-

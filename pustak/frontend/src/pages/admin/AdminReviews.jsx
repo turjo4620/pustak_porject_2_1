@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Eye, EyeOff, Trash2, FileText, X } from 'lucide-react';
 import '../../styles/admin.css';
 
@@ -71,7 +71,7 @@ export default function AdminReviews() {
   };
 
   const renderStars = (rating) => {
-    return 'â˜…'.repeat(rating) + 'â˜†'.repeat(5 - rating);
+    return '★'.repeat(rating) + '☆'.repeat(5 - rating);
   };
 
   return (
@@ -114,7 +114,7 @@ export default function AdminReviews() {
                     <td className="review-text">{review.review_text || 'No text'}</td>
                     <td>{review.review_date
                       ? new Date(review.review_date).toLocaleDateString()
-                      : 'â€”'}</td>
+                      : '—'}</td>
                     <td>
                       <span className={`status-badge ${review.is_hidden ? 'danger' : 'success'}`}>
                         {review.is_hidden ? 'Hidden' : 'Visible'}
@@ -176,8 +176,8 @@ export default function AdminReviews() {
             </div>
             <div className="modal-form">
               <p><strong>Review ID:</strong> {selectedReview.review_id}</p>
-              <p><strong>Book:</strong> {selectedReview.book_name || 'â€”'}</p>
-              <p><strong>User:</strong> {selectedReview.user_name || 'â€”'}</p>
+              <p><strong>Book:</strong> {selectedReview.book_name || '—'}</p>
+              <p><strong>User:</strong> {selectedReview.user_name || '—'}</p>
               <p>
                 <strong>Rating:</strong>{' '}
                 <span className="rating-stars">{renderStars(Number(selectedReview.rating) || 0)}</span>
@@ -186,7 +186,7 @@ export default function AdminReviews() {
                 <strong>Date:</strong>{' '}
                 {selectedReview.review_date
                   ? new Date(selectedReview.review_date).toLocaleString()
-                  : 'â€”'}
+                  : '—'}
               </p>
               <p>
                 <strong>Visibility:</strong>{' '}
@@ -203,4 +203,3 @@ export default function AdminReviews() {
     </div>
   );
 }
-

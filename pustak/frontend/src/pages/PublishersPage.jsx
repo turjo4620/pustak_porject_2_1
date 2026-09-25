@@ -1,10 +1,10 @@
-﻿import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import './ListPage.css'
 import './PublishersPage.css'
 
 const getLogoText = (title) => {
-  if (!title) return 'à¦ªà§à¦°'
+  if (!title) return 'প্র'
   const words = title.trim().split(/\s+/)
   if (words.length === 1) {
     return words[0].slice(0, 2)
@@ -40,19 +40,19 @@ export default function PublishersPage() {
     <div className="list-page">
       <div className="container">
         <div className="list-page__header">
-          <p className="list-page__breadcrumb"><Link to="/">à¦¹à§‹à¦®</Link> â€º à¦ªà§à¦°à¦•à¦¾à¦¶à¦•</p>
-          <h1 className="list-page__title">à¦¸à¦•à¦² à¦ªà§à¦°à¦•à¦¾à¦¶à¦¨à§€</h1>
+          <p className="list-page__breadcrumb"><Link to="/">হোম</Link> › প্রকাশক</p>
+          <h1 className="list-page__title">সকল প্রকাশনী</h1>
           <p className="list-page__count">
-            {loading ? 'à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...' : `${Math.min(publications.length, 20)} à¦Ÿà¦¿ à¦ªà§à¦°à¦•à¦¾à¦¶à¦¨à§€`}
+            {loading ? 'লোড হচ্ছে...' : `${Math.min(publications.length, 20)} টি প্রকাশনী`}
           </p>
         </div>
 
         {error ? (
           <p style={{ textAlign: 'center', padding: '2rem' }}>
-            à¦ªà§à¦°à¦•à¦¾à¦¶à¦• à¦¤à¦¥à§à¦¯ à¦²à§‹à¦¡ à¦•à¦°à¦¤à§‡ à¦ªà¦¾à¦°à¦›à¦¿à¦¨à¦¾à¥¤ à¦…à¦¨à§à¦—à§à¦°à¦¹ à¦•à¦°à§‡ à¦ªà¦°à§‡ à¦†à¦¬à¦¾à¦° à¦šà§‡à¦·à§à¦Ÿà¦¾ à¦•à¦°à§à¦¨à¥¤
+            প্রকাশক তথ্য লোড করতে পারছিনা। অনুগ্রহ করে পরে আবার চেষ্টা করুন।
           </p>
         ) : loading ? (
-          <p style={{ textAlign: 'center', padding: '2rem' }}>à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...</p>
+          <p style={{ textAlign: 'center', padding: '2rem' }}>লোড হচ্ছে...</p>
         ) : (
           <div className="publishers-page-grid">
             {publications.slice(0, 20).map((publication) => (
@@ -84,4 +84,3 @@ export default function PublishersPage() {
     </div>
   )
 }
-

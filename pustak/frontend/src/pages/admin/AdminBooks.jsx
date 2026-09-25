@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Plus, Edit, Trash2, Package } from 'lucide-react';
 import '../../styles/admin.css';
 
@@ -204,16 +204,16 @@ export default function AdminBooks() {
                     <td>
                       {book.discount_percentage > 0 ? (
                         <>
-                          <span className="price-original">à§³{book.price}</span>
+                          <span className="price-original">৳{book.price}</span>
                           <span className="price-discount">
-                            à§³{Math.round(book.price * (1 - book.discount_percentage / 100))}
+                            ৳{Math.round(book.price * (1 - book.discount_percentage / 100))}
                           </span>
                           <span style={{ fontSize: '11px', color: '#16a34a', marginLeft: 4 }}>
-                            ({book.discount_percentage}% à¦›à¦¾à¦¡à¦¼)
+                            ({book.discount_percentage}% ছাড়)
                           </span>
                         </>
                       ) : (
-                        `à§³${book.price}`
+                        `৳${book.price}`
                       )}
                     </td>
                     <td>
@@ -283,7 +283,7 @@ export default function AdminBooks() {
   );
 }
 
-// â”€â”€ Floating tooltip portal rendered at document.body level â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Floating tooltip portal rendered at document.body level ────────────────
 function FloatingTooltip({ text, anchorRect }) {
   if (!text || !anchorRect) return null;
 
@@ -330,7 +330,7 @@ function FloatingTooltip({ text, anchorRect }) {
   );
 }
 
-// â”€â”€ Generic picker (works for both authors and publications) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Generic picker (works for both authors and publications) ────────────────
 function EntityPicker({
   items,          // array of objects
   selectedIds,    // number[]
@@ -354,7 +354,7 @@ function EntityPicker({
     if (!bio) return;
     clearTimeout(leaveTimer.current);
     const rect = e.currentTarget.getBoundingClientRect();
-    setTooltip({ text: bio.slice(0, 160) + (bio.length > 160 ? 'â€¦' : ''), rect });
+    setTooltip({ text: bio.slice(0, 160) + (bio.length > 160 ? '…' : ''), rect });
   }, [bioKey]);
 
   const handleMouseLeave = useCallback(() => {
@@ -401,7 +401,7 @@ function EntityPicker({
                       </div>
                   }
                   {selected && (
-                    <span className="author-card__check" aria-hidden="true">âœ“</span>
+                    <span className="author-card__check" aria-hidden="true">✓</span>
                   )}
                 </div>
                 <span className="author-card__name">{name}</span>
@@ -410,7 +410,7 @@ function EntityPicker({
           })}
 
           {filtered.length === 0 && (
-            <p className="author-picker__empty">à¦•à¦¿à¦›à§ à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿à¥¤</p>
+            <p className="author-picker__empty">কিছু পাওয়া যায়নি।</p>
           )}
         </div>
       </div>
@@ -429,7 +429,7 @@ function AuthorPicker({ authors, selectedIds, onToggle }) {
       nameKey="name"
       photoKey="photo_url"
       bioKey="bio"
-      searchPlaceholder="à¦²à§‡à¦–à¦• à¦–à§à¦à¦œà§à¦¨..."
+      searchPlaceholder="লেখক খুঁজুন..."
     />
   );
 }
@@ -445,7 +445,7 @@ function PublicationPicker({ publications, selectedIds, onToggle }) {
       nameKey="title"
       photoKey="cover_image_url"
       bioKey="bio"
-      searchPlaceholder="à¦ªà§à¦°à¦•à¦¾à¦¶à¦¨à§€ à¦–à§à¦à¦œà§à¦¨..."
+      searchPlaceholder="প্রকাশনী খুঁজুন..."
     />
   );
 }
@@ -605,7 +605,7 @@ function BookModal({ book, categories, authors, publications, onClose, onSuccess
             </div>
 
             <div className="form-group">
-              <label>Discount % <small style={{color:'#888'}}>(0â€“100, e.g. 18 for 18% off)</small></label>
+              <label>Discount % <small style={{color:'#888'}}>(0–100, e.g. 18 for 18% off)</small></label>
               <input
                 type="number"
                 min="0"
@@ -617,7 +617,7 @@ function BookModal({ book, categories, authors, publications, onClose, onSuccess
               />
               {formData.price && formData.discount_percentage > 0 && (
                 <small style={{ color: '#16a34a' }}>
-                  Discounted price: à§³{Math.round(formData.price * (1 - formData.discount_percentage / 100))}
+                  Discounted price: ৳{Math.round(formData.price * (1 - formData.discount_percentage / 100))}
                 </small>
               )}
             </div>
@@ -716,4 +716,3 @@ function BookModal({ book, categories, authors, publications, onClose, onSuccess
     </div>
   );
 }
-

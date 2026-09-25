@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate, NavLink } from 'react-router-dom'
 import { Search, Heart, ShoppingBag, User, Menu, X, Sun, Moon, Trash2, ArrowRight,
          Package, Star, LogOut, RotateCcw } from 'lucide-react'
@@ -6,15 +6,15 @@ import { useApp } from '../context/AppContext'
 import './Navigation.css'
 
 const navLinks = [
-  { label: 'à¦¬à¦¿à¦­à¦¾à¦—', to: '/categories' },
-  { label: 'à¦†à¦œà¦•à§‡à¦° à¦…à¦«à¦¾à¦°', to: '/offers' },
-  { label: 'à¦¨à¦¤à§à¦¨ à¦¬à¦‡',    to: '/new-arrivals' },
-  { label: 'à¦¬à§‡à¦¸à§à¦Ÿà¦¸à§‡à¦²à¦¾à¦°', to: '/bestsellers' },
-  { label: 'à¦²à§‡à¦–à¦•',       to: '/authors' },
-  { label: 'à¦ªà§à¦°à¦•à¦¾à¦¶à¦•',    to: '/publishers' },
+  { label: 'বিভাগ', to: '/categories' },
+  { label: 'আজকের অফার', to: '/offers' },
+  { label: 'নতুন বই',    to: '/new-arrivals' },
+  { label: 'বেস্টসেলার', to: '/bestsellers' },
+  { label: 'লেখক',       to: '/authors' },
+  { label: 'প্রকাশক',    to: '/publishers' },
 ]
 
-const trendingSearches = ['à¦¹à¦¿à¦®à§', 'à¦¹à§à¦®à¦¾à¦¯à¦¼à§‚à¦¨ à¦†à¦¹à¦®à§‡à¦¦', 'à¦°à¦¬à§€à¦¨à§à¦¦à§à¦°à¦¨à¦¾à¦¥', 'à¦®à§à¦•à§à¦¤à¦¿à¦¯à§à¦¦à§à¦§', 'à¦¬à¦¿à¦œà§à¦žà¦¾à¦¨']
+const trendingSearches = ['হিমু', 'হুমায়ূন আহমেদ', 'রবীন্দ্রনাথ', 'মুক্তিযুদ্ধ', 'বিজ্ঞান']
 const BASE = 'https://putak-porject-2-1.onrender.com/api'
 
 export default function Navigation({ isDarkMode, toggleDarkMode }) {
@@ -104,11 +104,11 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
 
   return (
     <>
-      <nav className={`nav ${scrolled ? 'nav--scrolled' : ''}`} role="navigation" aria-label="à¦ªà§à¦°à¦§à¦¾à¦¨ à¦¨à§‡à¦­à¦¿à¦—à§‡à¦¶à¦¨">
+      <nav className={`nav ${scrolled ? 'nav--scrolled' : ''}`} role="navigation" aria-label="প্রধান নেভিগেশন">
         <div className="nav__inner container">
 
           {/* Logo */}
-          <Link to="/" className="nav__logo" aria-label="à¦ªà§à¦¸à§à¦¤à¦• à¦¹à§‹à¦®">
+          <Link to="/" className="nav__logo" aria-label="পুস্তক হোম">
             <PustakLogo />
           </Link>
 
@@ -132,7 +132,7 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
           <div className="nav__actions">
             <button
               className="nav__icon-btn"
-              aria-label="à¦…à¦¨à§à¦¸à¦¨à§à¦§à¦¾à¦¨"
+              aria-label="অনুসন্ধান"
               onClick={() => setSearchOpen(true)}
             >
               <Search size={20} />
@@ -140,7 +140,7 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
 
             <button
               className={`nav__icon-btn nav__icon-btn--badge ${wishOpen ? 'nav__icon-btn--open' : ''}`}
-              aria-label={`à¦‰à¦‡à¦¶à¦²à¦¿à¦¸à§à¦Ÿ (${wishItems.length} à¦Ÿà¦¿ à¦¬à¦‡)`}
+              aria-label={`উইশলিস্ট (${wishItems.length} টি বই)`}
               aria-expanded={wishOpen}
               data-count={wishItems.length || ''}
               onClick={() => { setWishOpen(!wishOpen); setCartOpen(false); setUserOpen(false) }}
@@ -150,7 +150,7 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
 
             <button
               className={`nav__icon-btn nav__icon-btn--badge ${cartOpen ? 'nav__icon-btn--open' : ''}`}
-              aria-label={`à¦•à¦¾à¦°à§à¦Ÿ (${cartItems.length} à¦Ÿà¦¿ à¦¬à¦‡)`}
+              aria-label={`কার্ট (${cartItems.length} টি বই)`}
               aria-expanded={cartOpen}
               data-count={cartItems.length || ''}
               onClick={() => { setCartOpen(!cartOpen); setWishOpen(false); setUserOpen(false) }}
@@ -160,7 +160,7 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
 
             <button
               className={`nav__theme-toggle ${isDarkMode ? 'nav__theme-toggle--dark' : ''}`}
-              aria-label={isDarkMode ? 'à¦²à¦¾à¦‡à¦Ÿ à¦®à§‹à¦¡ à¦šà¦¾à¦²à§ à¦•à¦°à§à¦¨' : 'à¦¡à¦¾à¦°à§à¦• à¦®à§‹à¦¡ à¦šà¦¾à¦²à§ à¦•à¦°à§à¦¨'}
+              aria-label={isDarkMode ? 'লাইট মোড চালু করুন' : 'ডার্ক মোড চালু করুন'}
               onClick={toggleDarkMode}
               title={isDarkMode ? 'Light mode' : 'Dark mode'}
             >
@@ -175,7 +175,7 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
             {authUser ? (
               <button
                 className={`nav__icon-btn nav__icon-btn--user ${userOpen ? 'nav__icon-btn--open' : ''}`}
-                aria-label="à¦†à¦®à¦¾à¦° à¦…à§à¦¯à¦¾à¦•à¦¾à¦‰à¦¨à§à¦Ÿ"
+                aria-label="আমার অ্যাকাউন্ট"
                 aria-expanded={userOpen}
                 onClick={() => {
                   if (userOpen) navigate('/account')
@@ -190,15 +190,15 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
               <button
                 className="nav__signin-btn"
                 onClick={() => navigate('/login')}
-                aria-label="à¦²à¦—à¦‡à¦¨ à¦•à¦°à§à¦¨"
+                aria-label="লগইন করুন"
               >
-                à¦²à¦—à¦‡à¦¨
+                লগইন
               </button>
             )}
 
             <button
               className="nav__hamburger"
-              aria-label="à¦®à§‡à¦¨à§"
+              aria-label="মেনু"
               aria-expanded={mobileOpen}
               onClick={() => setMobileOpen(!mobileOpen)}
             >
@@ -209,22 +209,22 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
 
       </nav>
 
-      {/* â”€â”€ Cart Drawer â”€â”€ */}
+      {/* ── Cart Drawer ── */}
       <Drawer
         open={cartOpen}
         onClose={() => setCartOpen(false)}
-        title={`à¦•à¦¾à¦°à§à¦Ÿ (${cartItems.length})`}
+        title={`কার্ট (${cartItems.length})`}
         side="right"
       >
         {cartItems.length === 0 ? (
           <div className="drawer__empty">
             <ShoppingBag size={48} opacity={0.25} />
-            <p>à¦•à¦¾à¦°à§à¦Ÿ à¦–à¦¾à¦²à¦¿ à¦†à¦›à§‡</p>
+            <p>কার্ট খালি আছে</p>
             <button
               className="drawer__cta"
               onClick={() => { setCartOpen(false); navigate('/') }}
             >
-              à¦¬à¦‡ à¦•à¦¿à¦¨à§à¦¨
+              বই কিনুন
             </button>
           </div>
         ) : (
@@ -246,12 +246,12 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
                       {b.book_name}
                     </strong>
                     <span className="drawer__item-author">{b.authors}</span>
-                    <span className="drawer__item-price">à§³{b.locked_price}</span>
+                    <span className="drawer__item-price">৳{b.locked_price}</span>
                   </div>
                   <button
                     className="drawer__item-remove"
                     onClick={() => removeFromCart(b.cart_item_id)}
-                    aria-label={`${b.book_name} à¦¸à¦°à¦¾à¦¨`}
+                    aria-label={`${b.book_name} সরান`}
                   >
                     <Trash2 size={15} />
                   </button>
@@ -260,36 +260,36 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
             </ul>
             <div className="drawer__footer">
               <div className="drawer__total">
-                <span>à¦®à§‹à¦Ÿ</span>
-                <strong>à§³{totalCartPrice}</strong>
+                <span>মোট</span>
+                <strong>৳{totalCartPrice}</strong>
               </div>
               <button
                 className="drawer__checkout"
                 onClick={() => { setCartOpen(false); navigate('/checkout') }}
               >
-                à¦šà§‡à¦•à¦†à¦‰à¦Ÿ à¦•à¦°à§à¦¨
+                চেকআউট করুন
               </button>
             </div>
           </>
         )}
       </Drawer>
 
-      {/* â”€â”€ Wishlist Drawer â”€â”€ */}
+      {/* ── Wishlist Drawer ── */}
       <Drawer
         open={wishOpen}
         onClose={() => setWishOpen(false)}
-        title={`à¦‰à¦‡à¦¶à¦²à¦¿à¦¸à§à¦Ÿ (${wishItems.length})`}
+        title={`উইশলিস্ট (${wishItems.length})`}
         side="right"
       >
         {wishItems.length === 0 ? (
           <div className="drawer__empty">
             <Heart size={48} opacity={0.25} />
-            <p>à¦‰à¦‡à¦¶à¦²à¦¿à¦¸à§à¦Ÿ à¦–à¦¾à¦²à¦¿ à¦†à¦›à§‡</p>
+            <p>উইশলিস্ট খালি আছে</p>
             <button
               className="drawer__cta"
               onClick={() => { setWishOpen(false); navigate('/') }}
             >
-              à¦¬à¦‡ à¦¬à§à¦°à¦¾à¦‰à¦œ à¦•à¦°à§à¦¨
+              বই ব্রাউজ করুন
             </button>
           </div>
         ) : (
@@ -311,13 +311,13 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
                   </strong>
                   <span className="drawer__item-author">{b.authors}</span>
                   <span className="drawer__item-price">
-                    à§³{b.discount_price ?? b.price}
+                    ৳{b.discount_price ?? b.price}
                   </span>
                 </div>
                 <button
                   className="drawer__item-remove"
                   onClick={() => toggleWish(b)}
-                  aria-label={`${b.book_name} à¦¸à¦°à¦¾à¦¨`}
+                  aria-label={`${b.book_name} সরান`}
                 >
                   <Trash2 size={15} />
                 </button>
@@ -327,17 +327,17 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
         )}
       </Drawer>
 
-      {/* â”€â”€ User Drawer â”€â”€ */}
+      {/* ── User Drawer ── */}
       <Drawer
         open={userOpen}
         onClose={() => setUserOpen(false)}
-        title="à¦†à¦®à¦¾à¦° à¦…à§à¦¯à¦¾à¦•à¦¾à¦‰à¦¨à§à¦Ÿ"
+        title="আমার অ্যাকাউন্ট"
         side="right"
       >
         <div className="user-drawer">
           {authUser ? (
             <>
-              {/* â”€â”€ Profile header â”€â”€ */}
+              {/* ── Profile header ── */}
               <div className="user-drawer__profile">
                 <div className="user-drawer__avatar">
                   {(authUser.name || authUser.email || 'U').slice(0,1).toUpperCase()}
@@ -355,23 +355,23 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
                 <button
                   type="button"
                   className="user-drawer__account-btn"
-                  aria-label="à¦…à§à¦¯à¦¾à¦•à¦¾à¦‰à¦¨à§à¦Ÿà§‡ à¦¯à¦¾à¦¨"
-                  title="à¦…à§à¦¯à¦¾à¦•à¦¾à¦‰à¦¨à§à¦Ÿà§‡ à¦¯à¦¾à¦¨"
+                  aria-label="অ্যাকাউন্টে যান"
+                  title="অ্যাকাউন্টে যান"
                   onClick={() => { setUserOpen(false); navigate('/account') }}
                 >
                   <User size={18} />
                 </button>
               </div>
 
-              {/* â”€â”€ Nav links â”€â”€ */}
+              {/* ── Nav links ── */}
               <div className="user-drawer__links">
                 {[
-                  { label: 'à¦†à¦®à¦¾à¦° à¦¤à¦¥à§à¦¯',          to: '/account/profile', icon: User      },
-                  { label: 'à¦…à¦°à§à¦¡à¦¾à¦° à¦¦à¦¿à¦¨',         to: '/account/order',   icon: ShoppingBag },
-                  { label: 'à¦…à¦°à§à¦¡à¦¾à¦° à¦Ÿà§à¦°à§à¦¯à¦¾à¦•à¦¿à¦‚',    to: '/account/orders',  icon: Package   },
-                  { label: 'à¦ªà¦›à¦¨à§à¦¦à§‡à¦° à¦¤à¦¾à¦²à¦¿à¦•à¦¾',     to: '/account/wishlist', icon: Heart     },
-                  { label: 'à¦°à¦¿à¦Ÿà¦¾à¦°à§à¦¨ à¦“ à¦°à¦¿à¦«à¦¾à¦¨à§à¦¡',   to: '/account/returns', icon: RotateCcw },
-                  { label: 'à¦°à¦¿à¦­à¦¿à¦‰ à¦“ à¦°à§‡à¦Ÿà¦¿à¦‚',       to: '/account/reviews', icon: Star      },
+                  { label: 'আমার তথ্য',          to: '/account/profile', icon: User      },
+                  { label: 'অর্ডার দিন',         to: '/account/order',   icon: ShoppingBag },
+                  { label: 'অর্ডার ট্র্যাকিং',    to: '/account/orders',  icon: Package   },
+                  { label: 'পছন্দের তালিকা',     to: '/account/wishlist', icon: Heart     },
+                  { label: 'রিটার্ন ও রিফান্ড',   to: '/account/returns', icon: RotateCcw },
+                  { label: 'রিভিউ ও রেটিং',       to: '/account/reviews', icon: Star      },
                 ].map(({ label, to, icon: Icon }) => (
                   <Link
                     key={to}
@@ -396,19 +396,19 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
                 >
                   <span className="user-drawer__link-inner">
                     <LogOut size={16} className="user-drawer__link-icon" strokeWidth={1.8} />
-                    à¦²à¦—à¦†à¦‰à¦Ÿ
+                    লগআউট
                   </span>
                 </button>
               </div>
             </>
           ) : (
             <>
-              <div className="user-drawer__avatar">à¦ªà¦¾</div>
-              <p className="user-drawer__name">à¦…à¦¤à¦¿à¦¥à¦¿ à¦ªà¦¾à¦ à¦•</p>
+              <div className="user-drawer__avatar">পা</div>
+              <p className="user-drawer__name">অতিথি পাঠক</p>
               <div className="user-drawer__links">
                 {[
-                  { label: 'à¦²à¦—à¦‡à¦¨ à¦•à¦°à§à¦¨',    to: '/login' },
-                  { label: 'à¦¨à¦¿à¦¬à¦¨à§à¦§à¦¨ à¦•à¦°à§à¦¨', to: '/register' },
+                  { label: 'লগইন করুন',    to: '/login' },
+                  { label: 'নিবন্ধন করুন', to: '/register' },
                 ].map((l) => (
                   <Link
                     key={l.label}
@@ -426,12 +426,12 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
         </div>
       </Drawer>
 
-      {/* â”€â”€ Mobile Drawer â”€â”€ */}
+      {/* ── Mobile Drawer ── */}
       <div className={`nav__drawer ${mobileOpen ? 'nav__drawer--open' : ''}`} role="dialog" aria-modal="true">
         <div className="nav__drawer-inner">
           <div className="nav__drawer-header">
             <Link to="/" onClick={() => setMobileOpen(false)}><PustakLogo /></Link>
-            <button onClick={() => setMobileOpen(false)} aria-label="à¦¬à¦¨à§à¦§ à¦•à¦°à§à¦¨">
+            <button onClick={() => setMobileOpen(false)} aria-label="বন্ধ করুন">
               <X size={22} />
             </button>
           </div>
@@ -443,7 +443,7 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
               <div className="nav__drawer-user-info">
                 <p className="nav__drawer-user-name">{authUser.name || authUser.email}</p>
                 <Link to="/account/profile" className="nav__drawer-user-link" onClick={() => setMobileOpen(false)}>
-                  à¦ªà§à¦°à§‹à¦«à¦¾à¦‡à¦² à¦¦à§‡à¦–à§à¦¨
+                  প্রোফাইল দেখুন
                 </Link>
               </div>
             </div>
@@ -453,10 +453,10 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
                 className="nav__drawer-signin-btn"
                 onClick={() => { setMobileOpen(false); navigate('/login') }}
               >
-                à¦²à¦—à¦‡à¦¨ à¦•à¦°à§à¦¨
+                লগইন করুন
               </button>
               <p className="nav__drawer-signin-text">
-                à¦¨à¦¤à§à¦¨ à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦°à¦•à¦¾à¦°à§€? <Link to="/register" onClick={() => setMobileOpen(false)}>à¦¨à¦¿à¦¬à¦¨à§à¦§à¦¨ à¦•à¦°à§à¦¨</Link>
+                নতুন ব্যবহারকারী? <Link to="/register" onClick={() => setMobileOpen(false)}>নিবন্ধন করুন</Link>
               </p>
             </div>
           )}
@@ -477,36 +477,36 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
           {authUser && (
             <div className="nav__drawer-account-links">
               <Link to="/account/profile" className="nav__drawer-link" onClick={() => setMobileOpen(false)}>
-                à¦†à¦®à¦¾à¦° à¦¤à¦¥à§à¦¯
+                আমার তথ্য
               </Link>
               <Link to="/account/order" className="nav__drawer-link" onClick={() => setMobileOpen(false)}>
-                à¦…à¦°à§à¦¡à¦¾à¦° à¦¦à¦¿à¦¨
+                অর্ডার দিন
               </Link>
               <Link to="/account/orders" className="nav__drawer-link" onClick={() => setMobileOpen(false)}>
-                à¦…à¦°à§à¦¡à¦¾à¦° à¦Ÿà§à¦°à§à¦¯à¦¾à¦•à¦¿à¦‚
+                অর্ডার ট্র্যাকিং
               </Link>
               <Link to="/account/wishlist" className="nav__drawer-link" onClick={() => setMobileOpen(false)}>
-                à¦ªà¦›à¦¨à§à¦¦à§‡à¦° à¦¤à¦¾à¦²à¦¿à¦•à¦¾
+                পছন্দের তালিকা
               </Link>
               <Link to="/account/returns" className="nav__drawer-link" onClick={() => setMobileOpen(false)}>
-                à¦°à¦¿à¦Ÿà¦¾à¦°à§à¦¨ à¦“ à¦°à¦¿à¦«à¦¾à¦¨à§à¦¡
+                রিটার্ন ও রিফান্ড
               </Link>
               <Link to="/account/reviews" className="nav__drawer-link" onClick={() => setMobileOpen(false)}>
-                à¦°à¦¿à¦­à¦¿à¦‰ à¦“ à¦°à§‡à¦Ÿà¦¿à¦‚
+                রিভিউ ও রেটিং
               </Link>
             </div>
           )}
           
           <div className="nav__drawer-footer">
             <button className="nav__drawer-dark-btn" onClick={toggleDarkMode}>
-              {isDarkMode ? <><Sun size={16}/> à¦²à¦¾à¦‡à¦Ÿ à¦®à§‹à¦¡</> : <><Moon size={16}/> à¦¡à¦¾à¦°à§à¦• à¦®à§‹à¦¡</>}
+              {isDarkMode ? <><Sun size={16}/> লাইট মোড</> : <><Moon size={16}/> ডার্ক মোড</>}
             </button>
             {authUser && (
               <button 
                 className="nav__drawer-signout-btn"
                 onClick={() => { signOut(); setMobileOpen(false); navigate('/') }}
               >
-                à¦²à¦—à¦†à¦‰à¦Ÿ
+                লগআউট
               </button>
             )}
           </div>
@@ -527,9 +527,9 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
         />
       )}
 
-      {/* â”€â”€ Search Modal â”€â”€ */}
+      {/* ── Search Modal ── */}
       {searchOpen && (
-        <div className="search-modal" role="dialog" aria-modal="true" aria-label="à¦¬à¦‡ à¦–à§à¦à¦œà§à¦¨">
+        <div className="search-modal" role="dialog" aria-modal="true" aria-label="বই খুঁজুন">
           <div className="search-modal__backdrop" onClick={() => setSearchOpen(false)} />
           <div className="search-modal__box">
             <form className="search-modal__input-wrap" onSubmit={handleSearch}>
@@ -538,28 +538,28 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
                 ref={searchRef}
                 type="search"
                 className="search-modal__input"
-                placeholder="à¦¬à¦‡, à¦²à§‡à¦–à¦• à¦¬à¦¾ à¦¬à¦¿à¦­à¦¾à¦— à¦–à§à¦à¦œà§à¦¨..."
-                aria-label="à¦¬à¦‡ à¦–à§à¦à¦œà§à¦¨"
+                placeholder="বই, লেখক বা বিভাগ খুঁজুন..."
+                aria-label="বই খুঁজুন"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
-              <button type="submit" className="search-modal__submit" aria-label="à¦…à¦¨à§à¦¸à¦¨à§à¦§à¦¾à¦¨ à¦•à¦°à§à¦¨">
+              <button type="submit" className="search-modal__submit" aria-label="অনুসন্ধান করুন">
                 <ArrowRight size={18} />
               </button>
               <button
                 type="button"
                 className="search-modal__close"
                 onClick={() => setSearchOpen(false)}
-                aria-label="à¦¬à¦¨à§à¦§ à¦•à¦°à§à¦¨"
+                aria-label="বন্ধ করুন"
               >
                 <X size={20} />
               </button>
             </form>
             {query.trim().length >= 2 ? (
-              <div className="search-modal__results" role="listbox" aria-label="à¦…à¦¨à§à¦¸à¦¨à§à¦§à¦¾à¦¨ à¦«à¦²à¦¾à¦«à¦²">
-                {searchLoading && <p className="search-modal__status">à¦–à§à¦à¦œà¦›à¦¿...</p>}
+              <div className="search-modal__results" role="listbox" aria-label="অনুসন্ধান ফলাফল">
+                {searchLoading && <p className="search-modal__status">খুঁজছি...</p>}
                 {!searchLoading && searchResults.length === 0 && (
-                  <p className="search-modal__status">à¦•à§‹à¦¨à§‹ à¦«à¦²à¦¾à¦«à¦² à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿à¥¤</p>
+                  <p className="search-modal__status">কোনো ফলাফল পাওয়া যায়নি।</p>
                 )}
                 {!searchLoading && searchResults.map((book) => (
                   <button
@@ -571,24 +571,24 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
                   >
                     {book.cover_image_url
                       ? <img src={book.cover_image_url} alt="" className="search-modal__result-cover" />
-                      : <span className="search-modal__result-cover search-modal__result-cover--fallback">à¦¬à¦‡</span>
+                      : <span className="search-modal__result-cover search-modal__result-cover--fallback">বই</span>
                     }
                     <span className="search-modal__result-info">
                       <strong>{book.book_name}</strong>
                       <span>{book.author || book.authors?.[0]?.name || ''}</span>
                     </span>
-                    <span className="search-modal__result-type">à¦¬à¦‡</span>
+                    <span className="search-modal__result-type">বই</span>
                   </button>
                 ))}
                 {!searchLoading && searchResults.length > 0 && (
                   <button type="submit" className="search-modal__all">
-                    "{query.trim()}" â€” à¦¸à¦¬ à¦«à¦²à¦¾à¦«à¦² à¦¦à§‡à¦–à§à¦¨ â†’
+                    "{query.trim()}" — সব ফলাফল দেখুন →
                   </button>
                 )}
               </div>
             ) : (
               <div className="search-modal__trending">
-                <p className="search-modal__label">à¦Ÿà§à¦°à§‡à¦¨à§à¦¡à¦¿à¦‚ à¦…à¦¨à§à¦¸à¦¨à§à¦§à¦¾à¦¨</p>
+                <p className="search-modal__label">ট্রেন্ডিং অনুসন্ধান</p>
                 <div className="search-modal__chips">
                   {trendingSearches.map((t) => (
                     <button
@@ -609,7 +609,7 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
   )
 }
 
-/* â”€â”€ Reusable Drawer â”€â”€ */
+/* ── Reusable Drawer ── */
 function Drawer({ open, onClose, title, children, side = 'right' }) {
   return (
     <div
@@ -620,7 +620,7 @@ function Drawer({ open, onClose, title, children, side = 'right' }) {
     >
       <div className="side-drawer__header">
         <h2 className="side-drawer__title">{title}</h2>
-        <button className="side-drawer__close" onClick={onClose} aria-label="à¦¬à¦¨à§à¦§ à¦•à¦°à§à¦¨">
+        <button className="side-drawer__close" onClick={onClose} aria-label="বন্ধ করুন">
           <X size={20} />
         </button>
       </div>
@@ -629,17 +629,16 @@ function Drawer({ open, onClose, title, children, side = 'right' }) {
   )
 }
 
-/* â”€â”€ Logo â”€â”€ */
+/* ── Logo ── */
 function PustakLogo() {
   return (
-    <div className="pustak-logo" aria-label="à¦ªà§à¦¸à§à¦¤à¦•">
+    <div className="pustak-logo" aria-label="পুস্তক">
       <svg width="110" height="44" viewBox="0 0 110 44" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M8 36 Q30 40 55 38 Q80 36 102 39" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.35"/>
         <path d="M46 4 Q55 1 64 4" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.5"/>
-        <text x="55" y="30" textAnchor="middle" fontFamily="'Noto Serif Bengali', 'Tiro Bangla', serif" fontWeight="700" fontSize="26" fill="currentColor" letterSpacing="1">à¦ªà§à¦¸à§à¦¤à¦•</text>
+        <text x="55" y="30" textAnchor="middle" fontFamily="'Noto Serif Bengali', 'Tiro Bangla', serif" fontWeight="700" fontSize="26" fill="currentColor" letterSpacing="1">পুস্তক</text>
         <circle cx="55" cy="6" r="1.5" fill="currentColor" opacity="0.6"/>
       </svg>
     </div>
   )
 }
-

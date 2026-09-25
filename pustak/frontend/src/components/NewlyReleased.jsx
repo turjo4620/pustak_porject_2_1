@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import BookCard from './BookCard'
 import SectionHeader from './SectionHeader'
 import './NewlyReleased.css'
@@ -18,13 +18,13 @@ export default function NewlyReleased() {
   if (loading || books.length === 0) return null
 
   return (
-    <section className="newly section" aria-label="à¦¨à¦¤à§à¦¨ à¦ªà§à¦°à¦•à¦¾à¦¶à¦¿à¦¤ à¦¬à¦‡">
+    <section className="newly section" aria-label="নতুন প্রকাশিত বই">
       <div className="container">
         <SectionHeader
-          label="à¦¨à¦¤à§à¦¨ à¦ªà§à¦°à¦•à¦¾à¦¶"
-          title="à¦¸à¦¦à§à¦¯ à¦ªà§à¦°à¦•à¦¾à¦¶à¦¿à¦¤"
-          subtitle="à¦¸à¦°à§à¦¬à¦¶à§‡à¦· à¦ªà§à¦°à¦•à¦¾à¦¶à¦¿à¦¤ à¦¬à¦‡"
-          linkText="à¦¸à¦¬ à¦¦à§‡à¦–à§à¦¨"
+          label="নতুন প্রকাশ"
+          title="সদ্য প্রকাশিত"
+          subtitle="সর্বশেষ প্রকাশিত বই"
+          linkText="সব দেখুন"
           linkHref="/new-arrivals"
         />
         <div className="newly__grid">
@@ -36,4 +36,3 @@ export default function NewlyReleased() {
     </section>
   )
 }
-

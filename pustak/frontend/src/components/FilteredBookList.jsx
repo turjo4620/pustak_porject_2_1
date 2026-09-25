@@ -1,22 +1,22 @@
-﻿import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { SlidersHorizontal, X, ChevronDown, ChevronUp, Search, BookOpen } from 'lucide-react'
 import BookCard from './BookCard'
 import HoverTooltip from './HoverTooltip'
 import useCatalogBooks from '../hooks/useCatalogBooks'
 import '../pages/BestSellersPage.css'
 
-const toBn = (n) => String(n).replace(/[0-9]/g, (d) => 'à§¦à§§à§¨à§©à§ªà§«à§¬à§­à§®à§¯'[d])
+const toBn = (n) => String(n).replace(/[0-9]/g, (d) => '০১২৩৪৫৬৭৮৯'[d])
 
 const DEFAULT_SORT_OPTIONS = [
-  { value: 'popularity',  label: 'à¦œà¦¨à¦ªà¦¿à¦¯à¦¼à¦¤à¦¾'            },
-  { value: 'newest',      label: 'à¦¨à¦¤à§à¦¨ à¦ªà§à¦°à¦•à¦¾à¦¶à¦¿à¦¤'       },
-  { value: 'price_asc',   label: 'à¦®à§‚à¦²à§à¦¯: à¦•à¦® à¦¥à§‡à¦•à§‡ à¦¬à§‡à¦¶à¦¿' },
-  { value: 'price_desc',  label: 'à¦®à§‚à¦²à§à¦¯: à¦¬à§‡à¦¶à¦¿ à¦¥à§‡à¦•à§‡ à¦•à¦®' },
-  { value: 'discount',    label: 'à¦¸à¦°à§à¦¬à§‹à¦šà§à¦š à¦›à¦¾à¦¡à¦¼'        },
-  { value: 'rating',      label: 'à¦¸à¦°à§à¦¬à§‹à¦šà§à¦š à¦°à§‡à¦Ÿà¦¿à¦‚'       },
+  { value: 'popularity',  label: 'জনপিয়তা'            },
+  { value: 'newest',      label: 'নতুন প্রকাশিত'       },
+  { value: 'price_asc',   label: 'মূল্য: কম থেকে বেশি' },
+  { value: 'price_desc',  label: 'মূল্য: বেশি থেকে কম' },
+  { value: 'discount',    label: 'সর্বোচ্চ ছাড়'        },
+  { value: 'rating',      label: 'সর্বোচ্চ রেটিং'       },
 ]
 
-// â”€â”€ Collapsible sidebar section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Collapsible sidebar section ───────────────────────────────────
 function FilterSection({ title, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen)
   return (
@@ -35,7 +35,7 @@ function FilterSection({ title, children, defaultOpen = true }) {
   )
 }
 
-// â”€â”€ Price range dual-handle slider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Price range dual-handle slider ────────────────────────────────
 function PriceSlider({ min, max, value, onChange }) {
   const rangeRef = useRef(null)
   const pct = (v) => ((v - min) / (max - min)) * 100
@@ -51,30 +51,30 @@ function PriceSlider({ min, max, value, onChange }) {
           style={{ left: `${pct(value[0])}%`, right: `${100 - pct(value[1])}%` }}
         />
         <input type="range" min={min} max={max} value={value[0]} onChange={handleLow}
-          className="bsp__range bsp__range--low"  aria-label="à¦¸à¦°à§à¦¬à¦¨à¦¿à¦®à§à¦¨ à¦®à§‚à¦²à§à¦¯" />
+          className="bsp__range bsp__range--low"  aria-label="সর্বনিম্ন মূল্য" />
         <input type="range" min={min} max={max} value={value[1]} onChange={handleHigh}
-          className="bsp__range bsp__range--high" aria-label="à¦¸à¦°à§à¦¬à§‹à¦šà§à¦š à¦®à§‚à¦²à§à¦¯" />
+          className="bsp__range bsp__range--high" aria-label="সর্বোচ্চ মূল্য" />
       </div>
       <div className="bsp__price-inputs">
         <label className="bsp__price-input-wrap">
-          <span>à§³</span>
+          <span>৳</span>
           <input type="number" min={min} max={value[1] - 1} value={value[0]}
             onChange={(e) => onChange([Math.max(min, Math.min(Number(e.target.value), value[1] - 1)), value[1]])}
-            className="bsp__price-input" aria-label="à¦¸à¦°à§à¦¬à¦¨à¦¿à¦®à§à¦¨ à¦®à§‚à¦²à§à¦¯ à¦‡à¦¨à¦ªà§à¦Ÿ" />
+            className="bsp__price-input" aria-label="সর্বনিম্ন মূল্য ইনপুট" />
         </label>
-        <span className="bsp__price-dash">â€“</span>
+        <span className="bsp__price-dash">–</span>
         <label className="bsp__price-input-wrap">
-          <span>à§³</span>
+          <span>৳</span>
           <input type="number" min={value[0] + 1} max={max} value={value[1]}
             onChange={(e) => onChange([value[0], Math.min(max, Math.max(Number(e.target.value), value[0] + 1))])}
-            className="bsp__price-input" aria-label="à¦¸à¦°à§à¦¬à§‹à¦šà§à¦š à¦®à§‚à¦²à§à¦¯ à¦‡à¦¨à¦ªà§à¦Ÿ" />
+            className="bsp__price-input" aria-label="সর্বোচ্চ মূল্য ইনপুট" />
         </label>
       </div>
     </div>
   )
 }
 
-// â”€â”€ Per-kind fetch caches (module-level â€” survive re-renders) â”€â”€â”€â”€â”€
+// ── Per-kind fetch caches (module-level — survive re-renders) ─────
 const authorCache = new Map()
 const pubCache    = new Map()
 
@@ -159,7 +159,7 @@ export default function FilteredBookList({
     return facets.authors.filter((a) => a.name.toLowerCase().includes(s))
   }, [facets.authors, authorSearch])
 
-  // â”€â”€ Active chips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Active chips ──────────────────────────────────────────────
   const chips = useMemo(() => {
     const list = []
     selCategories.forEach((id) => {
@@ -176,11 +176,11 @@ export default function FilteredBookList({
     })
     if (priceRange) {
       list.push({
-        label: `à§³${toBn(priceRange[0])}â€“à§³${toBn(priceRange[1])}`,
+        label: `৳${toBn(priceRange[0])}–৳${toBn(priceRange[1])}`,
         remove: () => setPriceRange(null),
       })
     }
-    if (inStockOnly) list.push({ label: 'à¦‡à¦¨-à¦¸à§à¦Ÿà¦•', remove: () => setInStockOnly(false) })
+    if (inStockOnly) list.push({ label: 'ইন-স্টক', remove: () => setInStockOnly(false) })
     return list
   }, [selCategories, selAuthors, selPublishers, priceRange, inStockOnly, facetById])
 
@@ -194,16 +194,16 @@ export default function FilteredBookList({
   const toggleItem = (setter, value) =>
     setter((prev) => prev.includes(value) ? prev.filter((x) => x !== value) : [...prev, value])
 
-  // â”€â”€ Pagination â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Pagination ─────────────────────────────────────────────────
   const pageNums = useMemo(() => {
     const delta = 2, range = []
     for (let i = Math.max(1, page - delta); i <= Math.min(totalPages, page + delta); i++) range.push(i)
-    if (range[0] > 1) range.unshift('â€¦', 1)
-    if (range[range.length - 1] < totalPages) range.push('â€¦', totalPages)
+    if (range[0] > 1) range.unshift('…', 1)
+    if (range[range.length - 1] < totalPages) range.push('…', totalPages)
     return [...new Set(range)]
   }, [page, totalPages])
 
-  // â”€â”€ Single shared tooltip state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Single shared tooltip state ───────────────────────────────
   const [hoveredItem, setHoveredItem] = useState(null)
   const hoverTimer  = useRef(null)
   const leaveTimer  = useRef(null)
@@ -256,19 +256,19 @@ export default function FilteredBookList({
     clearTimeout(leaveTimer.current)
   }, [])
 
-  // â”€â”€ Filter sidebar (shared desktop + drawer) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Filter sidebar (shared desktop + drawer) ──────────────────
   const filterSidebar = (
     <div className="bsp__sidebar-inner">
       <div className="bsp__sidebar-head">
-        <span className="bsp__sidebar-title">à¦«à¦¿à¦²à§à¦Ÿà¦¾à¦°</span>
+        <span className="bsp__sidebar-title">ফিল্টার</span>
         {hasFilters && (
-          <button className="bsp__clear-all" onClick={clearAll} type="button">à¦¸à¦¬ à¦®à§à¦›à§à¦¨</button>
+          <button className="bsp__clear-all" onClick={clearAll} type="button">সব মুছুন</button>
         )}
       </div>
 
       {/* Category */}
       {facets.categories.length > 0 && (
-        <FilterSection title="à¦¬à¦¿à¦·à¦¯à¦¼ / à¦•à§à¦¯à¦¾à¦Ÿà¦¾à¦—à¦°à¦¿">
+        <FilterSection title="বিষয় / ক্যাটাগরি">
           <ul className="bsp__check-list">
             {facets.categories.map((f) => (
               <li key={f.id}>
@@ -284,14 +284,14 @@ export default function FilteredBookList({
         </FilterSection>
       )}
 
-      {/* Authors â€” hover fires on the <li> */}
+      {/* Authors — hover fires on the <li> */}
       {facets.authors.length > 0 && (
-        <FilterSection title="à¦²à§‡à¦–à¦•">
+        <FilterSection title="লেখক">
           <div className="bsp__author-search-wrap">
             <Search size={13} className="bsp__author-search-icon" />
             <input
               className="bsp__author-search"
-              placeholder="à¦²à§‡à¦–à¦• à¦–à§à¦à¦œà§à¦¨..."
+              placeholder="লেখক খুঁজুন..."
               value={authorSearch}
               onChange={(e) => setAuthorSearch(e.target.value)}
             />
@@ -315,9 +315,9 @@ export default function FilteredBookList({
         </FilterSection>
       )}
 
-      {/* Publishers â€” hover fires on the <li> */}
+      {/* Publishers — hover fires on the <li> */}
       {facets.publishers.length > 0 && (
-        <FilterSection title="à¦ªà§à¦°à¦•à¦¾à¦¶à¦•" defaultOpen={false}>
+        <FilterSection title="প্রকাশক" defaultOpen={false}>
           <ul className="bsp__check-list bsp__check-list--scroll">
             {facets.publishers.map((f) => (
               <li
@@ -338,7 +338,7 @@ export default function FilteredBookList({
       )}
 
       {/* Price range */}
-      <FilterSection title="à¦®à§‚à¦²à§à¦¯ à¦ªà¦°à¦¿à¦¸à§€à¦®à¦¾">
+      <FilterSection title="মূল্য পরিসীমা">
         <PriceSlider
           min={priceBounds.min}
           max={Math.max(priceBounds.max, priceBounds.min + 1)}
@@ -352,9 +352,9 @@ export default function FilteredBookList({
       </FilterSection>
 
       {/* In-stock toggle */}
-      <FilterSection title="à¦¸à§à¦Ÿà¦• à¦¸à§à¦Ÿà§à¦¯à¦¾à¦Ÿà¦¾à¦¸">
+      <FilterSection title="স্টক স্ট্যাটাস">
         <label className="bsp__toggle-row">
-          <span className="bsp__toggle-label">à¦¶à§à¦§à§ à¦‡à¦¨-à¦¸à§à¦Ÿà¦• à¦¬à¦‡</span>
+          <span className="bsp__toggle-label">শুধু ইন-স্টক বই</span>
           <button type="button" role="switch" aria-checked={inStockOnly}
             className={`bsp__toggle ${inStockOnly ? 'bsp__toggle--on' : ''}`}
             onClick={() => setInStockOnly((v) => !v)}>
@@ -373,32 +373,32 @@ export default function FilteredBookList({
 
         {/* Active chips */}
         {chips.length > 0 && (
-          <div className="bsp__chips-bar" role="list" aria-label="à¦¸à¦•à§à¦°à¦¿à¦¯à¦¼ à¦«à¦¿à¦²à§à¦Ÿà¦¾à¦°">
+          <div className="bsp__chips-bar" role="list" aria-label="সক্রিয় ফিল্টার">
             {chips.map((chip, i) => (
               <span key={i} className="bsp__chip" role="listitem">
                 {chip.label}
                 <button className="bsp__chip-remove" onClick={chip.remove}
-                  aria-label={`${chip.label} à¦«à¦¿à¦²à§à¦Ÿà¦¾à¦° à¦¸à¦°à¦¾à¦¨`}>
+                  aria-label={`${chip.label} ফিল্টার সরান`}>
                   <X size={11} />
                 </button>
               </span>
             ))}
-            <button className="bsp__chip-clear-all" onClick={clearAll} type="button">à¦¸à¦¬ à¦®à§à¦›à§à¦¨</button>
+            <button className="bsp__chip-clear-all" onClick={clearAll} type="button">সব মুছুন</button>
           </div>
         )}
 
         {/* Layout */}
         <div className="bsp__layout">
-          <aside className="bsp__sidebar" aria-label="à¦«à¦¿à¦²à§à¦Ÿà¦¾à¦° à¦ªà§à¦¯à¦¾à¦¨à§‡à¦²">
+          <aside className="bsp__sidebar" aria-label="ফিল্টার প্যানেল">
             {filterSidebar}
           </aside>
 
           <div className="bsp__content">
             {/* Sort bar */}
             <div className="bsp__sort-bar">
-              <span className="bsp__result-count">{toBn(total)} à¦Ÿà¦¿ à¦¬à¦‡ à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦—à§‡à¦›à§‡</span>
+              <span className="bsp__result-count">{toBn(total)} টি বই পাওয়া গেছে</span>
               <div className="bsp__sort-wrap">
-                <label htmlFor="bsp-sort" className="bsp__sort-label">à¦¸à¦°à§à¦Ÿ à¦•à¦°à§à¦¨:</label>
+                <label htmlFor="bsp-sort" className="bsp__sort-label">সর্ট করুন:</label>
                 <select id="bsp-sort" className="bsp__sort-select" value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}>
                   {sortOptions.map((o) => (
@@ -411,15 +411,15 @@ export default function FilteredBookList({
             {error ? (
               <p className="bsp__loading">{error}</p>
             ) : loading ? (
-              <p className="bsp__loading">à¦²à§‹à¦¡ à¦¹à¦šà§à¦›à§‡...</p>
+              <p className="bsp__loading">লোড হচ্ছে...</p>
             ) : total === 0 ? (
               <div className="bsp__empty">
                 <BookOpen size={56} className="bsp__empty-icon" />
-                <p className="bsp__empty-msg">à¦•à§‹à¦¨à§‹ à¦¬à¦‡ à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿</p>
-                <p className="bsp__empty-hint">à¦…à¦¨à§à¦¯ à¦«à¦¿à¦²à§à¦Ÿà¦¾à¦° à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦° à¦•à¦°à§‡ à¦¦à§‡à¦–à§à¦¨</p>
+                <p className="bsp__empty-msg">কোনো বই পাওয়া যায়নি</p>
+                <p className="bsp__empty-hint">অন্য ফিল্টার ব্যবহার করে দেখুন</p>
                 {hasFilters && (
                   <button className="bsp__empty-reset" onClick={clearAll} type="button">
-                    à¦«à¦¿à¦²à§à¦Ÿà¦¾à¦° à¦°à¦¿à¦¸à§‡à¦Ÿ à¦•à¦°à§à¦¨
+                    ফিল্টার রিসেট করুন
                   </button>
                 )}
               </div>
@@ -430,19 +430,19 @@ export default function FilteredBookList({
                 </div>
 
                 {totalPages > 1 && (
-                  <nav className="bsp__pagination" aria-label="à¦ªà§‡à¦œà¦¿à¦¨à§‡à¦¶à¦¨">
+                  <nav className="bsp__pagination" aria-label="পেজিনেশন">
                     <button className="bsp__page-btn"
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={page === 1} aria-label="à¦†à¦—à§‡à¦° à¦ªà§‡à¦œ">â€¹</button>
+                      disabled={page === 1} aria-label="আগের পেজ">‹</button>
 
                     {pageNums.map((n, i) =>
-                      n === 'â€¦' ? (
-                        <span key={`e-${i}`} className="bsp__page-ellipsis">â€¦</span>
+                      n === '…' ? (
+                        <span key={`e-${i}`} className="bsp__page-ellipsis">…</span>
                       ) : (
                         <button key={n}
                           className={`bsp__page-btn ${page === n ? 'bsp__page-btn--active' : ''}`}
                           onClick={() => setPage(n)}
-                          aria-label={`à¦ªà§‡à¦œ ${toBn(n)}`}
+                          aria-label={`পেজ ${toBn(n)}`}
                           aria-current={page === n ? 'page' : undefined}>
                           {toBn(n)}
                         </button>
@@ -451,7 +451,7 @@ export default function FilteredBookList({
 
                     <button className="bsp__page-btn"
                       onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={page === totalPages} aria-label="à¦ªà¦°à§‡à¦° à¦ªà§‡à¦œ">â€º</button>
+                      disabled={page === totalPages} aria-label="পরের পেজ">›</button>
                   </nav>
                 )}
               </>
@@ -465,7 +465,7 @@ export default function FilteredBookList({
         <button className="bsp__mobile-filter-btn" onClick={() => setMobileOpen(true)}
           type="button" aria-haspopup="dialog">
           <SlidersHorizontal size={16} />
-          à¦«à¦¿à¦²à§à¦Ÿà¦¾à¦° à¦“ à¦¸à¦°à§à¦Ÿ
+          ফিল্টার ও সর্ট
           {hasFilters && <span className="bsp__mobile-badge">{toBn(chips.length)}</span>}
         </button>
       </div>
@@ -477,17 +477,17 @@ export default function FilteredBookList({
 
       {/* Mobile drawer */}
       <div className={`bsp__drawer ${mobileOpen ? 'bsp__drawer--open' : ''}`}
-        role="dialog" aria-modal="true" aria-label="à¦«à¦¿à¦²à§à¦Ÿà¦¾à¦° à¦“ à¦¸à¦°à§à¦Ÿ">
+        role="dialog" aria-modal="true" aria-label="ফিল্টার ও সর্ট">
         <div className="bsp__drawer-header">
-          <span className="bsp__drawer-title">à¦«à¦¿à¦²à§à¦Ÿà¦¾à¦° à¦“ à¦¸à¦°à§à¦Ÿ</span>
+          <span className="bsp__drawer-title">ফিল্টার ও সর্ট</span>
           <button className="bsp__drawer-close" onClick={() => setMobileOpen(false)}
-            aria-label="à¦¡à§à¦°à¦¯à¦¼à¦¾à¦° à¦¬à¦¨à§à¦§ à¦•à¦°à§à¦¨">
+            aria-label="ড্রয়ার বন্ধ করুন">
             <X size={20} />
           </button>
         </div>
 
         <div className="bsp__drawer-sort">
-          <span className="bsp__sort-label">à¦¸à¦°à§à¦Ÿ à¦•à¦°à§à¦¨</span>
+          <span className="bsp__sort-label">সর্ট করুন</span>
           <div className="bsp__drawer-sort-options">
             {sortOptions.map((o) => (
               <button key={o.value} type="button"
@@ -503,14 +503,13 @@ export default function FilteredBookList({
 
         <div className="bsp__drawer-footer">
           <button className="bsp__drawer-apply" onClick={() => setMobileOpen(false)} type="button">
-            {toBn(total)} à¦Ÿà¦¿ à¦¬à¦‡ à¦¦à§‡à¦–à§à¦¨
+            {toBn(total)} টি বই দেখুন
           </button>
         </div>
       </div>
 
-      {/* â”€â”€ Single shared tooltip â€” portalled to <body> â”€â”€ */}
+      {/* ── Single shared tooltip — portalled to <body> ── */}
       <HoverTooltip item={hoveredItem} />
     </div>
   )
 }
-

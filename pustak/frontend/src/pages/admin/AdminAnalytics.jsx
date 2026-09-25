@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { TrendingUp, Package, DollarSign, AlertTriangle } from 'lucide-react';
 import '../../styles/admin.css';
 
@@ -66,7 +66,7 @@ export default function AdminAnalytics() {
         <div className="summary-card">
           <DollarSign size={32} />
           <h3>Total Revenue</h3>
-          <p className="summary-value">à§³{totalRevenue.toFixed(2)}</p>
+          <p className="summary-value">৳{totalRevenue.toFixed(2)}</p>
         </div>
         <div className="summary-card">
           <TrendingUp size={32} />
@@ -107,14 +107,14 @@ export default function AdminAnalytics() {
                 </td>
                 <td>{book.total_sold}</td>
                 <td>{book.order_count}</td>
-                <td>à§³{parseFloat(book.revenue).toFixed(2)}</td>
+                <td>৳{parseFloat(book.revenue).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* â”€â”€ Best Customers â”€â”€ */}
+      {/* ── Best Customers ── */}
       <div className="analytics-section">
         <h2>Best Customers</h2>
         <table className="admin-table">
@@ -140,15 +140,15 @@ export default function AdminAnalytics() {
                     <div className="customer-avatar">
                       {(c.name || c.email || '?').charAt(0).toUpperCase()}
                     </div>
-                    <strong>{c.name || 'â€”'}</strong>
+                    <strong>{c.name || '—'}</strong>
                   </div>
                 </td>
                 <td style={{ fontSize: '0.85rem', color: '#6b7280' }}>{c.email}</td>
                 <td><strong>{c.total_orders}</strong></td>
                 <td>{c.delivered_orders}</td>
-                <td>à§³{parseFloat(c.total_spent || 0).toFixed(2)}</td>
+                <td>৳{parseFloat(c.total_spent || 0).toFixed(2)}</td>
                 <td style={{ fontSize: '0.82rem', color: '#9ca3af' }}>
-                  {c.last_order_date ? new Date(c.last_order_date).toLocaleDateString() : 'â€”'}
+                  {c.last_order_date ? new Date(c.last_order_date).toLocaleDateString() : '—'}
                 </td>
               </tr>
             ))}
@@ -238,4 +238,3 @@ export default function AdminAnalytics() {
     </div>
   );
 }
-

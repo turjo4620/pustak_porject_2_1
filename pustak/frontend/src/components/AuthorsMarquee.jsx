@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SectionHeader from './SectionHeader'
 import './AuthorsMarquee.css'
@@ -22,7 +22,7 @@ function AuthorCard({ author }) {
       </div>
       <span className="am-card__name">{author.name}</span>
       {author.count > 0 && (
-        <span className="am-card__count">{author.count} à¦Ÿà¦¿ à¦¬à¦‡</span>
+        <span className="am-card__count">{author.count} টি বই</span>
       )}
     </Link>
   )
@@ -38,7 +38,7 @@ export default function AuthorsMarquee() {
       .then(json => {
         const list = json.data || (Array.isArray(json) ? json : [])
         const sorted = [...list]
-          .filter(author => !/^(Stephen King|à¦¸à§à¦Ÿà¦¿à¦«à§‡à¦¨ à¦•à¦¿à¦‚)$/i.test(author.name?.trim()))
+          .filter(author => !/^(Stephen King|স্টিফেন কিং)$/i.test(author.name?.trim()))
           .sort((a, b) => Number(b.count || 0) - Number(a.count || 0))
           .slice(0, 20)
         setAuthors(sorted)
@@ -52,13 +52,13 @@ export default function AuthorsMarquee() {
   const doubled = [...authors, ...authors]
 
   return (
-    <section className="authors-marquee section-sm" aria-label="à¦œà¦¨à¦ªà§à¦°à¦¿à¦¯à¦¼ à¦²à§‡à¦–à¦• à¦“ à¦¶à§€à¦°à§à¦· à¦¬à¦¿à¦•à§à¦°à¦¿à¦¤ à¦¬à¦‡">
+    <section className="authors-marquee section-sm" aria-label="জনপ্রিয় লেখক ও শীর্ষ বিক্রিত বই">
       <div className="container">
         <SectionHeader
-          label="à¦²à§‡à¦–à¦•"
-          title="à¦œà¦¨à¦ªà§à¦°à¦¿à¦¯à¦¼ à¦²à§‡à¦–à¦•"
-          subtitle="à¦†à¦ªà¦¨à¦¾à¦° à¦ªà§à¦°à¦¿à¦¯à¦¼ à¦²à§‡à¦–à¦•à§‡à¦° à¦¬à¦‡ à¦–à§à¦à¦œà§à¦¨"
-          linkText="à¦¸à¦¬ à¦¦à§‡à¦–à§à¦¨"
+          label="লেখক"
+          title="জনপ্রিয় লেখক"
+          subtitle="আপনার প্রিয় লেখকের বই খুঁজুন"
+          linkText="সব দেখুন"
           linkHref="/authors"
         />
       </div>
@@ -73,4 +73,3 @@ export default function AuthorsMarquee() {
     </section>
   )
 }
-

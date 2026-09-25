@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import './AuthorSpotlight.css'
 
@@ -46,7 +46,7 @@ export default function AuthorSpotlight() {
     <section
       className={`author section ${visible ? 'author--visible' : ''}`}
       ref={ref}
-      aria-label="à¦²à§‡à¦–à¦• à¦¸à§à¦ªà¦Ÿà¦²à¦¾à¦‡à¦Ÿ"
+      aria-label="লেখক স্পটলাইট"
     >
       <div className="container">
         <div className="author__inner">
@@ -61,31 +61,31 @@ export default function AuthorSpotlight() {
               }
             </div>
             <div className="author__quote-bubble" aria-hidden="true">
-              "à¦¬à¦‡ à¦¹à¦²à§‹ à¦†à¦²à§‹à¦° à¦¬à¦¾à¦¤à¦¿à¦˜à¦°"
+              "বই হলো আলোর বাতিঘর"
             </div>
           </div>
 
           {/* Info */}
           <div className="author__info">
-            <span className="author__label">à¦²à§‡à¦–à¦• à¦ªà¦°à¦¿à¦šà¦¿à¦¤à¦¿</span>
+            <span className="author__label">লেখক পরিচিতি</span>
             <h2 className="author__name">{author.name}</h2>
             {author.bio && (
               <p className="author__bio">
-                {author.bio.slice(0, 240)}{author.bio.length > 240 ? 'â€¦' : ''}
+                {author.bio.slice(0, 240)}{author.bio.length > 240 ? '…' : ''}
               </p>
             )}
 
-            <div className="author__stat-row" aria-label="à¦²à§‡à¦–à¦•à§‡à¦° à¦ªà¦°à¦¿à¦¸à¦‚à¦–à§à¦¯à¦¾à¦¨">
+            <div className="author__stat-row" aria-label="লেখকের পরিসংখ্যান">
               <div className="author__stat">
-                <strong>{author.count || 'â€”'}</strong>
-                <span>à¦°à¦šà¦¨à¦¾</span>
+                <strong>{author.count || '—'}</strong>
+                <span>রচনা</span>
               </div>
             </div>
 
             {/* Popular books */}
             {books.length > 0 && (
-              <div className="author__books" aria-label="à¦œà¦¨à¦ªà§à¦°à¦¿à¦¯à¦¼ à¦¬à¦‡">
-                <p className="author__books-label">à¦œà¦¨à¦ªà§à¦°à¦¿à¦¯à¦¼ à¦¬à¦‡</p>
+              <div className="author__books" aria-label="জনপ্রিয় বই">
+                <p className="author__books-label">জনপ্রিয় বই</p>
                 <div className="author__books-grid">
                   {books.map((b) => (
                     <Link
@@ -110,7 +110,7 @@ export default function AuthorSpotlight() {
               to={`/author/${author.author_id}`}
               className="author__btn"
             >
-              à¦¸à¦•à¦² à¦¬à¦‡ à¦¦à§‡à¦–à§à¦¨
+              সকল বই দেখুন
             </Link>
           </div>
         </div>
@@ -118,4 +118,3 @@ export default function AuthorSpotlight() {
     </section>
   )
 }
-

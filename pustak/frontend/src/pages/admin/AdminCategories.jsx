@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Trash2 } from 'lucide-react';
 import '../../styles/admin.css';
 
@@ -214,4 +214,3 @@ function CategoryModal({ category, onClose, onSuccess }) {
     </div>
   );
 }
-

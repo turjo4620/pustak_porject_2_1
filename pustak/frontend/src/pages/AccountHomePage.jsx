@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   Search, X, ArrowRight, BookOpen, TrendingUp,
@@ -11,7 +11,7 @@ import './AccountHomePage.css'
 
 const BASE = 'https://putak-porject-2-1.onrender.com/api'
 
-// â”€â”€ Quick stat card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Quick stat card ──────────────────────────────────────────────────────────
 function StatCard({ icon: Icon, label, value, to, color }) {
   const navigate = useNavigate()
   return (
@@ -28,7 +28,7 @@ function StatCard({ icon: Icon, label, value, to, color }) {
   )
 }
 
-// â”€â”€ Compact horizontal book shelf â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Compact horizontal book shelf ────────────────────────────────────────────
 function BookShelf({ title, linkText, linkHref, books, loading }) {
   return (
     <div className="ahp-shelf">
@@ -55,15 +55,15 @@ function BookShelf({ title, linkText, linkHref, books, loading }) {
   )
 }
 
-// â”€â”€ Category chips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Category chips ────────────────────────────────────────────────────────────
 function CategoryChips({ categories }) {
   if (!categories || categories.length === 0) return null
   return (
     <div className="ahp-cats">
       <div className="ahp-shelf__header">
-        <h3 className="ahp-shelf__title">à¦¬à¦¿à¦­à¦¾à¦— à¦…à¦¨à§à¦¯à¦¾à¦¯à¦¼à§€ à¦¬à¦‡</h3>
+        <h3 className="ahp-shelf__title">বিভাগ অনুযায়ী বই</h3>
         <Link to="/categories" className="ahp-shelf__link">
-          à¦¸à¦¬ à¦¬à¦¿à¦­à¦¾à¦— <ArrowRight size={14} />
+          সব বিভাগ <ArrowRight size={14} />
         </Link>
       </div>
       <div className="ahp-cats__grid">
@@ -81,15 +81,15 @@ function CategoryChips({ categories }) {
   )
 }
 
-// â”€â”€ Author chips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Author chips ──────────────────────────────────────────────────────────────
 function AuthorChips({ authors }) {
   if (!authors || authors.length === 0) return null
   return (
     <div className="ahp-cats ahp-cats--authors">
       <div className="ahp-shelf__header">
-        <h3 className="ahp-shelf__title">à¦²à§‡à¦–à¦• à¦…à¦¨à§à¦¯à¦¾à¦¯à¦¼à§€ à¦¬à¦‡</h3>
+        <h3 className="ahp-shelf__title">লেখক অনুযায়ী বই</h3>
         <Link to="/authors" className="ahp-shelf__link">
-          à¦¸à¦¬ à¦²à§‡à¦–à¦• <ArrowRight size={14} />
+          সব লেখক <ArrowRight size={14} />
         </Link>
       </div>
       <div className="ahp-cats__grid">
@@ -120,15 +120,15 @@ function AuthorChips({ authors }) {
   )
 }
 
-// â”€â”€ Publisher chips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Publisher chips ───────────────────────────────────────────────────────────
 function PublisherChips({ publishers }) {
   if (!publishers || publishers.length === 0) return null
   return (
     <div className="ahp-cats ahp-cats--publishers">
       <div className="ahp-shelf__header">
-        <h3 className="ahp-shelf__title">à¦ªà§à¦°à¦•à¦¾à¦¶à¦• à¦…à¦¨à§à¦¯à¦¾à¦¯à¦¼à§€ à¦¬à¦‡</h3>
+        <h3 className="ahp-shelf__title">প্রকাশক অনুযায়ী বই</h3>
         <Link to="/publishers" className="ahp-shelf__link">
-          à¦¸à¦¬ à¦ªà§à¦°à¦•à¦¾à¦¶à¦• <ArrowRight size={14} />
+          সব প্রকাশক <ArrowRight size={14} />
         </Link>
       </div>
       <div className="ahp-cats__grid">
@@ -148,7 +148,7 @@ function PublisherChips({ publishers }) {
             )}
             {!p.cover_image_url && (
               <span className="ahp-chip-initial ahp-chip-initial--square">
-                {(p.title || 'à¦ªà§à¦°').slice(0, 2)}
+                {(p.title || 'প্র').slice(0, 2)}
               </span>
             )}
             {p.title}
@@ -159,7 +159,7 @@ function PublisherChips({ publishers }) {
   )
 }
 
-// â”€â”€ Main component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Main component ────────────────────────────────────────────────────────────
 export default function AccountHomePage() {
   const navigate = useNavigate()
   const { authUser, cartItems, wishItems } = useApp()
@@ -184,10 +184,10 @@ export default function AccountHomePage() {
   const [authors, setAuthors] = useState([])
   const [publishers, setPublishers] = useState([])
 
-  const name = authUser?.name || authUser?.full_name || 'à¦¬à¦¨à§à¦§à§'
+  const name = authUser?.name || authUser?.full_name || 'বন্ধু'
   const firstName = name.trim().split(/\s+/)[0]
 
-  // â”€â”€ Fetch book sections on mount â”€â”€
+  // ── Fetch book sections on mount ──
   useEffect(() => {
     fetch(`${BASE}/books/new-arrivals?limit=10`)
       .then(r => r.json())
@@ -223,7 +223,7 @@ export default function AccountHomePage() {
       .catch(() => {})
   }, [])
 
-  // â”€â”€ Debounced live search â”€â”€
+  // ── Debounced live search ──
   useEffect(() => {
     clearTimeout(debounceRef.current)
     const term = q.trim()
@@ -265,21 +265,21 @@ export default function AccountHomePage() {
   // Greeting by time of day
   const hour = new Date().getHours()
   const greeting =
-    hour < 5  ? 'à¦¶à§à¦­ à¦°à¦¾à¦¤' :
-    hour < 12 ? 'à¦¶à§à¦­ à¦¸à¦•à¦¾à¦²' :
-    hour < 17 ? 'à¦¶à§à¦­ à¦…à¦ªà¦°à¦¾à¦¹à§à¦¨' :
-    hour < 21 ? 'à¦¶à§à¦­ à¦¸à¦¨à§à¦§à§à¦¯à¦¾' : 'à¦¶à§à¦­ à¦°à¦¾à¦¤'
+    hour < 5  ? 'শুভ রাত' :
+    hour < 12 ? 'শুভ সকাল' :
+    hour < 17 ? 'শুভ অপরাহ্ন' :
+    hour < 21 ? 'শুভ সন্ধ্যা' : 'শুভ রাত'
 
   return (
     <div className="ahp-root">
 
-      {/* â”€â”€ Welcome banner â”€â”€ */}
+      {/* ── Welcome banner ── */}
       <div className="ahp-welcome">
         <div className="ahp-welcome__text">
-          <p className="ahp-welcome__greeting">{greeting}, {firstName} ðŸ‘‹</p>
-          <h2 className="ahp-welcome__headline">à¦†à¦œ à¦•à§‹à¦¨ à¦¬à¦‡à¦Ÿà¦¿ à¦ªà¦¡à¦¼à¦¬à§‡à¦¨?</h2>
+          <p className="ahp-welcome__greeting">{greeting}, {firstName} 👋</p>
+          <h2 className="ahp-welcome__headline">আজ কোন বইটি পড়বেন?</h2>
           <p className="ahp-welcome__sub">
-            à¦¨à¦¤à§à¦¨ à¦¬à¦‡ à¦–à§à¦à¦œà§à¦¨, à¦…à¦°à§à¦¡à¦¾à¦° à¦¦à¦¿à¦¨, à¦…à¦¥à¦¬à¦¾ à¦†à¦ªà¦¨à¦¾à¦° à¦ªà¦›à¦¨à§à¦¦à§‡à¦° à¦¤à¦¾à¦²à¦¿à¦•à¦¾ à¦¦à§‡à¦–à§à¦¨à¥¤
+            নতুন বই খুঁজুন, অর্ডার দিন, অথবা আপনার পছন্দের তালিকা দেখুন।
           </p>
         </div>
         <div className="ahp-welcome__deco" aria-hidden="true">
@@ -287,39 +287,39 @@ export default function AccountHomePage() {
         </div>
       </div>
 
-      {/* â”€â”€ Quick stats â”€â”€ */}
+      {/* ── Quick stats ── */}
       <div className="ahp-stats-row">
         <StatCard
           icon={ShoppingBag}
-          label="à¦…à¦°à§à¦¡à¦¾à¦° à¦¦à¦¿à¦¨"
-          value="à¦¬à¦‡ à¦•à¦¿à¦¨à§à¦¨"
+          label="অর্ডার দিন"
+          value="বই কিনুন"
           to="/account/order"
           color="#0f766e"
         />
         <StatCard
           icon={Package}
-          label="à¦…à¦°à§à¦¡à¦¾à¦° à¦Ÿà§à¦°à§à¦¯à¦¾à¦•à¦¿à¦‚"
-          value="à¦Ÿà§à¦°à§à¦¯à¦¾à¦• à¦•à¦°à§à¦¨"
+          label="অর্ডার ট্র্যাকিং"
+          value="ট্র্যাক করুন"
           to="/account/orders"
           color="#0369a1"
         />
         <StatCard
           icon={Heart}
-          label="à¦ªà¦›à¦¨à§à¦¦à§‡à¦° à¦¤à¦¾à¦²à¦¿à¦•à¦¾"
-          value={wishCount > 0 ? `${wishCount}à¦Ÿà¦¿ à¦¬à¦‡` : 'à¦–à¦¾à¦²à¦¿'}
+          label="পছন্দের তালিকা"
+          value={wishCount > 0 ? `${wishCount}টি বই` : 'খালি'}
           to="/account/wishlist"
           color="#be185d"
         />
         <StatCard
           icon={Star}
-          label="à¦°à¦¿à¦­à¦¿à¦‰ à¦“ à¦°à§‡à¦Ÿà¦¿à¦‚"
-          value="à¦†à¦®à¦¾à¦° à¦°à¦¿à¦­à¦¿à¦‰"
+          label="রিভিউ ও রেটিং"
+          value="আমার রিভিউ"
           to="/account/reviews"
           color="#b45309"
         />
       </div>
 
-      {/* â”€â”€ Search bar â”€â”€ */}
+      {/* ── Search bar ── */}
       <div className="ahp-search-card">
         <form
           className={`ahp-search-form ${searchFocused ? 'ahp-search-form--focused' : ''}`}
@@ -331,34 +331,34 @@ export default function AccountHomePage() {
             ref={inputRef}
             type="search"
             className="ahp-search-input"
-            placeholder="à¦¬à¦‡, à¦²à§‡à¦–à¦• à¦¬à¦¾ à¦¬à¦¿à¦­à¦¾à¦— à¦²à¦¿à¦–à§à¦¨..."
+            placeholder="বই, লেখক বা বিভাগ লিখুন..."
             value={q}
             onChange={e => setQ(e.target.value)}
             onFocus={() => setSearchFocused(true)}
             onBlur={() => setTimeout(() => setSearchFocused(false), 180)}
             autoComplete="off"
-            aria-label="à¦¬à¦‡ à¦–à§à¦à¦œà§à¦¨"
+            aria-label="বই খুঁজুন"
           />
           {q && (
             <button
               type="button"
               className="ahp-search-clear"
               onClick={() => { setQ(''); setSearchResults([]); inputRef.current?.focus() }}
-              aria-label="à¦®à§à¦›à§à¦¨"
+              aria-label="মুছুন"
             >
               <X size={15} />
             </button>
           )}
-          <button type="submit" className="ahp-search-btn">à¦…à¦¨à§à¦¸à¦¨à§à¦§à¦¾à¦¨</button>
+          <button type="submit" className="ahp-search-btn">অনুসন্ধান</button>
 
           {/* Live dropdown */}
           {showDropdown && (
             <div className="ahp-search-dropdown" role="listbox">
               {searchLoading && (
-                <p className="ahp-search-status">à¦–à§à¦à¦œà¦›à¦¿...</p>
+                <p className="ahp-search-status">খুঁজছি...</p>
               )}
               {!searchLoading && searchResults.length === 0 && (
-                <p className="ahp-search-status">à¦•à§‹à¦¨à§‹ à¦«à¦²à¦¾à¦«à¦² à¦ªà¦¾à¦“à¦¯à¦¼à¦¾ à¦¯à¦¾à¦¯à¦¼à¦¨à¦¿à¥¤</p>
+                <p className="ahp-search-status">কোনো ফলাফল পাওয়া যায়নি।</p>
               )}
               {!searchLoading && searchResults.map(book => (
                 <div
@@ -381,7 +381,7 @@ export default function AccountHomePage() {
               ))}
               {!searchLoading && searchResults.length > 0 && (
                 <button type="submit" className="ahp-search-all">
-                  "{q}" â€” à¦¸à¦¬ à¦«à¦²à¦¾à¦«à¦² à¦¦à§‡à¦–à§à¦¨ â†’
+                  "{q}" — সব ফলাফল দেখুন →
                 </button>
               )}
             </div>
@@ -391,8 +391,8 @@ export default function AccountHomePage() {
         {/* Trending chips */}
         <div className="ahp-trending">
           <TrendingUp size={13} className="ahp-trending__icon" />
-          <span className="ahp-trending__label">à¦Ÿà§à¦°à§‡à¦¨à§à¦¡à¦¿à¦‚:</span>
-          {['à¦¹à¦¿à¦®à§', 'à¦¹à§à¦®à¦¾à¦¯à¦¼à§‚à¦¨ à¦†à¦¹à¦®à§‡à¦¦', 'à¦°à¦¬à§€à¦¨à§à¦¦à§à¦°à¦¨à¦¾à¦¥', 'à¦®à§à¦•à§à¦¤à¦¿à¦¯à§à¦¦à§à¦§', 'à¦¬à¦¿à¦œà§à¦žà¦¾à¦¨'].map(t => (
+          <span className="ahp-trending__label">ট্রেন্ডিং:</span>
+          {['হিমু', 'হুমায়ূন আহমেদ', 'রবীন্দ্রনাথ', 'মুক্তিযুদ্ধ', 'বিজ্ঞান'].map(t => (
             <button
               key={t}
               type="button"
@@ -405,40 +405,40 @@ export default function AccountHomePage() {
         </div>
       </div>
 
-      {/* â”€â”€ Category / Author / Publisher chips â”€â”€ */}
+      {/* ── Category / Author / Publisher chips ── */}
       <div className="ahp-card">
         <CategoryChips categories={categories} />
         <AuthorChips authors={authors} />
         <PublisherChips publishers={publishers} />
       </div>
 
-      {/* â”€â”€ Recommended / Bestsellers â”€â”€ */}
+      {/* ── Recommended / Bestsellers ── */}
       <div className="ahp-card">
         <BookShelf
-          title="à¦œà¦¨à¦ªà§à¦°à¦¿à¦¯à¦¼ à¦¬à¦‡"
-          linkText="à¦¸à¦¬ à¦¬à§‡à¦¸à§à¦Ÿà¦¸à§‡à¦²à¦¾à¦°"
+          title="জনপ্রিয় বই"
+          linkText="সব বেস্টসেলার"
           linkHref="/bestsellers"
           books={bestsellers}
           loading={bestLoading}
         />
       </div>
 
-      {/* â”€â”€ New arrivals â”€â”€ */}
+      {/* ── New arrivals ── */}
       <div className="ahp-card">
         <BookShelf
-          title="à¦¨à¦¤à§à¦¨ à¦ªà§à¦°à¦•à¦¾à¦¶à¦¿à¦¤"
-          linkText="à¦¸à¦¬ à¦¨à¦¤à§à¦¨ à¦¬à¦‡"
+          title="নতুন প্রকাশিত"
+          linkText="সব নতুন বই"
           linkHref="/new-arrivals"
           books={newArrivals}
           loading={newLoading}
         />
       </div>
 
-      {/* â”€â”€ Recommended â”€â”€ */}
+      {/* ── Recommended ── */}
       <div className="ahp-card">
         <BookShelf
-          title="à¦†à¦ªà¦¨à¦¾à¦° à¦œà¦¨à§à¦¯ à¦¬à¦¾à¦›à¦¾à¦‡"
-          linkText="à¦¸à¦¬ à¦¬à¦‡ à¦¦à§‡à¦–à§à¦¨"
+          title="আপনার জন্য বাছাই"
+          linkText="সব বই দেখুন"
           linkHref="/bestsellers"
           books={recommended}
           loading={recoLoading}
@@ -448,4 +448,3 @@ export default function AccountHomePage() {
     </div>
   )
 }
-
