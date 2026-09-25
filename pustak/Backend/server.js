@@ -14,7 +14,18 @@ const pool = require('./src/config/db');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+const corsOptions = {
+    // The API is consumed by the public storefront and does not use cookies.
+    // Reflect the requesting origin so browser requests receive CORS headers
+    // on both successful and error responses.
+    origin: true,
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 
 // Base route

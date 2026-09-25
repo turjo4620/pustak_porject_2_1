@@ -4,6 +4,10 @@ import { useApp } from '../context/AppContext'
 import './AuthPage.css'
 
 const API_BASE_URL = (() => {
+  if (import.meta.env.DEV) {
+    return 'http://localhost:5000'
+  }
+
   const configuredUrl = (import.meta.env.VITE_API_URL || '').trim()
   const normalizedUrl = configuredUrl.replace(/\/+$/, '').replace(/\/api$/, '')
   return normalizedUrl || 'https://putak-porject-2-1.onrender.com'
