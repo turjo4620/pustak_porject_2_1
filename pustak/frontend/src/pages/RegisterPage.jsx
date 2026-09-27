@@ -78,19 +78,19 @@ export default function RegisterPage() {
     <div className="auth-page">
       <div className="auth-card">
         <Link to="/" className="auth-logo">পুস্তক</Link>
-        <h1 className="auth-title">নিবন্ধন করুন</h1>
-        <p className="auth-sub">নতুন অ্যাকাউন্ট তৈরি করুন</p>
+        <h1 className="auth-title">Sign Up</h1>
+        <p className="auth-sub">Create a new account</p>
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">
-            <label htmlFor="name">পুরো নাম</label>
-            <input id="name" type="text" placeholder="আপনার নাম" value={form.name} onChange={set('name')} required />
+            <label htmlFor="name">Full Name</label>
+            <input id="name" type="text" placeholder="Your name" value={form.name} onChange={set('name')} required />
           </div>
           <div className="auth-field">
-            <label htmlFor="email">ইমেইল</label>
+            <label htmlFor="email">Email</label>
             <input id="email" type="email" placeholder="your@email.com" value={form.email} onChange={set('email')} required />
           </div>
           <div className="auth-field">
-            <label htmlFor="password">পাসওয়ার্ড</label>
+            <label htmlFor="password">Password</label>
             <input id="password" type="password" placeholder="••••••••" value={form.password} onChange={set('password')} required />
           </div>
           {message.text ? (
@@ -99,11 +99,11 @@ export default function RegisterPage() {
             </p>
           ) : null}
           <button type="submit" className="auth-btn" disabled={loading}>
-            {loading ? 'অ্যাকাউন্ট তৈরি হচ্ছে…' : 'নিবন্ধন করুন'}
+            {loading ? 'Creating Account…' : 'Sign Up'}
           </button>
         </form>
         <p className="auth-switch">
-          ইতোমধ্যে অ্যাকাউন্ট আছে? <Link to="/login">লগইন করুন</Link>
+          Already have an account? <Link to="/login">Sign In</Link>
         </p>
       </div>
     </div>

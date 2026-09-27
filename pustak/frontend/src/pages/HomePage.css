@@ -19,7 +19,7 @@
 
 .landing-highlights {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   gap: var(--space-10);
   width: 100%;
@@ -28,11 +28,7 @@
 .landing-highlights > * {
   min-width: 0;
   height: 100%;
-  grid-column: span 7;
-}
-
-.landing-highlights .top-customers {
-  grid-column: span 5;
+  grid-column: span 1;
 }
 
 .landing-highlights .ranked-bestsellers,
