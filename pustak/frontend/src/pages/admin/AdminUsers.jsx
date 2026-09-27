@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Eye, Ban, CheckCircle } from 'lucide-react';
+import { Search, Eye, Ban, CheckCircle, Plus, ShieldCheck } from 'lucide-react';
 import '../../styles/admin.css';
 
 export default function AdminUsers() {
@@ -10,6 +10,10 @@ export default function AdminUsers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
+  const [adminForm, setAdminForm] = useState({ email: '', password: '' });
+  const [creatingAdmin, setCreatingAdmin] = useState(false);
+  const [adminMessage, setAdminMessage] = useState('');
+  const [adminError, setAdminError] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -83,11 +87,78 @@ export default function AdminUsers() {
     }
   };
 
+  const createAdmin = async (event) => {
+    event.preventDefault();
+    setAdminMessage('');
+    setAdminError('');
+    setCreatingAdmin(true);
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch('https://putak-porject-2-1.onrender.com/api/admin/users/admin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(adminForm)
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Admin account creation failed');
+      setAdminForm({ email: '', password: '' });
+      setAdminMessage(data.message || 'Admin account created successfully');
+      fetchUsers();
+    } catch (error) {
+      setAdminError(error.message || 'Admin account creation failed');
+    } finally {
+      setCreatingAdmin(false);
+    }
+  };
+
   return (
     <div className="admin-page">
       <div className="admin-header">
         <h1>User Management</h1>
       </div>
+
+      <section className="admin-create-card" aria-labelledby="create-admin-title">
+        <div className="admin-create-card__heading">
+          <ShieldCheck size={22} />
+          <div>
+            <h2 id="create-admin-title">Create Admin ID</h2>
+            <p>Use a Gmail address and password to add an administrator.</p>
+          </div>
+        </div>
+        <form className="admin-create-form" onSubmit={createAdmin}>
+          <label className="form-group">
+            <span>Gmail address</span>
+            <input
+              type="email"
+              value={adminForm.email}
+              placeholder="admin@gmail.com"
+              pattern="^[^\\s@]+@gmail\\.com$"
+              onChange={event => setAdminForm(form => ({ ...form, email: event.target.value }))}
+              required
+            />
+          </label>
+          <label className="form-group">
+            <span>Password</span>
+            <input
+              type="password"
+              value={adminForm.password}
+              placeholder="At least 8 characters"
+              minLength={8}
+              onChange={event => setAdminForm(form => ({ ...form, password: event.target.value }))}
+              required
+            />
+          </label>
+          <button type="submit" className="btn-primary admin-create-form__button" disabled={creatingAdmin}>
+            <Plus size={16} />
+            {creatingAdmin ? 'Creating...' : 'Create Admin'}
+          </button>
+        </form>
+        {adminMessage && <p className="admin-create-card__success" role="status">{adminMessage}</p>}
+        {adminError && <p className="admin-create-card__error" role="alert">{adminError}</p>}
+      </section>
 
       <div className="admin-filters">
         <div className="search-box">

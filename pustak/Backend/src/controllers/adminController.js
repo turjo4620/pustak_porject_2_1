@@ -119,6 +119,17 @@ class AdminController {
     }
   }
 
+  async createAdminAccount(req, res) {
+    try {
+      const { email, password } = req.body;
+      const admin = await adminService.createAdminAccount(email, password);
+      res.status(201).json({ message: 'অ্যাডমিন অ্যাকাউন্ট তৈরি হয়েছে', admin });
+    } catch (error) {
+      console.error('Create admin account error:', error);
+      res.status(error.status || 500).json({ message: error.message || 'অ্যাডমিন অ্যাকাউন্ট তৈরি করা যায়নি' });
+    }
+  }
+
   async updateUserStatus(req, res) {
     try {
       const { status } = req.body;

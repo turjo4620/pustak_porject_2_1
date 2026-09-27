@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const bcrypt = require('bcryptjs');
 
 class AdminService {
   // ============= DASHBOARD STATS =============
@@ -434,6 +435,53 @@ class AdminService {
       page,
       totalPages: Math.ceil(countResult.rows[0].total / limit)
     };
+  }
+
+  async createAdminAccount(email, password) {
+    const cleanEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+    const cleanPassword = typeof password === 'string' ? password : '';
+
+    if (!/^[^\s@]+@gmail\.com$/.test(cleanEmail)) {
+      const error = new Error('শুধুমাত্র Gmail ঠিকানা ব্যবহার করুন');
+      error.status = 400;
+      throw error;
+    }
+    if (cleanPassword.length < 8) {
+      const error = new Error('পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে');
+      error.status = 400;
+      throw error;
+    }
+
+    const passwordHash = await bcrypt.hash(cleanPassword, 12);
+    const displayName = cleanEmail.split('@')[0];
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+      const userResult = await client.query(
+        `INSERT INTO users (name, email, password_hash, status, role)
+         VALUES ($1, $2, $3, 'Active', 'admin')
+         RETURNING user_id, name, email, role, status`,
+        [displayName, cleanEmail, passwordHash]
+      );
+      const user = userResult.rows[0];
+      await client.query(
+        `INSERT INTO admin (user_id, admin_level, department)
+         VALUES ($1, 'admin', 'Management')`,
+        [user.user_id]
+      );
+      await client.query('COMMIT');
+      return user;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      if (error.code === '23505') {
+        error.status = 409;
+        error.message = 'এই Gmail দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট আছে';
+      }
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   async getUserDetails(userId) {

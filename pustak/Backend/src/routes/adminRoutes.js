@@ -20,6 +20,7 @@ router.patch('/books/:id/stock', adminController.updateBookStock);
 
 // ============= USER MANAGEMENT =============
 router.get('/users', adminController.getAllUsers);
+router.post('/users/admin', adminController.createAdminAccount);
 router.get('/users/:id', adminController.getUserDetails);
 router.patch('/users/:id/status', adminController.updateUserStatus);
 
