@@ -52,7 +52,7 @@ export default function AccountBestSellerRank() {
           <div className="abr-metrics">
             <div className="abr-metric"><ShoppingBag size={20} /><span>মোট অর্ডার</span><strong>{toBn(ranking.total_orders)}</strong></div>
             <div className="abr-metric"><WalletCards size={20} /><span>মোট খরচ</span><strong>৳{toBn(Number(ranking.total_spent || 0).toFixed(2))}</strong></div>
-            <div className="abr-metric"><Users size={20} /><span>র‍্যাংকিংয়ের ভিত্তি</span><strong>অর্ডারের সংখ্যা</strong></div>
+            <div className="abr-metric"><Users size={20} /><span>র‍্যাংকিংয়ের ভিত্তি</span><strong>খরচ, তারপর অর্ডার</strong></div>
           </div>
         </div>
       )}

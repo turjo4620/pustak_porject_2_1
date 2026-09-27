@@ -267,7 +267,7 @@ async function getBuyerRank(userId) {
      JOIN orders o ON o.user_id = u.user_id
      WHERE o.status NOT IN ('Cancelled')
      GROUP BY u.user_id, u.name
-    ORDER BY total_orders DESC, u.user_id ASC`
+      ORDER BY total_spent DESC, total_orders DESC, u.user_id ASC`
   );
 
   const buyers = result.rows;
