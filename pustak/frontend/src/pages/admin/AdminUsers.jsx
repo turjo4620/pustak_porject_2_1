@@ -91,6 +91,11 @@ export default function AdminUsers() {
     event.preventDefault();
     setAdminMessage('');
     setAdminError('');
+    const email = adminForm.email.trim().toLowerCase();
+    if (!/^[^\s@]+@gmail\.com$/.test(email)) {
+      setAdminError('Please enter a valid Gmail address, for example admin@gmail.com');
+      return;
+    }
     setCreatingAdmin(true);
     try {
       const token = localStorage.getItem('adminToken');
@@ -100,7 +105,7 @@ export default function AdminUsers() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(adminForm)
+        body: JSON.stringify({ ...adminForm, email })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Admin account creation failed');
@@ -135,7 +140,6 @@ export default function AdminUsers() {
               type="email"
               value={adminForm.email}
               placeholder="admin@gmail.com"
-              pattern="^[^\\s@]+@gmail\\.com$"
               onChange={event => setAdminForm(form => ({ ...form, email: event.target.value }))}
               required
             />

@@ -278,6 +278,70 @@
   font: 700 1.75rem var(--font-serif);
 }
 
+.admin-account-avatar-wrap { position: relative; flex: 0 0 72px; }
+.admin-account-camera {
+  position: absolute;
+  right: -4px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.admin-account-role { display: flex; align-items: center; gap: 0.35rem; }
+
+.admin-profile-section {
+  margin-bottom: var(--space-6);
+  padding: var(--space-6);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+.admin-profile-details h2 { margin: 0 0 var(--space-5); color: var(--text-primary); font: 700 1.2rem var(--font-serif); }
+.admin-profile-field { padding: var(--space-4) 0; border-top: 1px solid var(--border-color); }
+.admin-profile-field > label { display: block; margin-bottom: var(--space-2); color: var(--text-muted); font-weight: 600; font-size: 0.85rem; }
+.admin-profile-field__display, .admin-profile-field__edit { display: flex; align-items: center; gap: var(--space-2); min-height: 38px; }
+.admin-profile-field__display > span { flex: 1; color: var(--text-primary); }
+.admin-profile-field__display em { color: var(--text-muted); }
+.admin-profile-field__display small { color: var(--text-muted); background: var(--bg-secondary); padding: 0.35rem 0.55rem; border-radius: var(--radius-sm); }
+.admin-profile-field__display button, .admin-profile-field__edit button, .admin-password-field button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.admin-profile-field__display button:hover, .admin-profile-field__edit button:hover, .admin-password-field button:hover { color: var(--color-forest); border-color: var(--color-forest); }
+.admin-profile-field__edit input, .admin-password-field input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.65rem 0.75rem;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font: inherit;
+}
+.admin-profile-error { color: var(--color-burgundy); font-size: 0.85rem; }
+.admin-profile-error--banner, .admin-profile-toast { margin-bottom: var(--space-4); padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); }
+.admin-profile-error--banner { background: rgba(107,39,55,0.08); }
+.admin-profile-toast { color: #166534; background: #dcfce7; }
+.admin-profile-section__toggle { display: flex; justify-content: space-between; width: 100%; padding: 0; color: var(--text-primary); background: transparent; border: 0; cursor: pointer; font: 700 1.15rem var(--font-serif); }
+.admin-password-form { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
+.admin-password-field { display: grid; gap: 0.4rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; }
+.admin-password-field > div { display: flex; gap: var(--space-2); }
+.admin-password-field button { flex: 0 0 34px; }
+
 .admin-account-name {
   margin: 0 0 var(--space-1);
   color: var(--text-primary);
