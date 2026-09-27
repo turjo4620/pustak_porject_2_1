@@ -1,33 +1,3 @@
--- Function: fn_calc_discount_percentage
-CREATE OR REPLACE FUNCTION fn_calc_discount_percentage()
-    RETURNS trigger
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-    IF NEW.price IS NOT NULL AND NEW.price > 0
-       AND NEW.discount_price IS NOT NULL AND NEW.discount_price < NEW.price
-    THEN
-        NEW.discount_percentage :=
-            ROUND(((NEW.price - NEW.discount_price) / NEW.price * 100)::numeric, 0)::varchar || '% Off';
-    ELSE
-        NEW.discount_percentage := NULL;
-    END IF;
-
-    RETURN NEW;
-END;
-$$;
-
-
--- Trigger: trg_create_initial_book_copies
-CREATE OR REPLACE TRIGGER trg_create_initial_book_copies
-    AFTER INSERT
-    ON books
-    FOR EACH ROW
-    EXECUTE FUNCTION fn_create_initial_book_copies();
-
-
-
-
 -- Function: fn_create_initial_book_copies
 CREATE OR REPLACE FUNCTION fn_create_initial_book_copies()
     RETURNS trigger
@@ -49,6 +19,13 @@ BEGIN
     RETURN NEW;
 END;
 $$;
+
+-- Trigger: trg_create_initial_book_copies
+CREATE OR REPLACE TRIGGER trg_create_initial_book_copies
+    AFTER INSERT
+    ON books
+    FOR EACH ROW
+    EXECUTE FUNCTION fn_create_initial_book_copies();
 
 
 

@@ -12,8 +12,8 @@ const createToken = (user) => {
 
 const signup = async (req, res) => {
     try {
-        const { name, email, password, is_admin } = req.body;
-        const user = await authService.signupUser(name, email, password, is_admin || false);
+        const { name, email, password } = req.body;
+        const user = await authService.signupUser(name, email, password);
         const token = createToken(user);
 
         return res.status(201).json({

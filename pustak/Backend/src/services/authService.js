@@ -1,5 +1,6 @@
 const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
+const withTransaction = require('../utils/withTransaction');
 
 const createAuthError = (message, code, status) => {
     const error = new Error(message);
@@ -36,40 +37,33 @@ const normalizeSignupInput = (name, email, password) => {
     return { name: cleanName, email: cleanEmail, password: cleanPassword };
 };
 
-const signupUser = async (name, email, password, isAdmin = false) => {
+const signupUser = async (name, email, password) => {
     const normalizedInput = normalizeSignupInput(name, email, password);
 
-    const existingUser = await pool.query('SELECT user_id FROM users WHERE email = $1', [normalizedInput.email]);
-    if (existingUser.rowCount > 0) {
-        throw createAuthError('An account with this email already exists.', 'DUPLICATE_EMAIL', 409);
-    }
-
     const passwordHash = await bcrypt.hash(normalizedInput.password, 12);
-    const userId = Math.floor(Date.now() / 1000);
-    const role = isAdmin ? 'admin' : 'customer';
-    
-    // Insert into users table
-    const result = await pool.query(
-        'INSERT INTO users (user_id, name, email, password_hash, status, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING user_id AS id, name, email, role',
-        [userId, normalizedInput.name, normalizedInput.email, passwordHash, 'Active', role]
-    );
 
-    const user = result.rows[0];
+    try {
+        return await withTransaction(async (client) => {
+            const result = await client.query(
+                `INSERT INTO users (name, email, password_hash, status, role)
+                 VALUES ($1, $2, $3, 'Active', 'customer')
+                 RETURNING user_id AS id, name, email, role`,
+                [normalizedInput.name, normalizedInput.email, passwordHash]
+            );
 
-    // Insert into appropriate child table
-    if (isAdmin) {
-        await pool.query(
-            'INSERT INTO admin (user_id, admin_level, department) VALUES ($1, NULL, NULL)',
-            [userId]
-        );
-    } else {
-        await pool.query(
-            'INSERT INTO customer (user_id, newsletter_opt_in) VALUES ($1, FALSE)',
-            [userId]
-        );
+            const user = result.rows[0];
+            await client.query(
+                'INSERT INTO customer (user_id, newsletter_opt_in) VALUES ($1, FALSE)',
+                [user.id]
+            );
+            return user;
+        });
+    } catch (error) {
+        if (error.code === '23505') {
+            throw createAuthError('An account with this email already exists.', 'DUPLICATE_EMAIL', 409);
+        }
+        throw error;
     }
-
-    return user;
 };
 
 const loginUser = async (email, password, expectedRole = null) => {

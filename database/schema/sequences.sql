@@ -1,4 +1,15 @@
 -- Sequence: addresses_address_id_seq
+CREATE SEQUENCE IF NOT EXISTS users_user_id_seq
+    AS bigint
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1
+    OWNED BY users.user_id;
+
+
+-- Sequence: addresses_address_id_seq
 CREATE SEQUENCE IF NOT EXISTS addresses_address_id_seq
     AS integer
     INCREMENT 1

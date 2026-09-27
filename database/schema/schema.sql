@@ -78,6 +78,7 @@ return_date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 status varchar(50) NOT NULL DEFAULT 'initiated',
 approved_at timestamp,
 CONSTRAINT return_pkey PRIMARY KEY (return_id),
+CONSTRAINT return_order_item_id_key UNIQUE (order_item_id),
 CONSTRAINT return_order_item_id_fkey FOREIGN KEY (order_item_id)
 REFERENCES order_item (order_item_id)
 );

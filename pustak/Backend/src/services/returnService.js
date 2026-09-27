@@ -11,48 +11,6 @@ const pool = require('../config/db');
 
 const RETURN_WINDOW_DAYS = 7;
 
-const CREATE_APPROVE_RETURN_PROCEDURE = `
-CREATE OR REPLACE PROCEDURE sp_approve_return(p_return_id bigint)
-LANGUAGE plpgsql
-AS $$
-DECLARE
-  v_order_item_id bigint;
-  v_copy_id bigint;
-  v_price_sold numeric(10, 2);
-  v_status varchar(50);
-BEGIN
-  SELECT r.order_item_id, r.status, oi.copy_id, oi.price_sold
-    INTO v_order_item_id, v_status, v_copy_id, v_price_sold
-  FROM "return" r
-  JOIN order_item oi ON oi.order_item_id = r.order_item_id
-  WHERE r.return_id = p_return_id
-  FOR UPDATE OF r;
-
-  IF v_order_item_id IS NULL THEN
-    RAISE EXCEPTION 'Return request % was not found', p_return_id
-      USING ERRCODE = 'P0002';
-  END IF;
-
-  IF v_status <> 'initiated' THEN
-    RAISE EXCEPTION 'Return request % is already %', p_return_id, v_status
-      USING ERRCODE = 'P0001';
-  END IF;
-
-  UPDATE "return"
-     SET status = 'approved', approved_at = CURRENT_TIMESTAMP
-   WHERE return_id = p_return_id;
-
-  INSERT INTO refund (return_id, refund_amount, refund_status)
-  VALUES (p_return_id, v_price_sold, 'Pending')
-  ON CONFLICT (return_id) DO NOTHING;
-
-  UPDATE book_copy
-     SET status = 'in_stock'
-   WHERE copy_id = v_copy_id;
-END;
-$$;
-`;
-
 function withinReturnWindow(deliveredAt) {
   if (!deliveredAt) return false;
   const diffMs   = Date.now() - new Date(deliveredAt).getTime();
@@ -62,8 +20,11 @@ function withinReturnWindow(deliveredAt) {
 
 // ── requestReturn ──────────────────────────────────────────────────────────
 async function requestReturn(userId, orderItemId, reason, copyId = null) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
   // 1. Verify the item belongs to this user's order and the order is Delivered
-  const ownershipRes = await pool.query(
+  const ownershipRes = await client.query(
     `SELECT
        oi.order_item_id,
        oi.copy_id,
@@ -105,26 +66,28 @@ async function requestReturn(userId, orderItemId, reason, copyId = null) {
   }
 
   // 2. Check for duplicate
-  const dupRes = await pool.query(
-    'SELECT return_id, status FROM "return" WHERE order_item_id = $1',
-    [orderItemId]
-  );
-  if (dupRes.rows.length) {
-    throw {
-      status: 409,
-      message: 'এই আইটেমের জন্য ইতিমধ্যে একটি রিটার্ন রিকোয়েস্ট করা হয়েছে',
-    };
-  }
-
   // 3. Insert
-  const insertRes = await pool.query(
+  const insertRes = await client.query(
     `INSERT INTO "return" (order_item_id, reason, status)
      VALUES ($1, $2, 'initiated')
      RETURNING *`,
     [orderItemId, reason || null]
   );
 
+  await client.query('COMMIT');
   return insertRes.rows[0];
+  } catch (error) {
+    await client.query('ROLLBACK');
+    if (error.code === '23505') {
+      throw {
+        status: 409,
+        message: 'এই আইটেমের জন্য ইতিমধ্যে একটি রিটার্ন রিকোয়েস্ট করা হয়েছে',
+      };
+    }
+    throw error;
+  } finally {
+    client.release();
+  }
 }
 
 // ── getReturnsForOrder ─────────────────────────────────────────────────────
@@ -207,13 +170,7 @@ async function approveReturn(returnId) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    try {
-      await client.query('CALL sp_approve_return($1::bigint)', [returnId]);
-    } catch (error) {
-      if (error.code !== '42883') throw error;
-      await client.query(CREATE_APPROVE_RETURN_PROCEDURE);
-      await client.query('CALL sp_approve_return($1::bigint)', [returnId]);
-    }
+    await client.query('CALL sp_approve_return($1::bigint)', [returnId]);
     const refundRes = await client.query(
       'SELECT * FROM refund WHERE return_id = $1',
       [returnId]
