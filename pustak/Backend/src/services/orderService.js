@@ -256,6 +256,31 @@ async function listOrders(userId) {
   return orders;
 }
 
+async function getBuyerRank(userId) {
+  const result = await pool.query(
+    `SELECT
+       u.user_id,
+       u.name,
+       COUNT(DISTINCT o.order_id)::int AS total_orders,
+       COALESCE(SUM(o.total_amount), 0) AS total_spent
+     FROM users u
+     JOIN orders o ON o.user_id = u.user_id
+     WHERE o.status NOT IN ('Cancelled')
+     GROUP BY u.user_id, u.name
+    ORDER BY total_orders DESC, u.user_id ASC`
+  );
+
+  const buyers = result.rows;
+  const index = buyers.findIndex(buyer => Number(buyer.user_id) === userId);
+  if (index < 0) return null;
+
+  return {
+    ...buyers[index],
+    rank: index + 1,
+    total_buyers: buyers.length,
+  };
+}
+
 async function getTrackingInfo(userId, orderId) {
   const orderRes = await pool.query(
     `SELECT order_id, order_number, status, order_date
@@ -429,4 +454,4 @@ async function cancelOrder(userId, orderId) {
   }
 }
 
-module.exports = { placeOrderFromCart, placeBuyNowOrder, getOrderById, listOrders, getTrackingInfo, cancelOrder };
+module.exports = { placeOrderFromCart, placeBuyNowOrder, getOrderById, listOrders, getBuyerRank, getTrackingInfo, cancelOrder };

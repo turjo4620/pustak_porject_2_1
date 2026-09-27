@@ -31,6 +31,19 @@ async function getOrders(req, res, next) {
   }
 }
 
+async function getBuyerRank(req, res, next) {
+  try {
+    const userId = Number(req.userId);
+    if (!Number.isSafeInteger(userId) || userId <= 0) {
+      return res.status(400).json({ message: 'অবৈধ ব্যবহারকারী আইডি' });
+    }
+    const ranking = await orderService.getBuyerRank(userId);
+    res.json(ranking || { rank: null, total_buyers: 0, total_orders: 0, total_spent: 0 });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function getTracking(req, res, next) {
   try {
     const data = await orderService.getTrackingInfo(req.userId, req.params.orderId);
@@ -67,4 +80,4 @@ async function cancelOrder(req, res, next) {
   }
 }
 
-module.exports = { placeOrder, buyNow, getOrder, getOrders, getTracking, cancelOrder };
+module.exports = { placeOrder, buyNow, getOrder, getOrders, getBuyerRank, getTracking, cancelOrder };

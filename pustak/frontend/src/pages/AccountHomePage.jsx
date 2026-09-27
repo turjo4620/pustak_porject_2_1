@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import {
   Search, X, ArrowRight, BookOpen, TrendingUp,
-  ShoppingBag, Package, Heart, Star
+  ShoppingBag, Package, Heart, Star, Trophy
 } from 'lucide-react'
 import BookCard from '../components/BookCard'
 import { useApp } from '../context/AppContext'
@@ -316,6 +316,13 @@ export default function AccountHomePage() {
           value="আমার রিভিউ"
           to="/account/reviews"
           color="#b45309"
+        />
+        <StatCard
+          icon={Trophy}
+          label="সেরা ক্রেতার র‍্যাংকিং"
+          value="আমার অবস্থান"
+          to="/account/best-seller-rank"
+          color="#7c3aed"
         />
       </div>
 

@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { User, Package, Heart, Star, LogOut, Camera, RotateCcw, ShoppingBag } from 'lucide-react'
+import { User, Package, Heart, Star, LogOut, Camera, RotateCcw, ShoppingBag, Trophy } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import './account-dashboard.css'
 
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { to: '/account/wishlist', icon: Heart,       label: 'পছন্দের তালিকা'   },
   { to: '/account/returns',  icon: RotateCcw,   label: 'রিটার্ন ও রিফান্ড' },
   { to: '/account/reviews',  icon: Star,        label: 'রিভিউ ও রেটিং'    },
+  { to: '/account/best-seller-rank', icon: Trophy, label: 'সেরা ক্রেতার র‍্যাংকিং' },
 ]
 
 export default function AccountSidebar() {

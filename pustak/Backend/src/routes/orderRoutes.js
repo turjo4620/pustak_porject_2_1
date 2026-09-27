@@ -15,6 +15,9 @@ router.post('/', orderController.placeOrder);
 // GET  /api/orders            -> list current user's orders
 router.get('/', orderController.getOrders);
 
+// GET  /api/orders/buyer-rank -> current user's best-buyer ranking
+router.get('/buyer-rank', orderController.getBuyerRank);
+
 // GET  /api/orders/:orderId           -> { order, items } | used by PaymentPage
 router.get('/:orderId', orderController.getOrder);
 

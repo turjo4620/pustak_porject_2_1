@@ -1,0 +1,86 @@
+.abr-root {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.abr-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.75rem 2rem;
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(135deg, #7c3aed, #4c1d95);
+}
+
+.abr-header h1 {
+  margin: 0.35rem 0 0.45rem;
+  font-size: 1.45rem;
+  line-height: 1.25;
+}
+
+.abr-header p {
+  margin: 0;
+  color: #ede9fe;
+  font-size: 0.875rem;
+}
+
+.abr-eyebrow,
+.abr-back {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.abr-eyebrow {
+  color: #ddd6fe !important;
+  font-size: 0.8rem !important;
+  font-weight: 700;
+}
+
+.abr-back {
+  width: fit-content;
+  color: #ede9fe;
+  font-size: 0.78rem;
+  text-decoration: none;
+}
+
+.abr-back:hover { color: #fff; }
+
+.abr-header__icon { color: rgba(255, 255, 255, 0.28); flex-shrink: 0; }
+
+.abr-summary { display: grid; grid-template-columns: minmax(210px, 0.8fr) 1.5fr; gap: 0.75rem; }
+.abr-rank-hero, .abr-metric { border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; }
+.abr-rank-hero { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; padding: 1.5rem; color: #6d28d9; text-align: center; }
+.abr-rank-hero span { color: #6b7280; font-size: 0.85rem; }
+.abr-rank-hero strong { font-size: 3rem; line-height: 1; }
+.abr-rank-hero small { color: #9ca3af; }
+.abr-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+.abr-metric { display: flex; flex-direction: column; justify-content: center; gap: 0.45rem; padding: 1rem; color: #7c3aed; }
+.abr-metric span { color: #6b7280; font-size: 0.78rem; }
+.abr-metric strong { color: #111827; font-size: 1.05rem; }
+
+.abr-state {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  padding: 1.5rem;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  color: #6b7280;
+  background: #fff;
+}
+
+.abr-state--empty { gap: 0.55rem; text-align: center; }
+.abr-state--empty strong { color: #374151; }
+.abr-state--error { color: #b91c1c; }
+.abr-action { margin-top: 0.35rem; color: #6d28d9; font-weight: 700; text-decoration: none; }
+
+@media (max-width: 720px) {
+  .abr-header { padding: 1.35rem; }
+  .abr-header__icon { display: none; }
+  .abr-summary, .abr-metrics { grid-template-columns: 1fr; }
+  .abr-metrics { gap: 0.6rem; }
+}

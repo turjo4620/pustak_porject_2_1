@@ -33,6 +33,7 @@ import AccountOrders          from './pages/AccountOrders'
 import AccountWishlist        from './pages/AccountWishlist'
 import AccountReviews         from './pages/AccountReviews'
 import AccountReturns         from './pages/AccountReturns'
+import AccountBestSellerRank  from './pages/AccountBestSellerRank'
 import OrderDinPage           from './pages/OrderDinPage'
 import AccountHomePage        from './pages/AccountHomePage'
 import PaymentPage            from './pages/PaymentPage'
@@ -166,6 +167,7 @@ export default function App() {
                 <Route path="wishlist" element={<AccountWishlist />} />
                 <Route path="returns" element={<AccountReturns />} />
                 <Route path="reviews" element={<AccountReviews />} />
+                <Route path="best-seller-rank" element={<AccountBestSellerRank />} />
               </Route>
             </Route>
 
