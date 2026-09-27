@@ -133,8 +133,6 @@ export default function AccountReturns() {
         ? submittedReturn
         : item
     ))
-    setSelectedItem(null)
-
     // Reconcile the optimistic update with the complete server representation.
     loadReturns(false)
   }

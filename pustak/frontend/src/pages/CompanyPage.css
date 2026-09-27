@@ -1,0 +1,88 @@
+.company-page {
+  min-height: 100vh;
+  padding: calc(72px + var(--space-10)) 0 var(--space-20);
+  background: var(--bg-primary);
+}
+
+.company-page__breadcrumb {
+  margin-bottom: var(--space-6);
+  color: var(--text-muted);
+  font: 0.82rem var(--font-sans);
+}
+
+.company-page__breadcrumb a {
+  color: var(--text-secondary);
+}
+
+.company-page__breadcrumb a:hover {
+  color: var(--accent);
+}
+
+.company-page__card {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: clamp(var(--space-6), 5vw, var(--space-12));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-md);
+}
+
+.company-page__label {
+  color: var(--accent);
+  font: 700 0.75rem var(--font-sans);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.company-page__title {
+  margin: var(--space-3) 0 var(--space-4);
+  color: var(--text-primary);
+  font: 800 clamp(2rem, 5vw, 3rem) var(--font-serif);
+}
+
+.company-page__intro,
+.company-page__section p {
+  color: var(--text-secondary);
+  font: 1rem/1.8 var(--font-sans);
+  white-space: pre-line;
+}
+
+.company-page__intro {
+  max-width: 650px;
+  margin-bottom: var(--space-10);
+}
+
+.company-page__sections {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.company-page__section {
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border-color);
+}
+
+.company-page__section h2 {
+  margin-bottom: var(--space-2);
+  color: var(--text-primary);
+  font: 700 1.25rem var(--font-serif);
+}
+
+.company-page__section p {
+  margin: 0;
+}
+
+.company-page__action {
+  display: inline-flex;
+  margin-top: var(--space-10);
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: white;
+  font: 600 0.9rem var(--font-sans);
+}
+
+.company-page__action:hover {
+  background: var(--color-forest-light);
+}

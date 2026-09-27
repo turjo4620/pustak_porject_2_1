@@ -24,6 +24,7 @@ import LoginPage       from './pages/LoginPage'
 import RegisterPage    from './pages/RegisterPage'
 import NotFoundPage    from './pages/NotFoundPage'
 import HelpPage        from './pages/HelpPage'
+import CompanyPage    from './pages/CompanyPage'
 
 // Import the Account Dashboard components
 import AccountDashboardLayout from './pages/AccountDashboardLayout.jsx'
@@ -148,6 +149,10 @@ export default function App() {
             <Route path="/login"             element={<LoginPage />} />
             <Route path="/register"          element={<RegisterPage />} />
             <Route path="/help"              element={<HelpPage />} />
+            <Route path="/about"             element={<CompanyPage />} />
+            <Route path="/blog"              element={<CompanyPage />} />
+            <Route path="/careers"           element={<CompanyPage />} />
+            <Route path="/contact"           element={<CompanyPage />} />
             
             {/* --- NEW NESTED ACCOUNT ROUTES --- */}
             <Route element={<CustomerAuthRoute />}>

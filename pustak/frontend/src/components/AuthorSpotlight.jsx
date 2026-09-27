@@ -9,6 +9,7 @@ export default function AuthorSpotlight() {
   const [visible, setVisible] = useState(false)
   const [authors, setAuthors] = useState([])
   const [authorIndex, setAuthorIndex] = useState(0)
+  const [autoSwitchPaused, setAutoSwitchPaused] = useState(false)
   const [books,   setBooks]   = useState([])
   const ref = useRef(null)
 
@@ -36,6 +37,16 @@ export default function AuthorSpotlight() {
   }, [])
 
   useEffect(() => {
+    if (authors.length < 2 || autoSwitchPaused) return undefined
+
+    const timer = window.setInterval(() => {
+      setAuthorIndex(index => (index + 1) % authors.length)
+    }, 6000)
+
+    return () => window.clearInterval(timer)
+  }, [authors.length, autoSwitchPaused])
+
+  useEffect(() => {
     if (!author) return
 
     setBooks([])
@@ -54,7 +65,14 @@ export default function AuthorSpotlight() {
       aria-label="লেখক স্পটলাইট"
     >
       <div className="container">
-        <div className="author__inner" key={author.author_id}>
+        <div
+          className="author__inner"
+          key={author.author_id}
+          onMouseEnter={() => setAutoSwitchPaused(true)}
+          onMouseLeave={() => setAutoSwitchPaused(false)}
+          onFocus={() => setAutoSwitchPaused(true)}
+          onBlur={() => setAutoSwitchPaused(false)}
+        >
 
           {/* Portrait */}
           <div className="author__portrait-wrap" aria-hidden="true">

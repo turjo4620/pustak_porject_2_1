@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useApp } from '../context/AppContext'
 import './AuthPage.css'
 
 const API_BASE_URL = (() => {
@@ -26,7 +25,6 @@ async function parseApiResponse(response) {
 
 export default function RegisterPage() {
   const navigate = useNavigate()
-  const { setAuthUser } = useApp()
   const [form, setForm] = useState({ 
     name: '', 
     email: '', 
@@ -60,16 +58,14 @@ export default function RegisterPage() {
         throw new Error(data.message || 'Unable to create your account right now.')
       }
 
-      localStorage.setItem('pustak-auth-token', data.token)
-      localStorage.setItem('pustak-user-type', form.accountType)
-
-      if (form.accountType === 'admin') {
-        localStorage.setItem('adminToken', data.token)
-      } else {
-        setAuthUser(data.user)
-      }
-
-      navigate('/', { replace: true })
+      navigate('/login', {
+        replace: true,
+        state: {
+          message: 'Account created successfully. Please log in to continue.',
+          userType: form.accountType,
+          email: form.email
+        }
+      })
     } catch (error) {
       const friendlyMessage = error.message.includes('Unexpected token')
         ? 'The authentication service is unavailable. Make sure the backend is running.'

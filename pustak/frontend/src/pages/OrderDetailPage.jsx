@@ -763,7 +763,6 @@ export default function OrderDetailPage() {
               order_item_id:  newReturn.order_item_id,
             },
           }))
-          setReturnModal(null)
         }}
       />
     )}

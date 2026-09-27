@@ -33,7 +33,8 @@ export default function CheckoutPage() {
   const location = useLocation()
   const { cartItems, totalCartPrice, removeFromCart, incrementItem, decrementItem, placeOrder, authUser } = useApp()
 
-  const buyNow = location.state?.buyNow || null
+  const initialBuyNow = location.state?.buyNow || null
+  const [buyNow, setBuyNow] = useState(initialBuyNow)
 
   // ── Address state ──────────────────────────────────────────────
   const [addresses, setAddresses]         = useState([])
@@ -61,6 +62,13 @@ export default function CheckoutPage() {
   const selectedAddr   = addresses.find(x => x.address_id === selectedAddressId) || null
   const deliveryCharge = selectedAddr ? calcDeliveryCharge(selectedAddr) : 0
   const finalTotal     = Math.max(0, subtotal - discountAmount) + deliveryCharge
+
+  const changeBuyNowQuantity = (amount) => {
+    setBuyNow(item => {
+      if (!item) return item
+      return { ...item, quantity: Math.max(1, item.quantity + amount) }
+    })
+  }
 
   // ── Fetch user's saved addresses ───────────────────────────────
   useEffect(() => {
@@ -206,25 +214,25 @@ export default function CheckoutPage() {
                     </div>
 
                     {/* Quantity stepper */}
-                    {!buyNow && (
-                      <div className="checkout-item__stepper">
-                        <button
-                          className="checkout-item__stepper-btn"
-                          onClick={() => decrementItem(b)}
-                          aria-label="কমান"
-                        >−</button>
-                        <span className="checkout-item__stepper-qty">{toBn(b.quantity)}</span>
-                        <button
-                          className="checkout-item__stepper-btn"
-                          onClick={() => incrementItem(b)}
-                          aria-label="বাড়ান"
-                        >+</button>
-                      </div>
-                    )}
+                    <div className="checkout-item__stepper">
+                      <button
+                        className="checkout-item__stepper-btn"
+                        onClick={() => buyNow ? changeBuyNowQuantity(-1) : decrementItem(b)}
+                        aria-label="কমান"
+                      >−</button>
+                      <span className="checkout-item__stepper-qty">{toBn(b.quantity)}</span>
+                      <button
+                        className="checkout-item__stepper-btn"
+                        onClick={() => buyNow ? changeBuyNowQuantity(1) : incrementItem(b)}
+                        aria-label="বাড়ান"
+                      >+</button>
+                    </div>
 
-                    {!buyNow && (
-                      <button className="checkout-item__remove" onClick={() => removeFromCart(b.cart_item_id)} aria-label="সরান">✕</button>
-                    )}
+                    <button
+                      className="checkout-item__remove"
+                      onClick={() => buyNow ? setBuyNow(null) : removeFromCart(b.cart_item_id)}
+                      aria-label="সরান"
+                    >✕</button>
                   </div>
                 ))}
               </div>

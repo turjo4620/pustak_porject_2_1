@@ -4,7 +4,7 @@
   padding: 0 var(--space-6);
   display: flex;
   flex-direction: column;
-  gap: var(--space-12);
+  gap: var(--space-16);
   overflow: hidden;
 }
 
@@ -21,7 +21,7 @@
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   align-items: start;
-  gap: var(--space-8);
+  gap: var(--space-10);
   width: 100%;
 }
 
@@ -38,7 +38,7 @@
 .landing-highlights .ranked-bestsellers,
 .landing-highlights .top-customers {
   margin: 0;
-  padding: var(--space-6) 0;
+  padding: var(--space-8) 0;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   background: var(--bg-card);
@@ -100,7 +100,7 @@
 @media (max-width: 1024px) {
   .landing-highlights {
     grid-template-columns: 1fr;
-    gap: var(--space-6);
+    gap: var(--space-8);
   }
 
   .landing-highlights > *,
@@ -126,6 +126,6 @@
 @media (max-width: 768px) {
   .homepage-shell {
     padding: 0 var(--space-4);
-    gap: var(--space-10);
+    gap: var(--space-12);
   }
 }
