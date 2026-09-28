@@ -70,24 +70,6 @@ const createAuthor = async (authorData, adminId) => {
     try {
         await client.query('BEGIN');
         const aliasName = normalizeAuthorName(name);
-        const existing = await client.query(
-            `SELECT a.*
-             FROM authors a
-             LEFT JOIN author_aliases aa ON aa.author_id = a.author_id
-             WHERE aa.alias_name = $1
-                OR LOWER(TRIM(a.name)) = $1
-             LIMIT 1`,
-            [aliasName]
-        );
-
-        if (existing.rows[0]) {
-            await client.query(
-                'INSERT INTO author_aliases (alias_name, author_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-                [aliasName, existing.rows[0].author_id]
-            );
-            await client.query('COMMIT');
-            return existing.rows[0];
-        }
 
         const result = await client.query(
             `INSERT INTO authors (name, bio, photo_url, created_by, updated_by)
@@ -96,7 +78,7 @@ const createAuthor = async (authorData, adminId) => {
             [name.trim(), bio || null, photo_url || null, adminId]
         );
         await client.query(
-            'INSERT INTO author_aliases (alias_name, author_id) VALUES ($1, $2)',
+            'INSERT INTO author_aliases (alias_name, author_id) VALUES ($1, $2) ON CONFLICT (alias_name) DO NOTHING',
             [aliasName, result.rows[0].author_id]
         );
         await client.query('COMMIT');
