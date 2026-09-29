@@ -205,15 +205,20 @@ function CouponModal({ coupon, onClose, onSuccess }) {
 
       if (form.send_newsletter) {
         const delivery = savedCoupon?.newsletter;
-        if (!delivery?.sent) {
+        if (delivery?.queued) {
+          onSuccess(
+            `Coupon "${payload.code}" created. Newsletter is being sent to ${delivery.total} subscriber${delivery.total === 1 ? '' : 's'} in the background.`
+          );
+        } else if (!delivery?.sent) {
           throw new Error(
             delivery?.error || delivery?.message ||
             'Coupon was created, but the newsletter could not be sent.'
           );
-        }
-        onSuccess(
+        } else {
+          onSuccess(
           `Coupon "${payload.code}" ${isEdit ? 'updated' : 'created'}. Newsletter sent to ${delivery.sent} of ${delivery.total} subscribers.`
-        );
+          );
+        }
       } else {
         onSuccess(`Coupon "${payload.code}" ${isEdit ? 'updated' : 'created'} successfully.`);
       }

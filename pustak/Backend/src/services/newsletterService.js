@@ -36,6 +36,45 @@ async function subscribeByEmail(email) {
 }
 
 async function sendCampaign({ subject, message, couponCode = null }) {
+  const campaign = normalizeCampaign({ subject, message, couponCode });
+  const recipients = await getRecipients();
+  return deliverCampaign(campaign, recipients);
+}
+
+// Coupon creation must not wait for every SMTP delivery.  The recipient list is
+// captured before responding, then delivery continues on this server process.
+async function queueCampaign({ subject, message, couponCode = null }) {
+  const campaign = normalizeCampaign({ subject, message, couponCode });
+  const recipients = await getRecipients();
+
+  if (!recipients.length) {
+    return {
+      total: 0,
+      sent: 0,
+      failed: 0,
+      failures: [],
+      message: 'No active newsletter subscribers were found',
+    };
+  }
+
+  setImmediate(() => {
+    deliverCampaign(campaign, recipients).then((result) => {
+      console.log(`Newsletter delivery completed: ${result.sent}/${result.total} sent`);
+    }).catch((error) => {
+      console.error('Queued newsletter delivery failed:', error.message);
+    });
+  });
+
+  return {
+    total: recipients.length,
+    sent: 0,
+    failed: 0,
+    failures: [],
+    queued: true,
+  };
+}
+
+function normalizeCampaign({ subject, message, couponCode = null }) {
   const cleanSubject = typeof subject === 'string' ? subject.trim() : '';
   const cleanMessage = typeof message === 'string' ? message.trim() : '';
   const cleanCoupon = typeof couponCode === 'string' ? couponCode.trim().toUpperCase() : null;
@@ -44,7 +83,11 @@ async function sendCampaign({ subject, message, couponCode = null }) {
     throw { status: 400, message: 'subject and message are required' };
   }
 
-  const recipients = await pool.query(`
+  return { cleanSubject, cleanMessage, cleanCoupon };
+}
+
+async function getRecipients() {
+  const result = await pool.query(`
     SELECT u.user_id, u.email
     FROM users u
     JOIN customer c ON c.user_id = u.user_id
@@ -54,7 +97,11 @@ async function sendCampaign({ subject, message, couponCode = null }) {
     ORDER BY u.user_id
   `);
 
-  if (!recipients.rowCount) {
+  return result.rows;
+}
+
+async function deliverCampaign({ cleanSubject, cleanMessage, cleanCoupon }, recipients) {
+  if (!recipients.length) {
     return {
       total: 0,
       sent: 0,
@@ -72,9 +119,9 @@ async function sendCampaign({ subject, message, couponCode = null }) {
     : '';
   const text = `${cleanMessage}${footer}`;
   const html = `<div style="white-space:pre-wrap">${escapeHtml(cleanMessage)}${cleanCoupon ? `<br><br><strong>Use coupon code: ${escapeHtml(cleanCoupon)}</strong>` : ''}</div>`;
-  const results = { total: recipients.rowCount, sent: 0, failed: 0, failures: [] };
+  const results = { total: recipients.length, sent: 0, failed: 0, failures: [] };
 
-  await mapWithConcurrency(recipients.rows, 5, async (recipient) => {
+  await mapWithConcurrency(recipients, 5, async (recipient) => {
     try {
       await sendWithRetry(transporter, {
         from: process.env.SMTP_FROM || process.env.SMTP_USER,
@@ -162,4 +209,4 @@ function escapeHtml(value) {
   }[character]));
 }
 
-module.exports = { subscribeByEmail, sendCampaign };
+module.exports = { subscribeByEmail, sendCampaign, queueCampaign };

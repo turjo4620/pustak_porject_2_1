@@ -163,7 +163,7 @@ const createCoupon = async (req, res) => {
     let newsletter = null;
     if (send_newsletter) {
       try {
-        newsletter = await newsletterService.sendCampaign({
+        newsletter = await newsletterService.queueCampaign({
           subject: newsletter_subject || `New offer: ${result.rows[0].code}`,
           message: newsletter_message || description || `Use our new coupon ${result.rows[0].code} on your next order.`,
           couponCode: result.rows[0].code,
