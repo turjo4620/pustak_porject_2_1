@@ -1,5 +1,6 @@
 const pool = require('../config/db');
 const couponService = require('../services/couponService');
+const newsletterService = require('../services/newsletterService');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PUBLIC  POST /api/coupons/validate
@@ -106,10 +107,18 @@ const createCoupon = async (req, res) => {
       usage_limit,
       start_date, end_date,
       status,             // 'Active' | 'Inactive'
+      send_newsletter,
+      newsletter_subject,
+      newsletter_message,
     } = req.body;
 
     if (!code || !discount_value) {
       return res.status(400).json({ message: 'code and discount_value are required' });
+    }
+    if (send_newsletter && status === 'Inactive') {
+      return res.status(400).json({
+        message: 'Only active coupons can be sent in a newsletter',
+      });
     }
 
     // Duplicate check
@@ -151,7 +160,26 @@ const createCoupon = async (req, res) => {
       ]
     );
 
-    return res.status(201).json(result.rows[0]);
+    let newsletter = null;
+    if (send_newsletter) {
+      try {
+        newsletter = await newsletterService.sendCampaign({
+          subject: newsletter_subject || `New offer: ${result.rows[0].code}`,
+          message: newsletter_message || description || `Use our new coupon ${result.rows[0].code} on your next order.`,
+          couponCode: result.rows[0].code,
+        });
+      } catch (newsletterError) {
+        return res.status(201).json({
+          ...result.rows[0],
+          newsletter: {
+            sent: false,
+            error: newsletterError.message || 'Coupon created, but newsletter could not be sent',
+          },
+        });
+      }
+    }
+
+    return res.status(201).json({ ...result.rows[0], newsletter });
   } catch (err) {
     console.error('createCoupon error:', err);
     return res.status(500).json({ message: err.message || 'Failed to create coupon' });

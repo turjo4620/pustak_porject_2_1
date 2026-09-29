@@ -17,4 +17,13 @@ async function subscribe(req, res) {
   }
 }
 
-module.exports = { subscribe };
+async function sendCampaign(req, res, next) {
+  try {
+    const result = await newsletterService.sendCampaign(req.body || {});
+    return res.json({ success: true, data: result });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+module.exports = { subscribe, sendCampaign };

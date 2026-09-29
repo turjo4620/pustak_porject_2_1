@@ -68,6 +68,9 @@ const BLANK = {
   start_date:       '',
   end_date:         '',
   status:           'Active',       // 'Active' | 'Inactive'
+  send_newsletter:  false,
+  newsletter_subject: '',
+  newsletter_message: '',
 };
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -113,6 +116,9 @@ function CouponModal({ coupon, onClose, onSuccess }) {
       start_date:       coupon.start_date ? coupon.start_date.slice(0, 10) : '',
       end_date:         coupon.end_date   ? coupon.end_date.slice(0, 10)   : '',
       status:           coupon.status     ?? 'Active',
+      send_newsletter:    false,
+      newsletter_subject: '',
+      newsletter_message: '',
     };
   });
 
@@ -178,21 +184,39 @@ function CouponModal({ coupon, onClose, onSuccess }) {
       start_date:       form.start_date || null,
       end_date:         form.end_date   || null,
       status:           form.status,
+      send_newsletter:  !isEdit && form.send_newsletter,
+      newsletter_subject: form.newsletter_subject.trim() || null,
+      newsletter_message: form.newsletter_message.trim() || null,
     };
 
     try {
+      let savedCoupon;
       if (isEdit) {
-        await apiFetch(`/coupons/admin/${coupon.id}`, {
+        savedCoupon = await apiFetch(`/coupons/admin/${coupon.id}`, {
           method: 'PUT',
           body: JSON.stringify(payload),
         });
       } else {
-        await apiFetch('/coupons/admin', {
+        savedCoupon = await apiFetch('/coupons/admin', {
           method: 'POST',
           body: JSON.stringify(payload),
         });
       }
-      onSuccess(`Coupon "${payload.code}" ${isEdit ? 'updated' : 'created'} successfully.`);
+
+      if (!isEdit && form.send_newsletter) {
+        const delivery = savedCoupon?.newsletter;
+        if (!delivery?.sent) {
+          throw new Error(
+            delivery?.error ||
+            'Coupon was created, but the newsletter could not be sent.'
+          );
+        }
+        onSuccess(
+          `Coupon "${payload.code}" created. Newsletter sent to ${delivery.sent} of ${delivery.total} subscribers.`
+        );
+      } else {
+        onSuccess(`Coupon "${payload.code}" ${isEdit ? 'updated' : 'created'} successfully.`);
+      }
     } catch (err) {
       setServerErr(err.message);
     } finally {
@@ -377,6 +401,36 @@ function CouponModal({ coupon, onClose, onSuccess }) {
                   <span className="coupon-toggle-thumb" />
                 </button>
               </div>
+
+              {!isEdit && (
+                <div className="form-group">
+                  <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <input
+                      type="checkbox"
+                      checked={form.send_newsletter}
+                      onChange={e => set('send_newsletter', e.target.checked)}
+                    />
+                    Send this coupon to newsletter subscribers
+                  </label>
+                  {form.send_newsletter && (
+                    <>
+                      <input
+                        type="text"
+                        value={form.newsletter_subject}
+                        onChange={e => set('newsletter_subject', e.target.value)}
+                        placeholder={`New offer: ${form.code || 'coupon code'}`}
+                      />
+                      <textarea
+                        value={form.newsletter_message}
+                        onChange={e => set('newsletter_message', e.target.value)}
+                        placeholder="Message to include with the coupon (optional)"
+                        rows={3}
+                      />
+                      <small>Only active, opted-in customers will receive this email.</small>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
 
           </div>
