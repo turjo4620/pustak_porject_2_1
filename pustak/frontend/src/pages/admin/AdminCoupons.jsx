@@ -203,7 +203,7 @@ function CouponModal({ coupon, onClose, onSuccess }) {
         });
       }
 
-      if (!isEdit && form.send_newsletter) {
+      if (form.send_newsletter) {
         const delivery = savedCoupon?.newsletter;
         if (!delivery?.sent) {
           throw new Error(
@@ -212,7 +212,7 @@ function CouponModal({ coupon, onClose, onSuccess }) {
           );
         }
         onSuccess(
-          `Coupon "${payload.code}" created. Newsletter sent to ${delivery.sent} of ${delivery.total} subscribers.`
+          `Coupon "${payload.code}" ${isEdit ? 'updated' : 'created'}. Newsletter sent to ${delivery.sent} of ${delivery.total} subscribers.`
         );
       } else {
         onSuccess(`Coupon "${payload.code}" ${isEdit ? 'updated' : 'created'} successfully.`);
@@ -402,35 +402,33 @@ function CouponModal({ coupon, onClose, onSuccess }) {
                 </button>
               </div>
 
-              {!isEdit && (
-                <div className="form-group">
-                  <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <div className="form-group">
+                <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <input
+                    type="checkbox"
+                    checked={form.send_newsletter}
+                    onChange={e => set('send_newsletter', e.target.checked)}
+                  />
+                  Send {isEdit ? 'this updated coupon' : 'this coupon'} to newsletter subscribers
+                </label>
+                {form.send_newsletter && (
+                  <>
                     <input
-                      type="checkbox"
-                      checked={form.send_newsletter}
-                      onChange={e => set('send_newsletter', e.target.checked)}
+                      type="text"
+                      value={form.newsletter_subject}
+                      onChange={e => set('newsletter_subject', e.target.value)}
+                      placeholder={`${isEdit ? 'Updated offer' : 'New offer'}: ${form.code || 'coupon code'}`}
                     />
-                    Send this coupon to newsletter subscribers
-                  </label>
-                  {form.send_newsletter && (
-                    <>
-                      <input
-                        type="text"
-                        value={form.newsletter_subject}
-                        onChange={e => set('newsletter_subject', e.target.value)}
-                        placeholder={`New offer: ${form.code || 'coupon code'}`}
-                      />
-                      <textarea
-                        value={form.newsletter_message}
-                        onChange={e => set('newsletter_message', e.target.value)}
-                        placeholder="Message to include with the coupon (optional)"
-                        rows={3}
-                      />
-                      <small>Only active, opted-in customers will receive this email.</small>
-                    </>
-                  )}
-                </div>
-              )}
+                    <textarea
+                      value={form.newsletter_message}
+                      onChange={e => set('newsletter_message', e.target.value)}
+                      placeholder="Message to include with the coupon (optional)"
+                      rows={3}
+                    />
+                    <small>Only active, opted-in customers will receive this email.</small>
+                  </>
+                )}
+              </div>
             </div>
 
           </div>

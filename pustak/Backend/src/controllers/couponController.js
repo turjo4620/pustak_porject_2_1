@@ -199,6 +199,9 @@ const updateCoupon = async (req, res) => {
       usage_limit,
       start_date, end_date,
       status,
+      send_newsletter,
+      newsletter_subject,
+      newsletter_message,
     } = req.body;
 
     // Duplicate code check (excluding this row)
@@ -255,7 +258,32 @@ const updateCoupon = async (req, res) => {
       return res.status(404).json({ message: 'Coupon not found' });
     }
 
-    return res.json(result.rows[0]);
+    let newsletter = null;
+    if (send_newsletter) {
+      if (result.rows[0].status !== 'Active') {
+        return res.status(400).json({
+          message: 'Only active coupons can be sent in a newsletter',
+        });
+      }
+
+      try {
+        newsletter = await newsletterService.sendCampaign({
+          subject: newsletter_subject || `Updated offer: ${result.rows[0].code}`,
+          message: newsletter_message || result.rows[0].description || `Use our coupon ${result.rows[0].code} on your next order.`,
+          couponCode: result.rows[0].code,
+        });
+      } catch (newsletterError) {
+        return res.json({
+          ...result.rows[0],
+          newsletter: {
+            sent: false,
+            error: newsletterError.message || 'Coupon updated, but newsletter could not be sent',
+          },
+        });
+      }
+    }
+
+    return res.json({ ...result.rows[0], newsletter });
   } catch (err) {
     console.error('updateCoupon error:', err);
     return res.status(500).json({ message: err.message || 'Failed to update coupon' });
