@@ -1,6 +1,37 @@
 const pool = require('../config/db');
 const nodemailer = require('nodemailer');
 
+// Migrations are normally applied during deployment, but this guard keeps
+// delivery history working on existing installations that predate migration 015.
+// It is intentionally lazy: starting the API must not fail just because an
+// administrator has not yet sent a newsletter.
+let deliveryLogSetup;
+
+async function ensureDeliveryLogTable() {
+  if (!deliveryLogSetup) {
+    deliveryLogSetup = pool.query(`
+      CREATE TABLE IF NOT EXISTS newsletter_delivery_log (
+        delivery_id bigserial PRIMARY KEY,
+        user_id bigint REFERENCES users(user_id) ON DELETE SET NULL,
+        email varchar(255) NOT NULL,
+        subject varchar(255) NOT NULL,
+        status varchar(20) NOT NULL CHECK (status IN ('sent', 'failed')),
+        error_message text,
+        sent_at timestamp,
+        created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS newsletter_delivery_log_created_at_idx
+        ON newsletter_delivery_log (created_at DESC);
+    `).catch((error) => {
+      // Allow a later attempt after a transient database failure.
+      deliveryLogSetup = null;
+      throw error;
+    });
+  }
+
+  return deliveryLogSetup;
+}
+
 function getTransporter() {
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD } = process.env;
   if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASSWORD) {
@@ -11,17 +42,25 @@ function getTransporter() {
 }
 
 function createTransporter(port, secure) {
+  const host = process.env.SMTP_HOST.trim();
+  // Google displays app passwords in groups of four for readability. SMTP
+  // expects the sixteen characters without those display spaces.
+  const password = host.endsWith('gmail.com')
+    ? process.env.SMTP_PASSWORD.replace(/\s/g, '')
+    : process.env.SMTP_PASSWORD;
+
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
+    host,
     port,
     secure,
-    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD },
+    requireTLS: port === 587 && !secure,
+    auth: { user: process.env.SMTP_USER.trim(), pass: password },
     pool: true,
-    maxConnections: 5,
+    maxConnections: 2,
     maxMessages: 100,
-    connectionTimeout: 5000,
-    greetingTimeout: 5000,
-    socketTimeout: 10000,
+    connectionTimeout: 20000,
+    greetingTimeout: 20000,
+    socketTimeout: 30000,
   });
 }
 
@@ -118,7 +157,18 @@ async function deliverCampaign({ cleanSubject, cleanMessage, cleanCoupon }, reci
     };
   }
 
-  const transporter = await getVerifiedTransporter();
+  // SMTP egress is commonly blocked or unreliable on managed hosts. Prefer
+  // Resend's HTTPS API when configured, and keep SMTP as a local/dev fallback.
+  const useResend = Boolean(process.env.RESEND_API_KEY?.trim());
+  let sendMail = sendWithResend;
+  if (!useResend) {
+    const transporter = await getVerifiedTransporter();
+    sendMail = transporter.sendMail.bind(transporter);
+  }
+
+  // Do this before sending so a missing migration is reported once in server
+  // logs instead of being silently swallowed for every recipient.
+  await ensureDeliveryLogTable();
 
   const footer = cleanCoupon
     ? `\n\nUse coupon code: ${cleanCoupon}`
@@ -129,7 +179,7 @@ async function deliverCampaign({ cleanSubject, cleanMessage, cleanCoupon }, reci
 
   await mapWithConcurrency(recipients, 5, async (recipient) => {
     try {
-      await sendWithRetry(transporter, {
+      await sendWithRetry(sendMail, {
         from: process.env.SMTP_FROM || process.env.SMTP_USER,
         to: recipient.email,
         subject: cleanSubject,
@@ -181,12 +231,12 @@ async function getVerifiedTransporter() {
   }
 }
 
-async function sendWithRetry(transporter, message, attempts = 3) {
+async function sendWithRetry(sendMail, message, attempts = 3) {
   let lastError;
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
-      return await transporter.sendMail(message);
+      return await sendMail(message);
     } catch (error) {
       lastError = error;
       if (attempt === attempts || !isTransientSmtpError(error)) break;
@@ -197,12 +247,55 @@ async function sendWithRetry(transporter, message, attempts = 3) {
   throw lastError;
 }
 
+async function sendWithResend(message) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY.trim()}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: process.env.RESEND_FROM || message.from,
+        to: [message.to],
+        subject: message.subject,
+        text: message.text,
+        html: message.html,
+      }),
+      signal: controller.signal,
+    });
+
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const error = new Error(body?.message || body?.name || `Resend API returned ${response.status}`);
+      error.responseCode = response.status;
+      throw error;
+    }
+
+    return body;
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error('Email provider request timed out');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function isTransientSmtpError(error) {
   const retryableCodes = new Set(['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'EAI_AGAIN', 'ESOCKET']);
-  return retryableCodes.has(error?.code) || (error?.responseCode >= 400 && error.responseCode < 500);
+  return retryableCodes.has(error?.code)
+    || error?.responseCode === 408
+    || error?.responseCode === 429
+    || error?.responseCode >= 500;
 }
 
 async function logDelivery(recipient, subject, status, errorMessage = null) {
+  await ensureDeliveryLogTable();
   await pool.query(
     `INSERT INTO newsletter_delivery_log
        (user_id, email, subject, status, error_message, sent_at)
