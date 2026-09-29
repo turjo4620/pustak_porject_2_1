@@ -7,11 +7,15 @@ function getTransporter() {
     throw { status: 503, message: 'Newsletter email service is not configured' };
   }
 
+  return createTransporter(Number(SMTP_PORT), process.env.SMTP_SECURE === 'true');
+}
+
+function createTransporter(port, secure) {
   return nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: Number(SMTP_PORT),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
+    host: process.env.SMTP_HOST,
+    port,
+    secure,
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD },
     pool: true,
     maxConnections: 5,
     maxMessages: 100,
@@ -111,8 +115,7 @@ async function deliverCampaign({ cleanSubject, cleanMessage, cleanCoupon }, reci
     };
   }
 
-  const transporter = getTransporter();
-  await transporter.verify();
+  const transporter = await getVerifiedTransporter();
 
   const footer = cleanCoupon
     ? `\n\nUse coupon code: ${cleanCoupon}`
@@ -150,6 +153,29 @@ async function deliverCampaign({ cleanSubject, cleanMessage, cleanCoupon }, reci
   }
 
   return results;
+}
+
+async function getVerifiedTransporter() {
+  const transporter = getTransporter();
+  try {
+    await transporter.verify();
+    return transporter;
+  } catch (primaryError) {
+    const usesStartTls = Number(process.env.SMTP_PORT) === 587 && process.env.SMTP_SECURE !== 'true';
+    if (!usesStartTls || !isTransientSmtpError(primaryError)) throw primaryError;
+
+    // Some hosting networks block port 587. Gmail also supports implicit TLS on 465.
+    transporter.close();
+    const fallback = createTransporter(465, true);
+    try {
+      await fallback.verify();
+      console.warn('SMTP port 587 timed out; using Gmail SSL port 465 instead.');
+      return fallback;
+    } catch (fallbackError) {
+      fallback.close();
+      throw new Error(`SMTP connection failed on ports 587 and 465: ${fallbackError.message}`);
+    }
+  }
 }
 
 async function sendWithRetry(transporter, message, attempts = 3) {
