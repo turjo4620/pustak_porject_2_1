@@ -12,6 +12,9 @@ function getTransporter() {
     port: Number(SMTP_PORT),
     secure: process.env.SMTP_SECURE === 'true',
     auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
+    pool: true,
+    maxConnections: 5,
+    maxMessages: 100,
   });
 }
 
@@ -62,6 +65,7 @@ async function sendCampaign({ subject, message, couponCode = null }) {
   }
 
   const transporter = getTransporter();
+  await transporter.verify();
 
   const footer = cleanCoupon
     ? `\n\nUse coupon code: ${cleanCoupon}`
@@ -70,40 +74,82 @@ async function sendCampaign({ subject, message, couponCode = null }) {
   const html = `<div style="white-space:pre-wrap">${escapeHtml(cleanMessage)}${cleanCoupon ? `<br><br><strong>Use coupon code: ${escapeHtml(cleanCoupon)}</strong>` : ''}</div>`;
   const results = { total: recipients.rowCount, sent: 0, failed: 0, failures: [] };
 
-  for (const recipient of recipients.rows) {
+  await mapWithConcurrency(recipients.rows, 5, async (recipient) => {
     try {
-      await transporter.sendMail({
+      await sendWithRetry(transporter, {
         from: process.env.SMTP_FROM || process.env.SMTP_USER,
         to: recipient.email,
         subject: cleanSubject,
         text,
         html,
       });
-      await pool.query(
-        `INSERT INTO newsletter_delivery_log
-           (user_id, email, subject, status, sent_at)
-         VALUES ($1, $2, $3, 'sent', CURRENT_TIMESTAMP)`,
-        [recipient.user_id, recipient.email, cleanSubject]
-      );
       results.sent += 1;
+      await logDelivery(recipient, cleanSubject, 'sent').catch((logError) => {
+        console.error('Could not record newsletter delivery success:', logError.message);
+      });
     } catch (error) {
       const reason = error.message || 'Email delivery failed';
-      await pool.query(
-        `INSERT INTO newsletter_delivery_log
-           (user_id, email, subject, status, error_message)
-         VALUES ($1, $2, $3, 'failed', $4)`,
-        [recipient.user_id, recipient.email, cleanSubject, reason]
-      );
+      // A logging issue must not abort the remaining recipients.
+      await logDelivery(recipient, cleanSubject, 'failed', reason).catch((logError) => {
+        console.error('Could not record newsletter delivery failure:', logError.message);
+      });
       results.failed += 1;
       results.failures.push({ email: recipient.email, error: reason });
     }
-  }
+  });
 
   if (!results.sent && results.failed) {
     results.message = `Newsletter could not be delivered to any subscriber. ${results.failures[0]?.error || 'Email delivery failed'}`;
   }
 
   return results;
+}
+
+async function sendWithRetry(transporter, message, attempts = 3) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await transporter.sendMail(message);
+    } catch (error) {
+      lastError = error;
+      if (attempt === attempts || !isTransientSmtpError(error)) break;
+      await delay(attempt * 500);
+    }
+  }
+
+  throw lastError;
+}
+
+function isTransientSmtpError(error) {
+  const retryableCodes = new Set(['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'EAI_AGAIN', 'ESOCKET']);
+  return retryableCodes.has(error?.code) || (error?.responseCode >= 400 && error.responseCode < 500);
+}
+
+async function logDelivery(recipient, subject, status, errorMessage = null) {
+  await pool.query(
+    `INSERT INTO newsletter_delivery_log
+       (user_id, email, subject, status, error_message, sent_at)
+     VALUES ($1, $2, $3, $4, $5, CASE WHEN $4 = 'sent' THEN CURRENT_TIMESTAMP ELSE NULL END)`,
+    [recipient.user_id, recipient.email, subject, status, errorMessage]
+  );
+}
+
+async function mapWithConcurrency(items, concurrency, handler) {
+  let nextIndex = 0;
+  const worker = async () => {
+    while (nextIndex < items.length) {
+      const item = items[nextIndex];
+      nextIndex += 1;
+      await handler(item);
+    }
+  };
+
+  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
+}
+
+function delay(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 function escapeHtml(value) {
