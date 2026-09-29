@@ -267,7 +267,7 @@ const updateCoupon = async (req, res) => {
       }
 
       try {
-        newsletter = await newsletterService.sendCampaign({
+        newsletter = await newsletterService.queueCampaign({
           subject: newsletter_subject || `Updated offer: ${result.rows[0].code}`,
           message: newsletter_message || result.rows[0].description || `Use our coupon ${result.rows[0].code} on your next order.`,
           couponCode: result.rows[0].code,

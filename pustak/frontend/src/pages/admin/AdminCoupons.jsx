@@ -184,7 +184,7 @@ function CouponModal({ coupon, onClose, onSuccess }) {
       start_date:       form.start_date || null,
       end_date:         form.end_date   || null,
       status:           form.status,
-      send_newsletter:  !isEdit && form.send_newsletter,
+      send_newsletter:  form.send_newsletter,
       newsletter_subject: form.newsletter_subject.trim() || null,
       newsletter_message: form.newsletter_message.trim() || null,
     };
@@ -207,7 +207,7 @@ function CouponModal({ coupon, onClose, onSuccess }) {
         const delivery = savedCoupon?.newsletter;
         if (delivery?.queued) {
           onSuccess(
-            `Coupon "${payload.code}" created. Newsletter is being sent to ${delivery.total} subscriber${delivery.total === 1 ? '' : 's'} in the background.`
+            `Coupon "${payload.code}" ${isEdit ? 'updated' : 'created'}. Newsletter is being sent to ${delivery.total} subscriber${delivery.total === 1 ? '' : 's'} in the background.`
           );
         } else if (!delivery?.sent) {
           throw new Error(
