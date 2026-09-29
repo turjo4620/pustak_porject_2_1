@@ -41,7 +41,6 @@ async function sendCampaign({ subject, message, couponCode = null }) {
     throw { status: 400, message: 'subject and message are required' };
   }
 
-  const transporter = getTransporter();
   const recipients = await pool.query(`
     SELECT u.user_id, u.email
     FROM users u
@@ -51,6 +50,18 @@ async function sendCampaign({ subject, message, couponCode = null }) {
       AND c.newsletter_opt_in = TRUE
     ORDER BY u.user_id
   `);
+
+  if (!recipients.rowCount) {
+    return {
+      total: 0,
+      sent: 0,
+      failed: 0,
+      failures: [],
+      message: 'No active newsletter subscribers were found',
+    };
+  }
+
+  const transporter = getTransporter();
 
   const footer = cleanCoupon
     ? `\n\nUse coupon code: ${cleanCoupon}`
@@ -86,6 +97,10 @@ async function sendCampaign({ subject, message, couponCode = null }) {
       results.failed += 1;
       results.failures.push({ email: recipient.email, error: reason });
     }
+  }
+
+  if (!results.sent && results.failed) {
+    results.message = `Newsletter could not be delivered to any subscriber. ${results.failures[0]?.error || 'Email delivery failed'}`;
   }
 
   return results;

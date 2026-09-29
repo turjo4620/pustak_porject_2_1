@@ -207,7 +207,7 @@ function CouponModal({ coupon, onClose, onSuccess }) {
         const delivery = savedCoupon?.newsletter;
         if (!delivery?.sent) {
           throw new Error(
-            delivery?.error ||
+            delivery?.error || delivery?.message ||
             'Coupon was created, but the newsletter could not be sent.'
           );
         }
