@@ -263,6 +263,16 @@
   color: var(--text-primary);
   background: var(--bg-secondary);
 }
+.nav__drawer-link--action {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
 
 .nav__drawer-footer { padding-top: var(--space-6); border-top: 1px solid var(--border-color); }
 .nav__drawer-dark-btn {
@@ -903,7 +913,37 @@
   .nav__hamburger { display: flex; }
 }
 
+/* Keep the phone header focused on the primary actions. The wishlist, theme,
+   and account controls remain available in the mobile drawer. */
+@media (max-width: 640px) {
+  .nav__inner {
+    gap: var(--space-3);
+  }
+
+  .nav__actions {
+    gap: 0;
+  }
+
+  .nav__actions > .nav__theme-toggle,
+  .nav__actions > .nav__icon-btn--wishlist,
+  .nav__actions > .nav__icon-btn--user,
+  .nav__actions > .nav__signin-btn {
+    display: none;
+  }
+
+  .nav__drawer {
+    height: 100dvh;
+  }
+
+  .nav__drawer-inner {
+    padding-bottom: max(var(--space-6), env(safe-area-inset-bottom));
+  }
+}
+
 @media (max-width: 480px) {
-  .nav__inner { height: 60px; }
+  .nav__inner {
+    height: 60px;
+    gap: var(--space-2);
+  }
   .side-drawer { width: 100vw; }
 }

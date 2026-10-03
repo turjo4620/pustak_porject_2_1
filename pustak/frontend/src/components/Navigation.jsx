@@ -139,7 +139,7 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
             </button>
 
             <button
-              className={`nav__icon-btn nav__icon-btn--badge ${wishOpen ? 'nav__icon-btn--open' : ''}`}
+              className={`nav__icon-btn nav__icon-btn--badge nav__icon-btn--wishlist ${wishOpen ? 'nav__icon-btn--open' : ''}`}
               aria-label={`উইশলিস্ট (${wishItems.length} টি বই)`}
               aria-expanded={wishOpen}
               data-count={wishItems.length || ''}
@@ -462,6 +462,14 @@ export default function Navigation({ isDarkMode, toggleDarkMode }) {
           )}
 
           <nav className="nav__drawer-links">
+            <button
+              type="button"
+              className="nav__drawer-link nav__drawer-link--action"
+              onClick={() => { setMobileOpen(false); setWishOpen(true); setCartOpen(false); setUserOpen(false) }}
+            >
+              <Heart size={18} aria-hidden="true" />
+              উইশলিস্ট
+            </button>
             {navLinks.map((link) => (
               <Link
                 key={link.label}

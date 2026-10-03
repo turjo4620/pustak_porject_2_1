@@ -1,443 +1,221 @@
-<div align="center">
+# Pustak
 
-# 📚 পুস্তক · Pustak
+Pustak is a full-stack online bookstore for browsing, purchasing, reviewing, and managing books. It provides a Bengali-first customer storefront, a protected customer account area, and an administrative dashboard for catalog, order, inventory, user, and promotion management.
 
-### *Bangladesh's Online Bookstore — a full-stack, database-driven e-commerce platform*
+The project consists of a React single-page application, an Express REST API, and PostgreSQL database scripts. The API is configured for a PostgreSQL-compatible hosted database (the current connection log identifies Neon).
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Site-2ea44f?style=for-the-badge&logo=vercel&logoColor=white)](https://putak-porject-2-1.vercel.app)
-[![Course](https://img.shields.io/badge/CSE_216-Database_Sessional-blueviolet?style=for-the-badge)]()
-[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)]()
-[![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=for-the-badge&logo=vite&logoColor=white)]()
-[![Node](https://img.shields.io/badge/Node.js-Express_5-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)]()
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)]()
-[![Made in Bangladesh](https://img.shields.io/badge/Made_in-Bangladesh_🇧🇩-006a4e?style=for-the-badge)]()
+## Highlights
 
-<br/>
+- Browse, search, filter, sort, and paginate the book catalog.
+- Explore books by author, category, publisher, best-seller, new-arrival, and offer collections.
+- Customer authentication, profile management, saved addresses, cart, wishlist, checkout, payments, orders, delivery tracking, returns, and reviews.
+- Responsive Bengali-oriented storefront with dark-mode preference persistence.
+- Admin authentication and dashboard tools for books, authors, publications, categories, coupons, users, orders, returns/refunds, reviews, stock, and analytics.
+- Inventory-aware book copies, order processing, delivery data, coupons, newsletter campaigns, return/refund handling, audit fields, triggers, functions, and procedures.
 
-**[🌐 Live Demo](https://putak-porject-2-1.vercel.app)** &nbsp;•&nbsp;
-**[✨ Features](#-features)** &nbsp;•&nbsp;
-**[🗄️ Database Design](#️-database-design)** &nbsp;•&nbsp;
-**[🏗 Architecture](#-architecture)** &nbsp;•&nbsp;
-**[🚀 Getting Started](#-getting-started)**
+## Technology
 
-</div>
+| Area | Technologies |
+| --- | --- |
+| Frontend | React 18, React Router 6, Vite 5, Framer Motion, Lucide React |
+| Backend | Node.js, Express 5, `pg`, JWT, bcrypt, Nodemailer, CORS |
+| Database | PostgreSQL / Neon-compatible PostgreSQL, PL/pgSQL |
+| Local development | npm and Nodemon |
 
----
-
-## 📖 About
-
-**Pustak** (পুস্তক — *"book"* in Bangla) is a Bangla-first online bookstore built for Bangladeshi readers. Customers can discover books by author, publisher and category, build a cart and wishlist, apply coupons, pay by card, mobile banking or cash on delivery, track their orders, request returns and write reviews. Store admins get a complete back-office to manage the catalogue, stock, orders, returns, coupons, users and analytics.
-
-> 🎓 **Academic Project** — Developed for the **CSE 216: Database Sessional** course. The emphasis is on solid relational design: normalised schema, constraints, indexes, triggers, stored procedures, functions, transactions and migrations, all wired to a real working application.
-
-| | |
-|---|---|
-| **Course** | CSE 216 — Database Sessional |
-| **Project** | Pustak — Online Bookstore |
-| **Database** | PostgreSQL (hosted on Neon) |
-| **Author** | Turjo ([@turjo4620](https://github.com/turjo4620)) |
-
----
-
-## ✨ Features
-
-### 🛍️ Storefront & Discovery
-
-- **Rich home page** — hero banner, scrolling authors marquee, ranked bestsellers, top customers, newly released books, personalised recommendations, publisher showcase, category grid, author spotlight, reader reviews and newsletter signup.
-- **Dedicated browsing pages** — Bestsellers, New Arrivals, Offers (discounted books), All Categories, Authors, Publishers.
-- **Author, publisher & category pages** — each with its own book listing.
-- **Search** — full catalogue search by query.
-- **Filtering & sorting** (spec-driven, see [`.kiro/specs`](.kiro/specs/book-list-filtering-sorting/requirements.md)) — filter by category, author, publisher, price range and in-stock availability; sort by popularity, newest, price (low→high / high→low) and highest discount. Includes active filter chips, pagination and Bengali numeral formatting.
-- **Book detail page** — full details, rating, reviews, add-to-cart, wishlist and *Buy Now*.
-- **Large Bangla-first catalogue** — categories such as উপন্যাস, গল্প, কবিতা, ইতিহাস, ইসলামিক বই, শিশু-কিশোর, রহস্য-থ্রিলার, আত্ম-উন্নয়ন, programming and more, seeded with books from dozens of Bangladeshi, Indian and international authors.
-- **Bilingual author handling** — an `author_aliases` table and merge migrations unify the same author written in Bangla and English.
-
-### 🛒 Cart, Wishlist & Checkout
-
-- **Persistent cart** — add, update quantity, remove (one cart per user, one line per book, quantity must be positive).
-- **Wishlist** — toggle books in and out of a personal wishlist.
-- **Address book** — save multiple delivery addresses and choose a default.
-- **Coupons** — validated for usage limit, minimum and maximum order amount, and support both flat and percentage discounts.
-- **Buy Now** — skip the cart and order a single book instantly.
-- **Delivery charge** — stored per order along with courier and delivery status.
-
-### 💳 Payments
-
-Three payment methods, each modelled with its own table linked to a common `payments` record:
-
-| Method | Details stored |
-|---|---|
-| 💳 **Card** | Last 4 digits, bank name, card brand (`card_payments`) |
-| 📱 **Mobile Financial Services** | Sender mobile number, provider (`mfs_payments`) |
-| 💵 **Cash on Delivery** | Collector and collection date (`cash_on_deliveries`) |
-
-### 📦 Orders & Tracking
-
-- **Atomic order placement** — runs in a transaction and reserves individual physical copies using `FOR UPDATE SKIP LOCKED`, so two customers can never buy the same copy.
-- **5-step order tracking** in Bangla — অর্ডার গৃহীত → অর্ডার নিশ্চিত → প্যাকেজিং সম্পন্ন → পথে আছে → ডেলিভার্ড.
-- **Order history & details** for every customer.
-- **Order cancellation** — allowed while the order is Pending, Confirmed, Paid or Processing; reserved copies are automatically released back to stock.
-- **Order success page** after checkout.
-
-### ↩️ Returns & Refunds
-
-- **7-day return window** from the delivery date.
-- **Return reasons** — damaged book, wrong item received, defective print, missing pages, not as described, or other (with a custom note).
-- **Admin approval workflow** via the `sp_approve_return` stored procedure: approves the return, creates a pending refund, and marks the copy as *damaged* or puts it back *in stock* depending on the reason.
-- **Refund status tracking** managed by admins.
-
-### ⭐ Reviews & Ratings
-
-- Star rating (1–5) with a comment; one review per customer per book (resubmitting updates it).
-- Book **average rating and review count are recalculated automatically**.
-- Customers can view and manage their own reviews.
-- Admins can hide, show or delete reviews.
-
-### 👤 Customer Account
-
-- Sign up / log in with **JWT authentication** and **bcrypt-hashed passwords**.
-- Account dashboard with profile editing, password change and account deletion.
-- Pages for **Orders, Wishlist, Returns, Reviews** and a **Best-Seller Rank** page showing the customer's rank among top buyers.
-- Role-based access — customers and admins use separate logins and cannot cross over; suspended accounts cannot sign in.
-
-### 📧 Newsletter
-
-- Visitors can subscribe from the home page.
-- Admins can send **email campaigns** (optionally with a coupon code) via SMTP / Resend.
-- Every delivery is recorded in a `newsletter_delivery_log` with a `sent` / `failed` status.
-
-### 🧑‍💼 Admin Panel
-
-A protected `/admin` area with its own login and layout:
-
-| Section | What admins can do |
-|---|---|
-| 📊 **Dashboard** | Totals for books, active users, authors, orders, reviews, revenue, pending orders, low-stock and out-of-stock counts |
-| 📈 **Analytics** | Sales analytics, bestsellers, low-stock report |
-| 📚 **Books** | Create, edit, delete books, upload cover image URL, adjust stock |
-| ✍️ **Authors** | Full CRUD |
-| 🏢 **Publications** | Full CRUD |
-| 🗂️ **Categories** | Full CRUD |
-| 🏷️ **Coupons** | Create, edit, delete, set limits and ranges |
-| 👥 **Users** | View users and details, activate/suspend accounts, create new admin accounts |
-| 🧾 **Orders** | View orders, assign couriers, update status |
-| ↩️ **Returns** | Approve or reject returns, update refund status |
-| 💬 **Reviews** | Moderate customer reviews |
-| 🔐 **Account** | Admin profile settings |
-
-Admin actions are tracked with `created_by` / `updated_by` audit columns on books, authors, publications, categories and coupons.
-
----
-
-## 🗄️ Database Design
-
-The heart of the project: a **normalised PostgreSQL schema** with **28+ tables**, versioned migrations and large seed datasets.
-
-### Entity-Relationship Overview
-
-```mermaid
-erDiagram
-    USERS ||--o| CART : has
-    USERS ||--o| WISHLIST : has
-    USERS ||--o{ ADDRESSES : saves
-    USERS ||--o{ ORDERS : places
-    USERS ||--o{ REVIEWS : writes
-    CART ||--o{ CART_ITEM : contains
-    WISHLIST ||--o{ WISHLIST_ITEM : contains
-    BOOKS ||--o{ CART_ITEM : in
-    BOOKS ||--o{ WISHLIST_ITEM : in
-    BOOKS ||--o{ REVIEWS : receives
-    BOOKS ||--o{ BOOK_COPY : "stocked as"
-    BOOKS }o--|| PUBLICATIONS : "published by"
-    BOOKS ||--o{ BOOK_AUTHOR : ""
-    AUTHORS ||--o{ BOOK_AUTHOR : ""
-    BOOKS ||--o{ BOOK_CATEGORY : ""
-    CATEGORIES ||--o{ BOOK_CATEGORY : ""
-    ORDERS ||--o{ ORDER_ITEM : contains
-    BOOK_COPY ||--o{ ORDER_ITEM : sold
-    ORDERS }o--o| COUPONS : uses
-    ORDERS }o--|| ADDRESSES : "ships to"
-    ORDERS ||--o{ PAYMENTS : "paid by"
-    PAYMENTS ||--o| CARD_PAYMENTS : is
-    PAYMENTS ||--o| MFS_PAYMENTS : is
-    PAYMENTS ||--o| CASH_ON_DELIVERIES : is
-    ORDERS ||--o{ DELIVERIES : "delivered via"
-    COURIER ||--o{ DELIVERIES : handles
-    ORDER_ITEM ||--o| RETURN : "may have"
-    RETURN ||--o| REFUND : triggers
-    ADMIN ||--o{ BOOKS : manages
-```
-
-### Main Tables
-
-| Group | Tables |
-|---|---|
-| **Users** | `users`, `customer`, `admin`, `addresses`, `user_status_audit` |
-| **Catalogue** | `books`, `book_copy`, `authors`, `author_aliases`, `book_author`, `categories`, `book_category`, `publications` |
-| **Shopping** | `cart`, `cart_item`, `wishlist`, `wishlist_item`, `coupons` |
-| **Orders & Payment** | `orders`, `order_item`, `payments`, `card_payments`, `mfs_payments`, `cash_on_deliveries`, `courier`, `deliveries` |
-| **After-sales** | `return`, `refund`, `reviews` |
-| **Marketing** | `newsletter_delivery_log` |
-
-### 🔑 Database Concepts Demonstrated
-
-| Concept | Where it's used |
-|---|---|
-| **Primary & foreign keys** | Every table, with referential integrity across users, books, orders, payments |
-| **Many-to-many relations** | `book_author`, `book_category` junction tables |
-| **Specialisation (ISA)** | `payments` → `card_payments` / `mfs_payments` / `cash_on_deliveries` |
-| **Constraints** | `UNIQUE` (email, coupon code, order number, barcode, one cart/wishlist per user), `CHECK` (rating 1–5, quantity > 0, delivery log status) |
-| **Sequences** | Dedicated sequences for IDs, with repair migrations |
-| **Indexes** | Indexes on book title, category, author and cart items for faster lookups |
-| **Triggers** | `trg_create_initial_book_copies` – creates stock rows when a book is added · `trg_sync_book_availability` – flips a book between *In Stock* / *Out of Stock* automatically · `trg_log_user_status_change` – audit log when a user's status changes |
-| **Stored procedure** | `sp_approve_return` – approves a return, creates the refund and updates copy condition |
-| **Stored function** | `fn_sales_summary(start, end)` – returns total orders, revenue and average order value |
-| **Transactions & locking** | Order placement, cancellation and returns use `BEGIN/COMMIT` with `FOR UPDATE` / `SKIP LOCKED` |
-| **Copy-level inventory** | Each physical copy is a row in `book_copy` (`in_stock`, `sold`, `damaged`) |
-| **Aggregation & joins** | Dashboard stats, bestsellers, buyer rank, low-stock reports, rating averages |
-| **Migrations** | 15 numbered migrations plus dated data-cleanup migrations |
-| **Seed data** | 35+ seed files with books by many authors, publications, categories, dummy users and reviews |
-
----
-
-## 🏗 Architecture
-
-```mermaid
-flowchart LR
-    A[👤 Browser<br/>React + Vite SPA] -->|REST / JSON<br/>JWT Bearer| B[⚙️ Express 5 API<br/>Node.js]
-    B -->|pg Pool · SSL| C[(🐘 PostgreSQL<br/>Neon)]
-    B -->|SMTP / Resend| D[📧 Newsletter emails]
-```
-
-The backend follows a clean **Routes → Controllers → Services** layered structure, with middleware for authentication, admin authorisation and centralised error handling.
-
-### 🛠 Tech Stack
-
-| Layer | Technology |
-|---|---|
-| **Frontend** | React 18, Vite 5, React Router 6, Framer Motion, Lucide React |
-| **Backend** | Node.js, Express 5, `pg`, `jsonwebtoken`, `bcrypt` / `bcryptjs`, `cors`, `dotenv`, `nodemailer` |
-| **Database** | PostgreSQL (Neon serverless) |
-| **Email** | SMTP via Nodemailer, Resend |
-| **Hosting** | Vercel (frontend) |
-| **Planning** | Kiro specs for the filtering & sorting feature |
-
-### 🔌 REST API Overview
-
-| Prefix | Purpose |
-|---|---|
-| `/api/auth` | Signup, login, admin login, profile, change password, delete account |
-| `/api/books` | Catalog, search, bestsellers, new arrivals, offers, by author / publisher / category |
-| `/api/authors` · `/api/publications` · `/api/categories` | Public listing; admin-only create / update / delete |
-| `/api/cart` · `/api/wishlist` · `/api/addresses` | Customer shopping data |
-| `/api/coupons` | Validate coupons; admin management |
-| `/api/orders` | Place order, buy-now, history, tracking, cancel, buyer rank |
-| `/api/payments` | Pay for an order (card / MFS / COD) |
-| `/api/returns` | Request and view returns |
-| `/api/reviews` | Book reviews and the customer's own reviews |
-| `/api/newsletter` | Subscribe; admin campaigns |
-| `/api/admin` | Dashboard, books, users, orders, returns, reviews, analytics |
-
----
-
-## 🗂 Project Structure
+## Repository layout
 
 ```text
-pustak_porject_2_1/
-│
-├── 📁 database/
-│   ├── schema/            # schema.sql, sequences.sql
-│   ├── migrations/        # 001 → 015 + dated data-cleanup migrations (+ legacy/)
-│   ├── seeds/             # books, authors, categories, publications, users, reviews
-│   ├── functions/         # fn_sales_summary
-│   ├── procedures/        # sp_approve_return
-│   └── triggers/          # inventory sync, user status audit
-│
-├── 📁 pustak/
-│   ├── Backend/
-│   │   ├── server.js · index.js
-│   │   └── src/
-│   │       ├── routes/ · controllers/ · services/
-│   │       ├── middlewares/   # auth, adminAuth, errorHandler
-│   │       ├── config/        # PostgreSQL pool
-│   │       └── utils/         # withTransaction
-│   │
-│   └── frontend/
-│       └── src/
-│           ├── pages/         # storefront, account dashboard, admin/
-│           ├── components/    # BookCard, Hero, Filters, Navigation, ...
-│           ├── context/       # AppContext (global state)
-│           ├── hooks/ · api/ · utils/ · styles/
-│
-├── 📁 .kiro/specs/book-list-filtering-sorting/   # requirements for filter & sort
-└── 📁 .vscode/
+.
+├── database/
+│   ├── schema/          # Base table definitions and sequences
+│   ├── migrations/      # Incremental database changes
+│   ├── seeds/           # Catalog, publication, review, user, and book data
+│   ├── functions/       # Reporting/database functions
+│   ├── procedures/      # Operational stored procedures
+│   └── triggers/        # Inventory-related trigger definitions
+└── pustak/
+    ├── Backend/
+    │   ├── src/config/       # PostgreSQL connection
+    │   ├── src/controllers/  # HTTP request handlers
+    │   ├── src/services/     # Business and data-access logic
+    │   ├── src/routes/       # REST endpoint definitions
+    │   └── src/middlewares/  # Authentication and error handling
+    └── frontend/
+        ├── src/components/   # Shared storefront components
+        ├── src/pages/        # Customer and admin views
+        ├── src/context/      # Application state
+        └── src/api/          # Browser API client
 ```
 
----
+## Prerequisites
 
-## 🚀 Getting Started
+- Node.js 18 or newer and npm.
+- A PostgreSQL database (local PostgreSQL or a hosted PostgreSQL provider such as Neon).
+- `psql` is recommended for applying the SQL scripts.
 
-### Prerequisites
+## Quick start
 
-- [Node.js](https://nodejs.org/) 18+
-- [PostgreSQL](https://www.postgresql.org/) (local, or a free [Neon](https://neon.tech) database)
-- Git
+The repository has separate frontend and backend npm projects. Open two terminals at the repository root.
 
-### 1️⃣ Clone
+### 1. Configure and start the API
 
-```bash
-git clone https://github.com/turjo4620/pustak_porject_2_1.git
-cd pustak_porject_2_1
-```
-
-### 2️⃣ Set up the database
-
-Run the SQL files against your PostgreSQL database in this order:
-
-```bash
-# 1. Schema
-psql "$DATABASE_URL" -f database/schema/sequences.sql
-psql "$DATABASE_URL" -f database/schema/schema.sql
-
-# 2. Triggers, function and procedure
-psql "$DATABASE_URL" -f database/triggers/inventory.sql
-psql "$DATABASE_URL" -f database/triggers/user_status_audit.sql
-psql "$DATABASE_URL" -f database/functions/fn_sales_summary.sql
-psql "$DATABASE_URL" -f database/procedures/sp_approve_return.sql
-
-# 3. Migrations (in numeric order, 005 → 015)
-# 4. Seed data from database/seeds/ (categories, publications, authors, books, ...)
-```
-
-> 💡 Check the `migrations/` folder for ordering. Run category and publication seeds before book seeds, since books reference them.
-
-### 3️⃣ Start the backend
-
-```bash
+```powershell
 cd pustak/Backend
-npm install
+npm ci
 ```
 
-Create `pustak/Backend/.env`:
+Create `pustak/Backend/.env` with values appropriate for your environment:
 
-```env
-DATABASE_URL=postgres://user:password@host/dbname
-JWT_SECRET=your_long_random_secret
+```dotenv
 PORT=5000
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require
+JWT_SECRET=replace-with-a-long-random-secret
 
-# Newsletter emails (optional)
+# Required when using newsletter delivery
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587
 SMTP_SECURE=false
-SMTP_USER=you@example.com
-SMTP_PASSWORD=your_password
-SMTP_FROM="Pustak <you@example.com>"
-# or use Resend
-RESEND_API_KEY=
-RESEND_FROM=
+SMTP_USER=your-smtp-user
+SMTP_PASSWORD=your-smtp-password
+SMTP_FROM="Pustak <no-reply@example.com>"
 ```
 
-```bash
-npm run dev      # development (nodemon)
-# or
-npm start        # production
+Start the API:
+
+```powershell
+npm start
 ```
 
-The API runs on **http://localhost:5000**. Visit `/api/test-db` to confirm the database connection.
+For automatic restarts while editing backend code:
 
-### 4️⃣ Start the frontend
-
-```bash
-cd pustak/frontend
-npm install
-```
-
-Create `pustak/frontend/.env`:
-
-```env
-VITE_API_URL=http://localhost:5000
-```
-
-```bash
+```powershell
 npm run dev
 ```
 
-Open the URL Vite prints (usually **http://localhost:5173**) 🎉
+The server listens on `http://localhost:5000` unless `PORT` is changed. Verify its database connection with:
 
-### 5️⃣ Create an admin
-
-Use the helper scripts in `pustak/Backend/` (for example `generate_admin_hash.js`) or the legacy `setup_admin.sql` migration to create your first admin, then sign in at `/admin/login`.
-
-### 🏭 Production build
-
-```bash
-cd pustak/frontend
-npm run build    # outputs to dist/
+```powershell
+Invoke-RestMethod http://localhost:5000/api/test-db
 ```
 
----
+### 2. Configure the database
 
-## 🌍 Deployment
+Create a database, then apply the SQL assets with `psql`. The SQL directory contains both a baseline schema and changes that evolved an existing project database.
 
-- **Frontend** — deployed on Vercel at **https://putak-porject-2-1.vercel.app** (SPA rewrites are configured through `_redirects`).
-- **Database** — Neon serverless PostgreSQL.
-- To deploy your own copy, set the Vercel root directory to `pustak/frontend`, add `VITE_API_URL` pointing at your hosted API, and set `DATABASE_URL` and `JWT_SECRET` on your backend host.
+```powershell
+psql "$env:DATABASE_URL" -f database/schema/schema.sql
+psql "$env:DATABASE_URL" -f database/schema/sequences.sql
+psql "$env:DATABASE_URL" -f database/triggers/inventory.sql
+psql "$env:DATABASE_URL" -f database/functions/fn_sales_summary.sql
+psql "$env:DATABASE_URL" -f database/procedures/sp_approve_return.sql
+```
 
----
+Then apply the numbered files in `database/migrations/` in ascending order. The three `20260925_*` files are data-cleanup migrations and should run after the numbered migrations. Load only the seed data you need from `database/seeds/`; the folders are organized by books, catalog data, and publications.
 
-## 🧭 Roadmap
+> **Important:** The schema and migrations were collected from an evolving database rather than a single migration runner. Before initializing a brand-new production database, apply them to a disposable database first, resolve any dependency/order issues for your PostgreSQL version, and record the exact order used. Never run cleanup or seed scripts against production without reviewing them.
 
-- [x] Catalogue, search, filtering and sorting
-- [x] Cart, wishlist, address book and coupons
-- [x] Card / MFS / COD payments
-- [x] Order tracking, cancellation, returns and refunds
-- [x] Reviews with automatic rating updates
-- [x] Newsletter campaigns
-- [x] Full admin panel with analytics
-- [ ] Real payment gateway integration (bKash, Nagad, SSLCommerz)
-- [ ] English / Bangla language toggle
-- [ ] Automated test suite
-- [ ] Order confirmation emails
+### 3. Configure and start the frontend
 
----
+```powershell
+cd pustak/frontend
+npm ci
+npm run dev
+```
 
-## 🙏 Acknowledgements
+Vite serves the application at `http://localhost:5173` by default.
 
-Built for the **CSE 216 (Database Sessional)** course. Thanks to the course teachers and instructors for their guidance and feedback throughout the term.
+The frontend includes `VITE_API_URL` in its local `.env`, but the active browser client currently uses the deployed API constant in `src/api/http.js`. The Vite `/api` proxy therefore only affects requests that use relative `/api` URLs. To develop against a local API, update `API_BASE` in `src/api/http.js` to `http://localhost:5000/api` (or refactor it to use `import.meta.env.VITE_API_URL`) before starting the frontend.
 
----
+## Available commands
 
-## 🤝 Contributing
+Run these from the relevant project directory.
 
-Suggestions and bug reports are welcome — [open an issue](https://github.com/turjo4620/pustak_porject_2_1/issues) or submit a pull request.
+| Directory | Command | Purpose |
+| --- | --- | --- |
+| `pustak/Backend` | `npm start` | Start the API through `index.js`. |
+| `pustak/Backend` | `npm run dev` | Start the API with Nodemon. |
+| `pustak/Backend` | `npm test` | Placeholder command; no automated test suite is configured. |
+| `pustak/frontend` | `npm run dev` | Start the Vite development server. |
+| `pustak/frontend` | `npm run build` | Produce a production build in `dist/`. |
+| `pustak/frontend` | `npm run preview` | Preview the production build locally. |
 
-1. Fork the repo
-2. `git checkout -b feature/your-feature`
-3. `git commit -m "Add: your feature"`
-4. `git push origin feature/your-feature`
-5. Open a Pull Request
+## Application areas
 
----
+### Customer storefront
 
-## 📜 License
+Public pages include the home page, catalog search, book details, categories, authors, publishers, best sellers, new arrivals, and offers. The storefront supports list filtering by category, author, publisher, price, availability, and sort order. Customer-only routes cover the cart, checkout/payment flow, account profile, orders, wishlist, reviews, returns, and buyer rank.
 
-No license is declared yet. Consider adding one (for example [MIT](https://choosealicense.com/licenses/mit/)).
+### Administrator dashboard
 
----
+Admin users sign in at `/admin/login`. The dashboard exposes catalog CRUD, stock updates, customer status administration, order and delivery status administration, review moderation, return/refund handling, coupons, analytics, low-stock reporting, and admin account management. Administrative endpoint access is enforced with a Bearer JWT.
 
-## 👤 Author
+## API overview
 
-**Turjo** — CSE 216 Database Sessional
-GitHub: [@turjo4620](https://github.com/turjo4620)
+All API routes are rooted at `/api`. Requests needing authentication send `Authorization: Bearer <token>`.
 
----
+| Area | Base path | Typical capabilities |
+| --- | --- | --- |
+| Authentication | `/auth` | Sign up, customer/admin login, current profile, password change, account deletion |
+| Books | `/books` | Catalog, search, best sellers, new arrivals, offers, book detail, author/publisher/category listings |
+| Catalog metadata | `/authors`, `/categories`, `/publications` | Public lookup and admin CRUD |
+| Shopping | `/cart`, `/wishlist`, `/coupons`, `/addresses` | Cart items, wishlists, coupon validation, saved addresses |
+| Orders & payments | `/orders`, `/payments` | Checkout, buy-now, order history/detail, cancellation, tracking, payment submission |
+| Customer engagement | `/reviews`, `/returns`, `/newsletter` | Reviews, returns, subscription, campaigns |
+| Administration | `/admin` | Dashboard, catalog/admin users, orders, returns, reviews, stock, and analytics |
+| Public statistics | `/public/top-customers` | Landing-page customer leaderboard |
 
-<div align="center">
+Useful health checks:
 
-### ⭐ If you like this project, give it a star!
+```text
+GET /                         # API welcome response
+GET /api/test-db              # Database connectivity check
+GET /api/books/catalog        # Catalog response
+```
 
-*Made with ❤️ and a love for books in Bangladesh 🇧🇩*
+## Database capabilities
 
-**পুস্তক — পড়ুন, জানুন, এগিয়ে যান।**
+The database models users and admin roles, authors and aliases, publications, categories, books and physical copies, carts/wishlists, orders/items, payment variants, delivery/courier tracking, reviews, returns/refunds, addresses, coupons, newsletters, and audit information.
 
-</div>
+Notable database behavior includes:
+
+- `trg_create_initial_book_copies` creates book-copy inventory from a new book's initial stock.
+- `trg_sync_book_availability` keeps a book's availability aligned with its in-stock copies while preserving pre-order status.
+- `fn_sales_summary(start, end)` returns total orders, revenue, and average order value for a time range.
+- `sp_approve_return(return_id)` approves a return, creates its refund record, and marks damaged copies appropriately.
+
+## Authentication and secrets
+
+- Do not commit `.env` files, database URLs, JWT secrets, SMTP passwords, or generated credentials. Both application `.gitignore` files exclude `.env` and `node_modules`.
+- Use a separate database and a unique `JWT_SECRET` for every environment.
+- SMTP settings are required only for routes that send newsletter mail, but should be present before running campaigns.
+- The current CORS configuration accepts requests from any origin. Restrict it to known frontend origins before deploying a production service.
+
+## Production notes
+
+1. Run `npm run build` in `pustak/frontend` and deploy the generated `dist/` directory to a static host that rewrites unknown routes to `index.html`. The included `public/_redirects` supports this on compatible hosts.
+2. Deploy the Express service with all backend environment variables configured by the host, not by a committed `.env` file.
+3. Point the frontend API client at the deployed API, ensure the API CORS allow-list contains the storefront origin, and verify `GET /api/test-db` after deployment.
+4. Apply reviewed schema changes and backups through a controlled database migration process.
+
+## Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| API exits immediately | `DATABASE_URL` must be defined before the server starts. Confirm the backend `.env` is in `pustak/Backend/`. |
+| `/api/test-db` returns 500 | Verify the connection string, database network access, TLS requirements, and that the schema is installed. |
+| Frontend calls the wrong server | Check the `API_BASE` value in `pustak/frontend/src/api/http.js`; it currently targets the deployed API. |
+| A protected route redirects to login | Sign in again and confirm the browser has the expected authentication token. |
+| Admin requests return authorization errors | Use an admin account and its admin Bearer token; customer tokens are not sufficient. |
+| Database script fails on a new database | Review dependency order and run the script against an empty disposable database first; the SQL assets have historical dependencies. |
+
+## Contributing
+
+1. Create a focused branch.
+2. Install dependencies in both application directories.
+3. Keep controller logic thin and place reusable data/business logic in the backend service layer.
+4. Test affected customer and admin flows, then run `npm run build` from `pustak/frontend` before submitting changes.
+5. Include any schema, migration, seed, or environment-variable changes in your pull request description.
+
+## License
+
+No project license has been specified. Add a license file before redistributing the code.
