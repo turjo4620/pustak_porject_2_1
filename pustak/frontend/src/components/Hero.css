@@ -330,14 +330,24 @@
 @media (max-width: 480px) {
   .hero__badges { gap: 8px; }
   .hero__promo {
+    width: 100%;
+    max-width: 380px;
+    justify-content: space-between;
     gap: var(--space-2);
     padding-right: var(--space-2);
   }
-  .hero__promo-copy { font-size: 0.75rem; }
+  .hero__promo-copy {
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
   .hero__promo-copy strong { font-size: 0.85rem; }
   .hero__promo-action { font-size: 0.68rem; }
   .hero__btn { width: 100%; justify-content: center; }
   .hero__cta-group { flex-direction: column; width: 100%; max-width: 260px; margin: 0 auto; }
+}
+
+@media (max-width: 380px) {
+  .hero__promo-action { display: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
